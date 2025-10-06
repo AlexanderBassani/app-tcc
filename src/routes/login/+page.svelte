@@ -1,9 +1,8 @@
 <script lang="ts">
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 	import { authStore } from '$lib/stores/auth';
-	import { api } from '$lib/api/client';
+	import { authApi } from '$lib/api/auth';
 	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
 
 	let login = $state('');
 	let password = $state('');
@@ -11,17 +10,13 @@
 	let isLoading = $state(false);
 	let errorMessage = $state('');
 
-	onMount(() => {
-		authStore.initialize();
-	});
-
 	async function handleSubmit(e: Event) {
 		e.preventDefault();
 		isLoading = true;
 		errorMessage = '';
 
 		try {
-			const response = await api.post<{ token: string; user: any }>('/api/users/login', {
+			const response = await authApi.login({
 				login: login,
 				password: password
 			});
@@ -30,10 +25,11 @@
 			authStore.login(response.user, response.token, rememberMe);
 
 			// Redirecionar para a página inicial
-			await goto('/');
+			await goto('/dashboard');
 		} catch (e) {
 			console.error('Erro no login:', e);
-			errorMessage = e instanceof Error ? e.message : 'Erro ao fazer login. Verifique suas credenciais.';
+			errorMessage =
+				e instanceof Error ? e.message : 'Erro ao fazer login. Verifique suas credenciais.';
 		} finally {
 			isLoading = false;
 		}
@@ -66,15 +62,11 @@
 				<!-- Error Message -->
 				{#if errorMessage}
 					<div
-						class="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-300"
+						class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300"
 						role="alert"
 					>
 						<div class="flex items-center">
-							<svg
-								class="h-5 w-5 mr-2 flex-shrink-0"
-								fill="currentColor"
-								viewBox="0 0 20 20"
-							>
+							<svg class="mr-2 h-5 w-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
 								<path
 									fill-rule="evenodd"
 									d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
@@ -134,7 +126,7 @@
 					</label>
 					<a
 						href="/forgot-password"
-						class="text-sm font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
+						class="cursor-pointer text-sm font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
 					>
 						Esqueceu a senha?
 					</a>
@@ -144,7 +136,7 @@
 				<button
 					type="submit"
 					disabled={isLoading}
-					class="w-full transform rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-3 font-semibold text-white transition duration-200 hover:scale-[1.02] hover:from-indigo-700 hover:to-purple-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+					class="w-full transform cursor-pointer rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-3 font-semibold text-white transition duration-200 hover:scale-[1.02] hover:from-indigo-700 hover:to-purple-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
 				>
 					{#if isLoading}
 						<span class="flex items-center justify-center">

@@ -3,3 +3,17 @@
 @plugin '@tailwindcss/typography';
 
 @variant dark (&:where(.dark, .dark *));
+
+/* Light theme - more gray */
+:root:not(.dark) {
+	--bg-primary: #e5e7eb;
+	--bg-secondary: #f3f4f6;
+	--bg-tertiary: #d1d5db;
+}
+
+/* Dark theme - lighter */
+:root.dark {
+	--bg-primary: #1f2937;
+	--bg-secondary: #374151;
+	--bg-tertiary: #4b5563;
+}

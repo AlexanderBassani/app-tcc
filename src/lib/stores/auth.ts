@@ -2,10 +2,37 @@ import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
 
 export interface User {
-	id: string;
-	login: string;
-	email?: string;
-	name?: string;
+	id: number;
+	first_name: string;
+	last_name: string;
+	username: string;
+	email: string;
+	role: 'admin' | 'user';
+	phone?: string;
+	date_of_birth?: string;
+	gender?: 'male' | 'female' | 'other' | 'prefer_not_to_say';
+	profile_image_url?: string;
+	bio?: string;
+	status?: 'active' | 'inactive' | 'suspended' | 'deleted';
+	email_verified?: boolean;
+	phone_verified?: boolean;
+	two_factor_enabled?: boolean;
+	preferred_language?: string;
+	timezone?: string;
+	last_login_at?: string;
+	login_attempts?: number;
+	locked_until?: string;
+	terms_accepted_at?: string;
+	privacy_policy_accepted_at?: string;
+	marketing_emails_consent?: boolean;
+	created_at?: string;
+	updated_at?: string;
+	deleted_at?: string;
+}
+
+// Helper computed property
+export function isAdmin(user: User | null): boolean {
+	return user?.role === 'admin';
 }
 
 export interface AuthState {
