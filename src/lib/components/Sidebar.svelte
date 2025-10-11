@@ -11,7 +11,7 @@
 	// Verifica se estamos em alguma rota de usuários e mantém o menu expandido
 	$effect(() => {
 		const pathname = $page.url.pathname;
-		if (pathname.startsWith('/dashboard/usuarios')) {
+		if (pathname.startsWith('/usuarios')) {
 			usersExpanded = true;
 		}
 	});
@@ -31,9 +31,9 @@
 		<nav class="flex-1 space-y-1 overflow-y-auto p-4">
 			<!-- Dashboard -->
 			<a
-				href="/dashboard"
+				href="/"
 				class="flex cursor-pointer items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors {isActive(
-					'/dashboard'
+					'/'
 				)
 					? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
 					: 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600'}"
@@ -99,9 +99,9 @@
 					{#if usersExpanded}
 						<div class="ml-4 space-y-1 border-l-2 border-gray-300 pl-4 dark:border-gray-600">
 							<a
-								href="/dashboard/usuarios"
+								href="/usuarios"
 								class="block cursor-pointer rounded-lg px-4 py-2 text-sm transition-colors {isActive(
-									'/dashboard/usuarios'
+									'/usuarios'
 								)
 									? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
 									: 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600'}"
@@ -109,9 +109,9 @@
 								Lista de Usuários
 							</a>
 							<a
-								href="/dashboard/usuarios/cadastro"
+								href="/usuarios/cadastro"
 								class="block cursor-pointer rounded-lg px-4 py-2 text-sm transition-colors {isActive(
-									'/dashboard/usuarios/cadastro'
+									'/usuarios/cadastro'
 								)
 									? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
 									: 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600'}"

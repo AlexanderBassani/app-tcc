@@ -25,7 +25,7 @@
 			authStore.login(response.user, response.token, rememberMe);
 
 			// Redirecionar para a página inicial
-			await goto('/dashboard');
+			await goto('/');
 		} catch (e) {
 			console.error('Erro no login:', e);
 			errorMessage =

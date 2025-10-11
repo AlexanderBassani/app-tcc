@@ -44,7 +44,7 @@ export interface AuthState {
 function createAuthStore() {
 	const initialState: AuthState = {
 		user: null,
-		token: browser ? localStorage.getItem('token') : null,
+		token: browser ? (localStorage.getItem('authToken') || sessionStorage.getItem('authToken')) : null,
 		isAuthenticated: false
 	};
 
@@ -55,10 +55,10 @@ function createAuthStore() {
 		login: (user: User, token: string, rememberMe: boolean = false) => {
 			if (browser) {
 				if (rememberMe) {
-					localStorage.setItem('token', token);
+					localStorage.setItem('authToken', token);
 					localStorage.setItem('user', JSON.stringify(user));
 				} else {
-					sessionStorage.setItem('token', token);
+					sessionStorage.setItem('authToken', token);
 					sessionStorage.setItem('user', JSON.stringify(user));
 				}
 			}
@@ -66,9 +66,9 @@ function createAuthStore() {
 		},
 		logout: () => {
 			if (browser) {
-				localStorage.removeItem('token');
+				localStorage.removeItem('authToken');
 				localStorage.removeItem('user');
-				sessionStorage.removeItem('token');
+				sessionStorage.removeItem('authToken');
 				sessionStorage.removeItem('user');
 			}
 			set({ user: null, token: null, isAuthenticated: false });
@@ -76,7 +76,7 @@ function createAuthStore() {
 		initialize: () => {
 			if (browser) {
 				const token =
-					localStorage.getItem('token') || sessionStorage.getItem('token');
+					localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
 				const userStr =
 					localStorage.getItem('user') || sessionStorage.getItem('user');
 				if (token && userStr) {
