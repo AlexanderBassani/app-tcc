@@ -13,16 +13,24 @@ export interface UserResponse {
 	user: User;
 }
 
-export interface CreateUserRequest {
+export interface RegisterUserRequest {
 	first_name: string;
 	last_name: string;
 	username: string;
 	email: string;
 	password: string;
-	role?: 'admin' | 'user';
 	phone?: string;
 	date_of_birth?: string;
 	gender?: 'male' | 'female' | 'other' | 'prefer_not_to_say';
+	bio?: string;
+	preferred_language?: string;
+	timezone?: string;
+	marketing_emails_consent?: boolean;
+}
+
+export interface CreateUserRequest extends RegisterUserRequest {
+	role?: 'admin' | 'user';
+	status?: 'active' | 'inactive';
 }
 
 export interface UpdateProfileRequest {
@@ -44,6 +52,10 @@ export interface ChangeUserPasswordRequest {
 
 // Users API Functions
 export const usersApi = {
+	// Register new user (public endpoint)
+	register: (data: RegisterUserRequest) =>
+		api.post<UserResponse>('/api/users/register', data),
+
 	// List all users
 	list: (token: string) =>
 		api.get<UsersListResponse>('/api/users', token),
@@ -56,9 +68,9 @@ export const usersApi = {
 	getById: (id: number, token: string) =>
 		api.get<UserResponse>(`/api/users/${id}`, token),
 
-	// Create user (admin only)
+	// Create user (admin only) - used for admin creating users with role assignment
 	create: (data: CreateUserRequest, token: string) =>
-		api.post<UserResponse>('/api/users', data, token),
+		api.post<UserResponse>('/api/users/register', data, token),
 
 	// Update own profile
 	updateProfile: (data: UpdateProfileRequest, token: string) =>
