@@ -15,12 +15,22 @@
 			if ($authStore.token) {
 				await authApi.logout($authStore.token);
 			}
+
+			// Limpar store local
+			authStore.logout();
+
+			// Chamar action do servidor para limpar cookies
+			await fetch('/login?/logout', {
+				method: 'POST'
+			});
+
+			// Redirecionar usando window.location para forçar reload completo
+			window.location.href = '/login';
 		} catch (error) {
 			console.error('Erro ao fazer logout:', error);
-		} finally {
-			// Limpar store e redirecionar independente do resultado
+			// Mesmo com erro, redirecionar
 			authStore.logout();
-			goto('/login');
+			window.location.href = '/login';
 		}
 	}
 

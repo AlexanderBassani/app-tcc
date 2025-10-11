@@ -21,11 +21,21 @@
 				password: password
 			});
 
-			// Salvar no store
+			// Salvar no store (localStorage/sessionStorage)
 			authStore.login(response.user, response.token, rememberMe);
 
+			// Salvar token nos cookies via action do servidor
+			const formData = new FormData();
+			formData.append('token', response.token);
+			formData.append('rememberMe', String(rememberMe));
+
+			await fetch('?/login', {
+				method: 'POST',
+				body: formData
+			});
+
 			// Redirecionar para a página inicial
-			await goto('/');
+			window.location.href = '/';
 		} catch (e) {
 			console.error('Erro no login:', e);
 			errorMessage =
