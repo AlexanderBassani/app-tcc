@@ -21,7 +21,7 @@
 	<div class="flex h-full flex-col">
 		<!-- Logo -->
 		<div class="flex h-16 items-center gap-3 border-b border-gray-300 px-6 dark:border-gray-600">
-			<div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600">
+			<div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-600">
 				<span class="text-xl font-bold text-white">M</span>
 			</div>
 			<span class="text-xl font-bold text-gray-800 dark:text-white">MyApp</span>
@@ -35,7 +35,7 @@
 				class="flex cursor-pointer items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors {isActive(
 					'/'
 				)
-					? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
+					? 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
 					: 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600'}"
 			>
 				<svg
@@ -103,7 +103,7 @@
 								class="block cursor-pointer rounded-lg px-4 py-2 text-sm transition-colors {isActive(
 									'/usuarios'
 								)
-									? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
+									? 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
 									: 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600'}"
 							>
 								Lista de Usuários
@@ -113,7 +113,7 @@
 								class="block cursor-pointer rounded-lg px-4 py-2 text-sm transition-colors {isActive(
 									'/usuarios/cadastro'
 								)
-									? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
+									? 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
 									: 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600'}"
 							>
 								Cadastro de Usuário

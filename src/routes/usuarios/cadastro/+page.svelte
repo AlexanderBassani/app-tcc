@@ -172,7 +172,7 @@
 							id="first_name"
 							bind:value={formData.first_name}
 							maxlength="50"
-							class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+							class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 							required
 						/>
 					</div>
@@ -190,7 +190,7 @@
 							id="last_name"
 							bind:value={formData.last_name}
 							maxlength="50"
-							class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+							class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 							required
 						/>
 					</div>
@@ -210,7 +210,7 @@
 							maxlength="30"
 							pattern="[a-zA-Z0-9_]+"
 							title="Apenas letras, números e underscore"
-							class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+							class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 							required
 						/>
 						<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
@@ -228,7 +228,7 @@
 							id="email"
 							bind:value={formData.email}
 							maxlength="100"
-							class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+							class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 							required
 						/>
 					</div>
@@ -245,7 +245,7 @@
 							oninput={handlePhoneInput}
 							maxlength="15"
 							placeholder="(00) 00000-0000"
-							class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+							class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 						/>
 					</div>
 
@@ -261,7 +261,7 @@
 							type="date"
 							id="date_of_birth"
 							bind:value={formData.date_of_birth}
-							class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+							class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 						/>
 					</div>
 
@@ -273,7 +273,7 @@
 						<select
 							id="gender"
 							bind:value={formData.gender}
-							class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+							class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 						>
 							<option value="">Selecione...</option>
 							<option value="male">Masculino</option>
@@ -293,7 +293,7 @@
 							bind:value={formData.bio}
 							rows="3"
 							maxlength="500"
-							class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+							class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 							placeholder="Conte um pouco sobre você..."
 						></textarea>
 						<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
@@ -322,7 +322,7 @@
 							id="password"
 							bind:value={formData.password}
 							minlength="6"
-							class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+							class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 							required
 						/>
 						<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Mínimo de 6 caracteres</p>
@@ -341,7 +341,7 @@
 							id="confirmPassword"
 							bind:value={formData.confirmPassword}
 							minlength="6"
-							class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+							class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 							required
 						/>
 					</div>
@@ -354,7 +354,7 @@
 						<select
 							id="role"
 							bind:value={formData.role}
-							class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+							class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 							required
 						>
 							<option value="user">Usuário</option>
@@ -370,7 +370,7 @@
 						<select
 							id="status"
 							bind:value={formData.status}
-							class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+							class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 							required
 						>
 							<option value="active">Ativo</option>
@@ -395,7 +395,7 @@
 						<select
 							id="preferred_language"
 							bind:value={formData.preferred_language}
-							class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+							class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 						>
 							<option value="pt-BR">Português (Brasil)</option>
 							<option value="en-US">English (US)</option>
@@ -414,7 +414,7 @@
 						<select
 							id="timezone"
 							bind:value={formData.timezone}
-							class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+							class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 						>
 							<option value="America/Sao_Paulo">América/São Paulo (BRT)</option>
 							<option value="America/New_York">América/Nova York (EST)</option>
@@ -430,7 +430,7 @@
 								type="checkbox"
 								id="marketing_emails_consent"
 								bind:checked={formData.marketing_emails_consent}
-								class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-600"
+								class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-600"
 							/>
 							<label
 								for="marketing_emails_consent"
@@ -454,7 +454,7 @@
 				<button
 					type="submit"
 					disabled={isLoading}
-					class="cursor-pointer rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+					class="cursor-pointer rounded-md bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
 				>
 					{#if isLoading}
 						<span class="flex items-center">

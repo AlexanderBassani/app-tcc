@@ -55,10 +55,10 @@
 		>
 			<!-- Header -->
 			<div
-				class="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-6 text-center dark:from-indigo-700 dark:to-purple-700"
+				class="bg-primary-600 px-8 py-6 text-center"
 			>
 				<h1 class="mb-2 text-3xl font-bold text-white">Bem-vindo</h1>
-				<p class="text-indigo-100 dark:text-indigo-200">Faça login para continuar</p>
+				<p class="text-white/80">Faça login para continuar</p>
 			</div>
 
 			<!-- Form -->
@@ -96,7 +96,7 @@
 						bind:value={login}
 						required
 						placeholder="nome usuário ou email"
-						class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 transition duration-200 outline-none focus:border-transparent focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500"
+						class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 transition duration-200 outline-none focus:border-transparent focus:ring-2 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500"
 					/>
 				</div>
 
@@ -114,7 +114,7 @@
 						bind:value={password}
 						required
 						placeholder="••••••••"
-						class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 transition duration-200 outline-none focus:border-transparent focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500"
+						class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 transition duration-200 outline-none focus:border-transparent focus:ring-2 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500"
 					/>
 				</div>
 
@@ -124,13 +124,13 @@
 						<input
 							type="checkbox"
 							bind:checked={rememberMe}
-							class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700"
+							class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700"
 						/>
 						<span class="ml-2 text-sm text-gray-600 dark:text-gray-400">Lembrar-me</span>
 					</label>
 					<a
 						href="/forgot-password"
-						class="cursor-pointer text-sm font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
+						class="cursor-pointer text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
 					>
 						Esqueceu a senha?
 					</a>
@@ -140,7 +140,7 @@
 				<button
 					type="submit"
 					disabled={isLoading}
-					class="w-full transform cursor-pointer rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-3 font-semibold text-white transition duration-200 hover:scale-[1.02] hover:from-indigo-700 hover:to-purple-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+					class="w-full transform cursor-pointer rounded-lg bg-primary-600 px-4 py-3 font-semibold text-white transition duration-200 hover:scale-[1.02] hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
 				>
 					{#if isLoading}
 						<span class="flex items-center justify-center">
@@ -231,7 +231,7 @@
 					Não tem uma conta?
 					<a
 						href="/register"
-						class="font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
+						class="font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
 					>
 						Criar conta
 					</a>

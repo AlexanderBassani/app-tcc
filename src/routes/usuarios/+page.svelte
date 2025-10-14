@@ -54,8 +54,8 @@
 				</p>
 			</div>
 			<a
-				href="/dashboard/usuarios/cadastro"
-				class="cursor-pointer rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+				href="/usuarios/cadastro"
+				class="bg-primary-600 hover:bg-primary-700 cursor-pointer rounded-md px-4 py-2 text-sm font-semibold text-white"
 			>
 				Novo Usuário
 			</a>
@@ -77,37 +77,37 @@
 					<thead class="bg-gray-100 dark:bg-gray-600">
 						<tr>
 							<th
-								class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+								class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
 							>
 								Nome
 							</th>
 							<th
-								class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+								class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
 							>
 								Email
 							</th>
 							<th
-								class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+								class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
 							>
 								Username
 							</th>
 							<th
-								class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+								class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
 							>
 								Tipo
 							</th>
 							<th
-								class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+								class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
 							>
 								Status
 							</th>
 							<th
-								class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+								class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
 							>
 								Cadastro
 							</th>
 							<th
-								class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+								class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400"
 							>
 								Ações
 							</th>
@@ -119,7 +119,7 @@
 								<td colspan="7" class="px-6 py-12 text-center">
 									<div class="flex items-center justify-center">
 										<svg
-											class="h-6 w-6 animate-spin text-blue-600"
+											class="text-primary-600 h-6 w-6 animate-spin"
 											xmlns="http://www.w3.org/2000/svg"
 											fill="none"
 											viewBox="0 0 24 24"
@@ -151,10 +151,10 @@
 						{:else}
 							{#each users as user (user.id)}
 								<tr class="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600">
-									<td class="whitespace-nowrap px-6 py-4">
+									<td class="px-6 py-4 whitespace-nowrap">
 										<div class="flex items-center">
 											<div
-												class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-sm font-semibold text-white"
+												class="bg-primary-600 flex h-10 w-10 items-center justify-center rounded-full text-sm font-semibold text-white"
 											>
 												{user.first_name[0]}{user.last_name[0]}
 											</div>
@@ -166,7 +166,7 @@
 											</div>
 										</div>
 									</td>
-									<td class="whitespace-nowrap px-6 py-4">
+									<td class="px-6 py-4 whitespace-nowrap">
 										<div class="text-sm text-gray-900 dark:text-white">{user.email}</div>
 										{#if user.email_verified}
 											<span
@@ -176,45 +176,45 @@
 											</span>
 										{/if}
 									</td>
-									<td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+									<td class="px-6 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
 										{user.username}
 									</td>
-									<td class="whitespace-nowrap px-6 py-4">
+									<td class="px-6 py-4 whitespace-nowrap">
 										{#if user.role === 'admin'}
 											<span
-												class="inline-flex rounded-full bg-purple-100 px-2 py-1 text-xs font-semibold leading-5 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300"
+												class="bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-300 inline-flex rounded-full px-2 py-1 text-xs leading-5 font-semibold"
 											>
 												Administrador
 											</span>
 										{:else}
 											<span
-												class="inline-flex rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold leading-5 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+												class="inline-flex rounded-full bg-gray-100 px-2 py-1 text-xs leading-5 font-semibold text-gray-800 dark:bg-gray-700 dark:text-gray-300"
 											>
 												Usuário
 											</span>
 										{/if}
 									</td>
-									<td class="whitespace-nowrap px-6 py-4">
+									<td class="px-6 py-4 whitespace-nowrap">
 										{#if user.status === 'active'}
 											<span
-												class="inline-flex rounded-full bg-green-100 px-2 py-1 text-xs font-semibold leading-5 text-green-800 dark:bg-green-900/20 dark:text-green-300"
+												class="inline-flex rounded-full bg-green-100 px-2 py-1 text-xs leading-5 font-semibold text-green-800 dark:bg-green-900/20 dark:text-green-300"
 											>
 												Ativo
 											</span>
 										{:else}
 											<span
-												class="inline-flex rounded-full bg-red-100 px-2 py-1 text-xs font-semibold leading-5 text-red-800 dark:bg-red-900/20 dark:text-red-300"
+												class="inline-flex rounded-full bg-red-100 px-2 py-1 text-xs leading-5 font-semibold text-red-800 dark:bg-red-900/20 dark:text-red-300"
 											>
 												Inativo
 											</span>
 										{/if}
 									</td>
-									<td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+									<td class="px-6 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
 										{formatDate(user.created_at)}
 									</td>
-									<td class="whitespace-nowrap px-6 py-4 text-sm font-medium">
+									<td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
 										<button
-											class="cursor-pointer text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+											class="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300 cursor-pointer"
 										>
 											Editar
 										</button>

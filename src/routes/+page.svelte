@@ -25,9 +25,9 @@
 						<p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total de Usuários</p>
 						<p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">-</p>
 					</div>
-					<div class="rounded-full bg-blue-100 p-3 dark:bg-blue-900/20">
+					<div class="rounded-full bg-primary-100 p-3 dark:bg-primary-900/30">
 						<svg
-							class="h-8 w-8 text-blue-600 dark:text-blue-400"
+							class="h-8 w-8 text-primary-600 dark:text-primary-400"
 							fill="none"
 							stroke="currentColor"
 							viewBox="0 0 24 24"

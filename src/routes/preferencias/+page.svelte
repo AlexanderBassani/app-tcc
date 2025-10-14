@@ -2,6 +2,7 @@
 	import DashboardLayout from '$lib/components/DashboardLayout.svelte';
 	import { onMount } from 'svelte';
 	import { authStore } from '$lib/stores/auth';
+	import { preferencesApi } from '$lib/api/preferences';
 
 	// Theme preferences
 	let themeMode = $state('system');
@@ -17,7 +18,9 @@
 	let reduceMotion = $state(false);
 
 	let isLoading = $state(false);
+	let isSaving = $state(false);
 	let saveMessage = $state('');
+	let errorMessage = $state('');
 
 	const themeModes = [
 		{ value: 'light', label: 'Claro' },
@@ -45,32 +48,91 @@
 	});
 
 	async function loadPreferences() {
-		// TODO: Buscar preferências da API
-		// Por enquanto, carregar do localStorage como fallback
-		const stored = localStorage.getItem('theme');
-		if (stored) {
-			themeMode = stored === 'dark' ? 'dark' : stored === 'light' ? 'light' : 'system';
+		isLoading = true;
+		errorMessage = '';
+
+		try {
+			if (!$authStore.token) {
+				throw new Error('Token não encontrado');
+			}
+
+			const response = await preferencesApi.get($authStore.token);
+			const prefs = response.data;
+
+			// Set preferences from API
+			themeMode = prefs.theme_mode || 'system';
+			themeColor = prefs.theme_color || 'blue';
+			fontSize = prefs.font_size || 'medium';
+			compactMode = prefs.compact_mode ?? false;
+			animationsEnabled = prefs.animations_enabled ?? true;
+			highContrast = prefs.high_contrast ?? false;
+			reduceMotion = prefs.reduce_motion ?? false;
+
+			// Apply settings immediately
+			applyTheme();
+			applyThemeColor();
+			applyFontSize();
+		} catch (error) {
+			console.error('Erro ao carregar preferências:', error);
+
+			// Fallback to localStorage
+			const stored = localStorage.getItem('theme');
+			if (stored) {
+				themeMode = stored === 'dark' ? 'dark' : stored === 'light' ? 'light' : 'system';
+			}
+
+			const storedColor = localStorage.getItem('themeColor');
+			if (storedColor) {
+				themeColor = storedColor;
+			}
+
+			const storedFontSize = localStorage.getItem('fontSize');
+			if (storedFontSize) {
+				fontSize = storedFontSize;
+			}
+
+			// Apply settings
+			applyTheme();
+			applyThemeColor();
+			applyFontSize();
+		} finally {
+			isLoading = false;
 		}
 	}
 
 	async function handleSave() {
-		isLoading = true;
+		isSaving = true;
 		saveMessage = '';
+		errorMessage = '';
 
 		try {
-			// TODO: Salvar preferências na API
-			// await preferencesApi.update({
-			//   theme_mode: themeMode,
-			//   theme_color: themeColor,
-			//   font_size: fontSize,
-			//   compact_mode: compactMode,
-			//   animations_enabled: animationsEnabled,
-			//   high_contrast: highContrast,
-			//   reduce_motion: reduceMotion
-			// });
+			if (!$authStore.token) {
+				throw new Error('Token não encontrado');
+			}
 
-			// Por enquanto, salvar no localStorage
+			// Save to API
+			await preferencesApi.update(
+				{
+					theme_mode: themeMode,
+					theme_color: themeColor,
+					font_size: fontSize,
+					compact_mode: compactMode,
+					animations_enabled: animationsEnabled,
+					high_contrast: highContrast,
+					reduce_motion: reduceMotion
+				},
+				$authStore.token
+			);
+
+			// Apply settings
 			applyTheme();
+			applyThemeColor();
+			applyFontSize();
+
+			// Save to localStorage as backup
+			localStorage.setItem('theme', themeMode === 'system' ? '' : themeMode);
+			localStorage.setItem('themeColor', themeColor);
+			localStorage.setItem('fontSize', fontSize);
 
 			saveMessage = 'Preferências salvas com sucesso!';
 			setTimeout(() => {
@@ -78,9 +140,10 @@
 			}, 3000);
 		} catch (error) {
 			console.error('Erro ao salvar preferências:', error);
-			saveMessage = 'Erro ao salvar preferências.';
+			errorMessage =
+				error instanceof Error ? error.message : 'Erro ao salvar preferências. Tente novamente.';
 		} finally {
-			isLoading = false;
+			isSaving = false;
 		}
 	}
 
@@ -95,10 +158,36 @@
 		}
 	}
 
+	function applyThemeColor() {
+		if (themeColor === 'blue') {
+			document.documentElement.removeAttribute('data-theme');
+		} else {
+			document.documentElement.setAttribute('data-theme', themeColor);
+		}
+	}
+
+	function applyFontSize() {
+		document.documentElement.setAttribute('data-font-size', fontSize);
+	}
+
 	// Apply theme when it changes
 	$effect(() => {
 		if (themeMode) {
 			applyTheme();
+		}
+	});
+
+	// Apply theme color when it changes
+	$effect(() => {
+		if (themeColor) {
+			applyThemeColor();
+		}
+	});
+
+	// Apply font size when it changes
+	$effect(() => {
+		if (fontSize) {
+			applyFontSize();
 		}
 	});
 </script>
@@ -113,15 +202,46 @@
 			</p>
 		</div>
 
-	<!-- Success/Error Message -->
+	<!-- Loading State -->
+	{#if isLoading}
+		<div class="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-300" role="alert">
+			<div class="flex items-center">
+				<svg class="mr-2 h-5 w-5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+					<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+					<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+				</svg>
+				Carregando preferências...
+			</div>
+		</div>
+	{/if}
+
+	<!-- Success Message -->
 	{#if saveMessage}
 		<div
-			class="rounded-lg border px-4 py-3 text-sm {saveMessage.includes('sucesso')
-				? 'border-green-200 bg-green-50 text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-300'
-				: 'border-red-200 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300'}"
+			class="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 dark:border-green-800 dark:bg-green-900/20 dark:text-green-300"
 			role="alert"
 		>
-			{saveMessage}
+			<div class="flex items-center">
+				<svg class="mr-2 h-5 w-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+					<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+				</svg>
+				{saveMessage}
+			</div>
+		</div>
+	{/if}
+
+	<!-- Error Message -->
+	{#if errorMessage}
+		<div
+			class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300"
+			role="alert"
+		>
+			<div class="flex items-center">
+				<svg class="mr-2 h-5 w-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+					<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+				</svg>
+				{errorMessage}
+			</div>
 		</div>
 	{/if}
 
@@ -142,7 +262,7 @@
 							onclick={() => (themeMode = mode.value)}
 							class="rounded-lg border-2 px-4 py-3 text-sm font-medium transition-all {themeMode ===
 							mode.value
-								? 'border-indigo-500 bg-indigo-50 text-indigo-700 dark:border-indigo-400 dark:bg-indigo-900/30 dark:text-indigo-300'
+								? 'border-primary-500 bg-primary-50 text-primary-700 dark:border-primary-400 dark:bg-primary-900/30 dark:text-primary-300'
 								: 'border-gray-300 bg-white text-gray-700 hover:border-gray-400 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300'}"
 						>
 							{mode.label}
@@ -190,7 +310,7 @@
 							onclick={() => (fontSize = size.value)}
 							class="rounded-lg border-2 px-4 py-2 text-sm font-medium transition-all {fontSize ===
 							size.value
-								? 'border-indigo-500 bg-indigo-50 text-indigo-700 dark:border-indigo-400 dark:bg-indigo-900/30 dark:text-indigo-300'
+								? 'border-primary-500 bg-primary-50 text-primary-700 dark:border-primary-400 dark:bg-primary-900/30 dark:text-primary-300'
 								: 'border-gray-300 bg-white text-gray-700 hover:border-gray-400 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300'}"
 						>
 							{size.label}
@@ -309,10 +429,10 @@
 		<button
 			type="button"
 			onclick={handleSave}
-			disabled={isLoading}
-			class="cursor-pointer rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-3 font-semibold text-white transition duration-200 hover:from-indigo-700 hover:to-purple-700 disabled:cursor-not-allowed disabled:opacity-50"
+			disabled={isSaving || isLoading}
+			class="cursor-pointer rounded-lg bg-primary-600 px-6 py-3 font-semibold text-white transition duration-200 hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
 		>
-			{#if isLoading}
+			{#if isSaving}
 				<span class="flex items-center">
 					<svg
 						class="mr-2 -ml-1 h-5 w-5 animate-spin text-white"
