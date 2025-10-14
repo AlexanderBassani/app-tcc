@@ -1,5 +1,4 @@
 <script lang="ts">
-	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 	import { authStore } from '$lib/stores/auth';
 	import { authApi } from '$lib/api/auth';
 	import { goto } from '$app/navigation';
@@ -49,11 +48,6 @@
 <div
 	class="flex min-h-screen items-center justify-center bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 px-4 py-12 transition-colors duration-300 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
 >
-	<!-- Theme Toggle -->
-	<div class="fixed top-4 right-4">
-		<ThemeToggle />
-	</div>
-
 	<div class="w-full max-w-md">
 		<!-- Card -->
 		<div

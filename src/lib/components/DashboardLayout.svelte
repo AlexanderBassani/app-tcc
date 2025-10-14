@@ -1,5 +1,4 @@
 <script lang="ts">
-	import ThemeToggle from './ThemeToggle.svelte';
 	import Sidebar from './Sidebar.svelte';
 	import UserDropdown from './UserDropdown.svelte';
 
@@ -19,7 +18,6 @@
 					<h1 class="text-2xl font-semibold text-gray-800 dark:text-white">Dashboard</h1>
 				</div>
 				<div class="flex items-center gap-3">
-					<ThemeToggle />
 					<UserDropdown />
 				</div>
 			</div>
