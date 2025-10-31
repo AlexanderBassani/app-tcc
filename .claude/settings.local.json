@@ -4,7 +4,9 @@
       "Bash(cat:*)",
       "Bash(git commit:*)",
       "Bash(git add:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(git push:*)",
+      "Read(//c/Users/alexa/Desktop/PUC/tcc/api/**)"
     ],
     "deny": [],
     "ask": []
