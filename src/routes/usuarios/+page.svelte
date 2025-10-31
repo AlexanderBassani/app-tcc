@@ -213,11 +213,12 @@
 										{formatDate(user.created_at)}
 									</td>
 									<td class="px-6 py-4 text-sm font-medium whitespace-nowrap">
-										<button
+										<a
+											href="/usuarios/editar/{user.id}"
 											class="text-primary-600 hover:text-primary-900 dark:text-primary-400 dark:hover:text-primary-300 cursor-pointer"
 										>
 											Editar
-										</button>
+										</a>
 									</td>
 								</tr>
 							{/each}

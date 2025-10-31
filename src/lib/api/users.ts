@@ -46,6 +46,13 @@ export interface UpdateProfileRequest {
 	timezone?: string;
 }
 
+export interface UpdateUserRequest extends UpdateProfileRequest {
+	username?: string;
+	role?: 'admin' | 'user';
+	status?: 'active' | 'inactive';
+	marketing_emails_consent?: boolean;
+}
+
 export interface ChangeUserPasswordRequest {
 	new_password: string;
 }
@@ -75,6 +82,10 @@ export const usersApi = {
 	// Update own profile
 	updateProfile: (data: UpdateProfileRequest, token: string) =>
 		api.put<UserResponse>('/api/users/profile', data, token),
+
+	// Update user (admin only)
+	update: (userId: number, data: UpdateUserRequest, token: string) =>
+		api.put<UserResponse>(`/api/users/${userId}`, data, token),
 
 	// Change another user's password (admin only)
 	changeUserPassword: (userId: number, data: ChangeUserPasswordRequest, token: string) =>
