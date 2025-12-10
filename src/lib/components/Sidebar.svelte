@@ -21,7 +21,7 @@
 	<div class="flex h-full flex-col">
 		<!-- Logo -->
 		<div class="flex h-16 items-center gap-3 border-b border-gray-300 px-6 dark:border-gray-600">
-			<div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-600">
+			<div class="bg-primary-600 flex h-10 w-10 items-center justify-center rounded-lg">
 				<span class="text-xl font-bold text-white">M</span>
 			</div>
 			<span class="text-xl font-bold text-gray-800 dark:text-white">MyApp</span>
@@ -122,13 +122,37 @@
 					{/if}
 				</div>
 			{/if}
+
+			<!-- Vehicles -->
+			<a
+				href="/vehicles"
+				class="flex cursor-pointer items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors {isActive(
+					'/vehicles'
+				)
+					? 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
+					: 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600'}"
+			>
+				<svg
+					class="h-5 w-5"
+					fill="none"
+					stroke="currentColor"
+					viewBox="0 0 24 24"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+					></path>
+				</svg>
+				<span>Veículos</span>
+			</a>
 		</nav>
 
 		<!-- Footer -->
 		<div class="border-t border-gray-300 p-4 dark:border-gray-600">
-			<p class="text-center text-xs text-gray-500 dark:text-gray-400">
-				© 2025 MyApp - TCC PUC
-			</p>
+			<p class="text-center text-xs text-gray-500 dark:text-gray-400">© 2025 MyApp - TCC PUC</p>
 		</div>
 	</div>
 </aside>

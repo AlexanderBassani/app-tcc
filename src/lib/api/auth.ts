@@ -3,7 +3,7 @@ import type { User } from '$lib/stores/auth';
 
 // Request/Response Types
 export interface LoginRequest {
-	username: string;
+	login: string;
 	password: string;
 }
 
