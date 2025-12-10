@@ -174,6 +174,7 @@
 				<div class="flex items-center gap-4">
 					<a
 						href="/vehicles"
+						aria-label="Voltar para lista de veículos"
 						class="flex h-10 w-10 items-center justify-center rounded-lg bg-white text-gray-500 shadow transition-colors hover:text-gray-700 dark:bg-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
 					>
 						<svg
