@@ -40,6 +40,7 @@ self.addEventListener('activate', (event) => {
 // Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
     const { request } = event;
+    const url = new URL(request.url);
 
     // Skip non-GET requests
     if (request.method !== 'GET') {
@@ -51,6 +52,37 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
+    // Skip API requests - always fetch fresh
+    if (url.pathname.startsWith('/api/') || url.pathname.includes('?/')) {
+        event.respondWith(fetch(request));
+        return;
+    }
+
+    // Network-first for HTML pages (to avoid stale login/auth pages)
+    if (request.mode === 'navigate' || request.headers.get('accept')?.includes('text/html')) {
+        event.respondWith(
+            fetch(request)
+                .then((response) => {
+                    // Cache the new version
+                    if (response && response.status === 200) {
+                        const responseToCache = response.clone();
+                        caches.open(DYNAMIC_CACHE).then((cache) => {
+                            cache.put(request, responseToCache);
+                        });
+                    }
+                    return response;
+                })
+                .catch(() => {
+                    // Fallback to cache if offline
+                    return caches.match(request).then((cachedResponse) => {
+                        return cachedResponse || caches.match('/offline.html');
+                    });
+                })
+        );
+        return;
+    }
+
+    // Cache-first for static assets (CSS, JS, images)
     event.respondWith(
         caches.match(request).then((cachedResponse) => {
             if (cachedResponse) {
