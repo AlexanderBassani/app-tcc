@@ -31,18 +31,8 @@
 			// Salvar no store (localStorage/sessionStorage)
 			authStore.login(response.user, response.token, rememberMe);
 
-			// Salvar token nos cookies via action do servidor
-			const formData = new FormData();
-			formData.append('token', response.token);
-			formData.append('rememberMe', String(rememberMe));
-
-			await fetch('?/login', {
-				method: 'POST',
-				body: formData
-			});
-
-			// Redirecionar para a página inicial
-			window.location.href = '/';
+			// Redirecionar para a página inicial usando SvelteKit
+			await goto('/', { replaceState: true });
 		} catch (e) {
 			console.error('Erro no login:', e);
 			errorMessage =
