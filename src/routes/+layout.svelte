@@ -31,6 +31,8 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-<InstallPrompt />
+{#if typeof window !== 'undefined'}
+	<InstallPrompt />
+{/if}
 
 {@render children?.()}
