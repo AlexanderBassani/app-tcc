@@ -4,6 +4,7 @@
 	import { authStore } from '$lib/stores/auth';
 	import { theme } from '$lib/stores/theme';
 	import { onMount } from 'svelte';
+	import InstallPrompt from '$lib/components/InstallPrompt.svelte';
 
 	let { children } = $props();
 
@@ -11,11 +12,25 @@
 	onMount(() => {
 		authStore.initialize();
 		theme.init();
+
+		// Registrar Service Worker para PWA
+		if ('serviceWorker' in navigator) {
+			navigator.serviceWorker
+				.register('/sw.js')
+				.then((registration) => {
+					console.log('Service Worker registrado:', registration);
+				})
+				.catch((error) => {
+					console.error('Erro ao registrar Service Worker:', error);
+				});
+		}
 	});
 </script>
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
 </svelte:head>
+
+<InstallPrompt />
 
 {@render children?.()}
