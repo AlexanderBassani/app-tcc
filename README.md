@@ -9,7 +9,9 @@ A modern web application built with SvelteKit, TypeScript, and Tailwind CSS.
 - **Tailwind CSS v4** - Modern utility-first styling with plugins
 - **Dark/Light Theme** - Theme toggle with persistent storage
 - **API Client** - Built-in API integration layer with authentication
-- **Authentication** - Login system with auth state management
+- **Authentication** - Login system with auth state management and protected routes
+- **Vehicle Management** - Complete CRUD for vehicle registration and tracking
+- **Searchable Select** - Custom searchable dropdown component with keyboard navigation
 - **Testing** - Unit tests (Vitest) and E2E tests (Playwright)
 - **Linting & Formatting** - ESLint and Prettier configured
 
@@ -69,10 +71,20 @@ src/
 ├── lib/
 │   ├── api/          # API client utilities
 │   ├── components/   # Reusable components
+│   │   ├── DashboardLayout.svelte
+│   │   ├── ProtectedRoute.svelte
+│   │   ├── SearchableSelect.svelte
+│   │   ├── Sidebar.svelte
+│   │   └── ThemeToggle.svelte
 │   ├── config/       # Configuration files
-│   └── stores/       # Svelte stores (auth, theme)
+│   ├── data/         # Static data (car brands, etc.)
+│   ├── stores/       # Svelte stores (auth, theme)
+│   └── types/        # TypeScript type definitions
 ├── routes/           # SvelteKit routes
 │   ├── login/        # Login page
+│   ├── vehicles/     # Vehicle management
+│   │   ├── new/      # New vehicle form
+│   │   └── [id]/     # Vehicle details
 │   └── exemplo-api/  # API example page
 ├── app.html          # HTML template
 └── app.css           # Global styles
@@ -80,10 +92,13 @@ src/
 
 ## 🔐 Authentication
 
-The app includes an authentication system with:
+The app includes a complete authentication system with:
 - Auth store for state management (`src/lib/stores/auth.ts`)
 - Token-based API authentication
 - Login page (`src/routes/login`)
+- Protected routes using `ProtectedRoute` component
+- Automatic redirect to login for unauthenticated users
+- Persistent session with localStorage/sessionStorage
 
 ## 🌐 API Integration
 
@@ -94,6 +109,33 @@ API client is configured in `src/lib/api/client.ts` with support for:
 - TypeScript types
 
 Configure your API URL in `src/lib/config/api.ts`
+
+## 🚗 Vehicle Management
+
+Complete CRUD system for vehicle tracking:
+- List active and inactive vehicles
+- Create new vehicle with searchable brand selector
+- View vehicle details
+- Edit vehicle information
+- Soft delete (deactivate) vehicles
+- Reactivate deleted vehicles
+- All major Brazilian car brands included
+
+## 🧩 Components
+
+### SearchableSelect
+Reusable searchable dropdown component with:
+- Real-time search filtering
+- Keyboard navigation (Arrow keys, Enter, Escape)
+- Dark mode support
+- Customizable options and placeholder
+
+### ProtectedRoute
+Authentication wrapper component:
+- Automatically checks user authentication
+- Redirects to login if not authenticated
+- Shows loading state during verification
+- Wraps any page that requires authentication
 
 ## 🎨 Theming
 

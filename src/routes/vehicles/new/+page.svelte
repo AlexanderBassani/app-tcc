@@ -3,6 +3,9 @@
 	import { vehiclesApi } from '$lib/api/vehicles';
 	import { authStore } from '$lib/stores/auth';
 	import DashboardLayout from '$lib/components/DashboardLayout.svelte';
+	import ProtectedRoute from '$lib/components/ProtectedRoute.svelte';
+	import SearchableSelect from '$lib/components/SearchableSelect.svelte';
+	import { carBrands } from '$lib/data/carBrands';
 
 	let loading = false;
 	let error = '';
@@ -43,6 +46,7 @@
 			<a
 				href="/vehicles"
 				class="flex h-10 w-10 items-center justify-center rounded-lg bg-white text-gray-500 shadow transition-colors hover:text-gray-700 dark:bg-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+				aria-label="Voltar para lista de veículos"
 			>
 				<svg
 					class="h-6 w-6"
@@ -78,13 +82,12 @@
 						<label for="brand" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
 							Marca
 						</label>
-						<input
-							type="text"
+						<SearchableSelect
 							id="brand"
+							options={carBrands}
 							bind:value={formData.brand}
+							placeholder="Digite para buscar uma marca..."
 							required
-							class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
-							placeholder="Ex: Toyota"
 						/>
 					</div>
 
