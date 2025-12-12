@@ -8,6 +8,10 @@
 		return $page.url.pathname === path;
 	};
 
+	const isActiveSection = (path: string) => {
+		return $page.url.pathname.startsWith(path);
+	};
+
 	// Verifica se estamos em alguma rota de usuários e mantém o menu expandido
 	$effect(() => {
 		const pathname = $page.url.pathname;
@@ -147,6 +151,30 @@
 					></path>
 				</svg>
 				<span>Veículos</span>
+			</a>
+
+			<!-- Maintenances -->
+			<a
+				href="/maintenances"
+				class="flex cursor-pointer items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors {isActiveSection('/maintenances')
+					? 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
+					: 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600'}"
+			>
+				<svg
+					class="h-5 w-5"
+					fill="none"
+					stroke="currentColor"
+					viewBox="0 0 24 24"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+					></path>
+				</svg>
+				<span>Manutenções</span>
 			</a>
 		</nav>
 

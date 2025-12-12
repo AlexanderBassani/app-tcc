@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { authStore } from '$lib/stores/auth';
+	import { authStore, isAdmin } from '$lib/stores/auth';
+
+	export let adminOnly: boolean = false;
 
 	let isChecking = true;
 
@@ -11,6 +13,13 @@
 			goto('/login');
 			return;
 		}
+
+		// Verificar se é admin quando necessário
+		if (adminOnly && !isAdmin($authStore.user)) {
+			goto('/'); // Redirect to dashboard
+			return;
+		}
+
 		isChecking = false;
 	});
 </script>

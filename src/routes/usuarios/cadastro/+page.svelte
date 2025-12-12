@@ -1,7 +1,8 @@
 <script lang="ts">
 	import DashboardLayout from '$lib/components/DashboardLayout.svelte';
+	import ProtectedRoute from '$lib/components/ProtectedRoute.svelte';
 	import { usersApi } from '$lib/api/users';
-	import { authStore } from '$lib/stores/auth';
+	import { authStore, isAdmin } from '$lib/stores/auth';
 
 	let formData = $state({
 		first_name: '',
@@ -66,9 +67,14 @@
 		isLoading = true;
 
 		try {
-			// Verificar se o usuário está autenticado
+			// Verificar se o usuário está autenticado e é admin
 			if (!$authStore.token) {
 				errorMessage = 'Você precisa estar autenticado para criar usuários';
+				return;
+			}
+
+			if (!isAdmin($authStore.user)) {
+				errorMessage = 'Você não tem permissão para criar usuários';
 				return;
 			}
 
@@ -124,7 +130,8 @@
 	}
 </script>
 
-<DashboardLayout>
+<ProtectedRoute adminOnly={true}>
+	<DashboardLayout>
 	<div class="space-y-6">
 		<!-- Header -->
 		<div>
@@ -487,4 +494,5 @@
 			</div>
 		</form>
 	</div>
-</DashboardLayout>
+	</DashboardLayout>
+</ProtectedRoute>
