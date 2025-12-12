@@ -35,7 +35,10 @@
 
 	function handleInputFocus() {
 		isOpen = true;
-		searchTerm = '';
+		// Only clear searchTerm if there's a selected value
+		if (value) {
+			searchTerm = '';
+		}
 	}
 
 	function handleInputBlur() {
@@ -82,8 +85,8 @@
 		}
 	}
 
-	// Initialize searchTerm with value
-	$: if (value && !searchTerm) {
+	// Initialize searchTerm with value only when not focused
+	$: if (value && !searchTerm && !isOpen) {
 		searchTerm = value;
 	}
 </script>

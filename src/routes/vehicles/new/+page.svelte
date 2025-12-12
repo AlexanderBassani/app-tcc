@@ -132,6 +132,8 @@
 							id="plate"
 							bind:value={formData.plate}
 							required
+							maxlength="8"
+							minlength="7"
 							class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 							placeholder="ABC-1234"
 						/>

@@ -6,6 +6,8 @@
 	import { authStore } from '$lib/stores/auth';
 	import type { Vehicle } from '$lib/types/vehicle';
 	import DashboardLayout from '$lib/components/DashboardLayout.svelte';
+import SearchableSelect from '$lib/components/SearchableSelect.svelte';
+import { carBrands } from '$lib/data/carBrands';
 
 	let vehicle: Vehicle | null = null;
 	let loading = true;
@@ -236,12 +238,12 @@
 								>
 									Marca
 								</label>
-								<input
-									type="text"
+								<SearchableSelect
 									id="brand"
+									options={carBrands}
 									bind:value={formData.brand}
+									placeholder="Digite para buscar uma marca..."
 									required
-									class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 								/>
 							</div>
 							<div>
@@ -286,6 +288,8 @@
 									id="plate"
 									bind:value={formData.plate}
 									required
+									maxlength="8"
+									minlength="7"
 									class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 								/>
 							</div>
