@@ -13,7 +13,9 @@
 		authStore.initialize();
 		theme.init();
 
-		// Registrar Service Worker para PWA
+		// DESABILITADO TEMPORARIAMENTE: Service Worker causa problemas de cache durante desenvolvimento
+		// Descomente em produção se necessário
+		/*
 		if ('serviceWorker' in navigator) {
 			navigator.serviceWorker
 				.register('/sw.js')
@@ -24,6 +26,7 @@
 					console.error('Erro ao registrar Service Worker:', error);
 				});
 		}
+		*/
 	});
 </script>
 

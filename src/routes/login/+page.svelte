@@ -2,20 +2,12 @@
 	import { authStore } from '$lib/stores/auth';
 	import { authApi } from '$lib/api/auth';
 	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
 
 	let login = $state('');
 	let password = $state('');
 	let rememberMe = $state(false);
 	let isLoading = $state(false);
 	let errorMessage = $state('');
-
-	// Redirecionar se já estiver autenticado
-	onMount(() => {
-		if ($authStore.isAuthenticated && $authStore.token) {
-			goto('/');
-		}
-	});
 
 	async function handleSubmit(e: Event) {
 		e.preventDefault();

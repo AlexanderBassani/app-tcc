@@ -1,25 +1,26 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { authStore, isAdmin } from '$lib/stores/auth';
+	import { onMount } from 'svelte';
 
-	export let adminOnly: boolean = false;
+	let { adminOnly = false } = $props();
 
-	let isChecking = true;
+	let isChecking = $state(true);
 
 	onMount(() => {
-		// Verificar autenticação
-		if (!$authStore.isAuthenticated || !$authStore.token) {
-			goto('/login');
-			return;
-		}
+		console.log('🔍 [ProtectedRoute] Checking permissions');
+		console.log('   adminOnly:', adminOnly);
+		console.log('   isAdmin:', isAdmin($authStore.user));
 
-		// Verificar se é admin quando necessário
+		// IMPORTANTE: O +layout.server.ts JÁ verificou autenticação server-side
+		// Aqui só verificamos permissões de admin
 		if (adminOnly && !isAdmin($authStore.user)) {
-			goto('/'); // Redirect to dashboard
+			console.log('   ➡️  Redirecting to / (not admin)');
+			goto('/');
 			return;
 		}
 
+		console.log('   ✅ Access granted');
 		isChecking = false;
 	});
 </script>
