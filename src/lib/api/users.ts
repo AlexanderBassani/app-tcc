@@ -37,7 +37,7 @@ export interface RegisterUserRequest {
 
 export interface CreateUserRequest extends RegisterUserRequest {
 	role?: 'admin' | 'user';
-	status?: 'active' | 'inactive';
+	status?: 'active' | 'inactive' | 'suspended' | 'deleted';
 }
 
 export interface UpdateProfileRequest {
@@ -56,7 +56,7 @@ export interface UpdateProfileRequest {
 export interface UpdateUserRequest extends UpdateProfileRequest {
 	username?: string;
 	role?: 'admin' | 'user';
-	status?: 'active' | 'inactive';
+	status?: 'active' | 'inactive' | 'suspended' | 'deleted';
 	marketing_emails_consent?: boolean;
 }
 

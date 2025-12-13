@@ -19,7 +19,7 @@
 		date_of_birth: '',
 		gender: '' as 'male' | 'female' | 'other' | 'prefer_not_to_say' | '',
 		bio: '',
-		status: 'active' as 'active' | 'inactive',
+		status: 'active' as 'active' | 'inactive' | 'suspended' | 'deleted',
 		preferred_language: 'pt-BR',
 		timezone: 'America/Sao_Paulo',
 		marketing_emails_consent: false
@@ -458,6 +458,8 @@
 							>
 								<option value="active">Ativo</option>
 								<option value="inactive">Inativo</option>
+								<option value="suspended">Suspenso</option>
+								<option value="deleted">Deletado</option>
 							</select>
 						</div>
 					</div>
