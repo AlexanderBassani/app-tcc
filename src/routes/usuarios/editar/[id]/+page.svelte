@@ -4,6 +4,7 @@
 	import { authStore } from '$lib/stores/auth';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
 
 	let userId: number;
 	let formData = $state({
@@ -156,7 +157,7 @@
 
 			// Redirecionar após sucesso
 			setTimeout(() => {
-				window.location.href = '/usuarios';
+				goto('/usuarios');
 			}, 1500);
 		} catch (e: any) {
 			console.error('Erro ao atualizar usuário:', e);

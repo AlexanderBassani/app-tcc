@@ -19,7 +19,13 @@ export async function apiRequest<T = any>(
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_URL}${endpoint}`, {
+  // Garantir que a URL seja absoluta
+  const fullUrl = `${API_URL}${endpoint}`;
+
+  // Debug: mostrar a URL que está sendo chamada
+  console.log('🔍 Chamando API:', fullUrl);
+
+  const response = await fetch(fullUrl, {
     ...fetchOptions,
     headers,
   });

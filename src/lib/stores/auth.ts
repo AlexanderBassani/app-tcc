@@ -61,6 +61,10 @@ function createAuthStore() {
 					sessionStorage.setItem('authToken', token);
 					sessionStorage.setItem('user', JSON.stringify(user));
 				}
+
+				// Salvar token nos cookies para o server-side load
+				const maxAge = rememberMe ? 60 * 60 * 24 * 30 : undefined; // 30 dias ou sessão
+				document.cookie = `authToken=${token}; path=/; ${maxAge ? `max-age=${maxAge};` : ''} SameSite=Strict`;
 			}
 			set({ user, token, isAuthenticated: true });
 		},
@@ -70,6 +74,9 @@ function createAuthStore() {
 				localStorage.removeItem('user');
 				sessionStorage.removeItem('authToken');
 				sessionStorage.removeItem('user');
+
+				// Remover cookie
+				document.cookie = 'authToken=; path=/; max-age=0; SameSite=Strict';
 			}
 			set({ user: null, token: null, isAuthenticated: false });
 		},
@@ -83,6 +90,13 @@ function createAuthStore() {
 					try {
 						const user = JSON.parse(userStr);
 						set({ user, token, isAuthenticated: true });
+
+						// Sincronizar cookie se ainda não existir
+						if (!document.cookie.includes('authToken=')) {
+							const rememberMe = !!localStorage.getItem('authToken');
+							const maxAge = rememberMe ? 60 * 60 * 24 * 30 : undefined;
+							document.cookie = `authToken=${token}; path=/; ${maxAge ? `max-age=${maxAge};` : ''} SameSite=Strict`;
+						}
 					} catch (e) {
 						console.error('Erro ao carregar dados do usuário:', e);
 					}

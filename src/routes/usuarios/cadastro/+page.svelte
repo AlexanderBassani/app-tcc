@@ -3,6 +3,7 @@
 	import ProtectedRoute from '$lib/components/ProtectedRoute.svelte';
 	import { usersApi } from '$lib/api/users';
 	import { authStore, isAdmin } from '$lib/stores/auth';
+	import { goto } from '$app/navigation';
 
 	let formData = $state({
 		first_name: '',
@@ -108,7 +109,7 @@
 
 			// Redirecionar após sucesso
 			setTimeout(() => {
-				window.location.href = '/usuarios';
+				goto('/usuarios');
 			}, 1500);
 		} catch (e: any) {
 			console.error('Erro ao cadastrar usuário:', e);
