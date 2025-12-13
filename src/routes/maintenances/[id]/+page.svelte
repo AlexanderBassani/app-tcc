@@ -9,6 +9,7 @@
 	import type { Vehicle } from '$lib/types/vehicle';
 	import { MAINTENANCE_TYPES } from '$lib/types/maintenance';
 	import DashboardLayout from '$lib/components/DashboardLayout.svelte';
+	import MaintenanceAttachments from '$lib/components/MaintenanceAttachments.svelte';
 
 	let maintenance: Maintenance | null = null;
 	let vehicles: Vehicle[] = [];
@@ -493,6 +494,11 @@
 						{/if}
 					</div>
 				{/if}
+			</div>
+
+			<!-- Attachments -->
+			<div class="rounded-lg bg-white p-6 shadow dark:bg-gray-700">
+				<MaintenanceAttachments maintenanceId={maintenance.id} />
 			</div>
 
 			<!-- Actions -->
