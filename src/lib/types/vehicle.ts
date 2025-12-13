@@ -48,3 +48,12 @@ export interface VehicleListResponse {
     data: Vehicle[];
     count: number;
 }
+export interface VehicleWithMaintenance extends Vehicle {
+    last_maintenance?: {
+        id: number;
+        title: string;
+        service_date: string;
+        is_completed: boolean;
+        type: string;
+    } | null;
+}

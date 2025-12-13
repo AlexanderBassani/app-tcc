@@ -8,6 +8,7 @@
 	import DashboardLayout from '$lib/components/DashboardLayout.svelte';
 import SearchableSelect from '$lib/components/SearchableSelect.svelte';
 import { carBrands } from '$lib/data/carBrands';
+import VehicleMaintenances from '$lib/components/VehicleMaintenances.svelte';
 
 	let vehicle: Vehicle | null = null;
 	let loading = true;
@@ -412,6 +413,11 @@ import { carBrands } from '$lib/data/carBrands';
 						</div>
 					</div>
 				{/if}
+			</div>
+
+			<!-- Manutenções -->
+			<div class="rounded-lg bg-white p-6 shadow dark:bg-gray-700">
+				<VehicleMaintenances vehicleId={vehicle.id} />
 			</div>
 
 			<!-- Actions -->

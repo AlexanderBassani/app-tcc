@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { vehiclesApi } from '$lib/api/vehicles';
+	import { maintenancesApi } from '$lib/api/maintenances';
 	import { authStore } from '$lib/stores/auth';
-	import type { Vehicle } from '$lib/types/vehicle';
+	import type { VehicleWithMaintenance } from '$lib/types/vehicle';
 	import DashboardLayout from '$lib/components/DashboardLayout.svelte';
 	import ProtectedRoute from '$lib/components/ProtectedRoute.svelte';
 
-	let activeVehicles: Vehicle[] = [];
-	let inactiveVehicles: Vehicle[] = [];
+	let activeVehicles = $state<VehicleWithMaintenance[]>([]);
+	let inactiveVehicles = $state<VehicleWithMaintenance[]>([]);
 	let loading = true;
 	let error = '';
 	let activeTab: 'active' | 'inactive' = 'active';
