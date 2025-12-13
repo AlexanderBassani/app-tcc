@@ -9,9 +9,9 @@
 
 	let activeVehicles = $state<VehicleWithMaintenance[]>([]);
 	let inactiveVehicles = $state<VehicleWithMaintenance[]>([]);
-	let loading = true;
-	let error = '';
-	let activeTab: 'active' | 'inactive' = 'active';
+	let loading = $state(true);
+	let error = $state('');
+	let activeTab = $state<'active' | 'inactive'>('active');
 
 	onMount(async () => {
 		await loadVehicles();
@@ -23,13 +23,55 @@
 			const token = $authStore.token;
 			if (!token) return;
 
-			const [activeRes, inactiveRes] = await Promise.all([
+			const [activeRes, inactiveRes, maintenancesRes] = await Promise.all([
 				vehiclesApi.list(token),
-				vehiclesApi.listInactive(token)
+				vehiclesApi.listInactive(token),
+				maintenancesApi.list(token)
 			]);
 
-			activeVehicles = activeRes.data;
-			inactiveVehicles = inactiveRes.data;
+			const maintenances = maintenancesRes.data || [];
+
+			// Associar última manutenção a cada veículo ativo
+			activeVehicles = activeRes.data.map(vehicle => {
+				const vehicleMaintenances = maintenances.filter(m => m.vehicle_id === vehicle.id);
+				const lastMaintenance = vehicleMaintenances.length > 0
+					? vehicleMaintenances.sort((a, b) =>
+						new Date(b.service_date).getTime() - new Date(a.service_date).getTime()
+					)[0]
+					: null;
+
+				return {
+					...vehicle,
+					last_maintenance: lastMaintenance ? {
+						id: lastMaintenance.id,
+						title: lastMaintenance.title,
+						service_date: lastMaintenance.service_date,
+						is_completed: lastMaintenance.is_completed,
+						type: lastMaintenance.type
+					} : null
+				};
+			});
+
+			// Associar última manutenção a cada veículo inativo
+			inactiveVehicles = inactiveRes.data.map(vehicle => {
+				const vehicleMaintenances = maintenances.filter(m => m.vehicle_id === vehicle.id);
+				const lastMaintenance = vehicleMaintenances.length > 0
+					? vehicleMaintenances.sort((a, b) =>
+						new Date(b.service_date).getTime() - new Date(a.service_date).getTime()
+					)[0]
+					: null;
+
+				return {
+					...vehicle,
+					last_maintenance: lastMaintenance ? {
+						id: lastMaintenance.id,
+						title: lastMaintenance.title,
+						service_date: lastMaintenance.service_date,
+						is_completed: lastMaintenance.is_completed,
+						type: lastMaintenance.type
+					} : null
+				};
+			});
 		} catch (err: any) {
 			error = err.message || 'Erro ao carregar veículos';
 		} finally {
@@ -39,6 +81,12 @@
 
 	function formatDate(dateString: string) {
 		return new Date(dateString).toLocaleDateString('pt-BR');
+	}
+
+	function getMaintenanceStatusBadge(isCompleted: boolean) {
+		return isCompleted
+			? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+			: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
 	}
 </script>
 
@@ -163,6 +211,38 @@
 										{vehicle.color}
 									</div>
 								</div>
+
+								<!-- Última Manutenção -->
+								{#if vehicle.last_maintenance}
+									<div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+										<p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
+											Última manutenção:
+										</p>
+										<div class="flex items-start justify-between gap-2">
+											<div class="flex-1 min-w-0">
+												<p class="text-sm font-medium text-gray-900 dark:text-white truncate">
+													{vehicle.last_maintenance.title}
+												</p>
+												<p class="text-xs text-gray-500 dark:text-gray-400">
+													{formatDate(vehicle.last_maintenance.service_date)}
+												</p>
+											</div>
+											<span
+												class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium {getMaintenanceStatusBadge(
+													vehicle.last_maintenance.is_completed
+												)}"
+											>
+												{vehicle.last_maintenance.is_completed ? 'Concluída' : 'Pendente'}
+											</span>
+										</div>
+									</div>
+								{:else}
+									<div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+										<p class="text-xs text-gray-500 dark:text-gray-400">
+											Nenhuma manutenção registrada
+										</p>
+									</div>
+								{/if}
 							</div>
 							<div class="bg-gray-50 px-6 py-3 dark:bg-gray-600/50">
 								<p class="text-xs text-gray-500 dark:text-gray-400">
