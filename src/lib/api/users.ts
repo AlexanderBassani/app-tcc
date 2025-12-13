@@ -8,9 +8,16 @@ export interface UsersListResponse {
 	count: number;
 }
 
+// Usado por: register, updateProfile (retornam 'user')
 export interface UserResponse {
 	message: string;
 	user: User;
+}
+
+// Usado por: getById, update (retornam 'data')
+export interface UserDataResponse {
+	message: string;
+	data: User;
 }
 
 export interface RegisterUserRequest {
@@ -69,23 +76,23 @@ export const usersApi = {
 
 	// Get current user profile
 	getProfile: (token: string) =>
-		api.get<UserResponse>('/api/users/profile', token),
+		api.get<User>('/api/users/profile', token),
 
-	// Get user by ID
+	// Get user by ID - returns { message, data }
 	getById: (id: number, token: string) =>
-		api.get<UserResponse>(`/api/users/${id}`, token),
+		api.get<UserDataResponse>(`/api/users/${id}`, token),
 
 	// Create user (admin only) - used for admin creating users with role assignment
 	create: (data: CreateUserRequest, token: string) =>
 		api.post<UserResponse>('/api/users/register', data, token),
 
-	// Update own profile
+	// Update own profile - returns { message, user }
 	updateProfile: (data: UpdateProfileRequest, token: string) =>
 		api.put<UserResponse>('/api/users/profile', data, token),
 
-	// Update user (admin only)
+	// Update user (admin only) - returns { message, data }
 	update: (userId: number, data: UpdateUserRequest, token: string) =>
-		api.put<UserResponse>(`/api/users/${userId}`, data, token),
+		api.put<UserDataResponse>(`/api/users/${userId}`, data, token),
 
 	// Change another user's password (admin only)
 	changeUserPassword: (userId: number, data: ChangeUserPasswordRequest, token: string) =>
