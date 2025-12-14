@@ -106,11 +106,28 @@
 				? parseInt(formData.km_when_done.replace(/\D/g, ''))
 				: undefined;
 
+			const selectedVehicle = vehicles.find((v) => v.id === formData.vehicle_id);
+
 			if (kmWhenDone !== undefined) {
-				const selectedVehicle = vehicles.find((v) => v.id === formData.vehicle_id);
 				if (selectedVehicle && kmWhenDone < selectedVehicle.current_km) {
 					throw new Error(
 						`A quilometragem informada (${kmWhenDone.toLocaleString('pt-BR')} km) não pode ser menor que a quilometragem atual do veículo (${selectedVehicle.current_km.toLocaleString('pt-BR')} km)`
+					);
+				}
+			}
+
+			// Validar próxima quilometragem
+			const nextKm = formData.next_km
+				? parseInt(formData.next_km.replace(/\D/g, ''))
+				: undefined;
+
+			if (nextKm !== undefined) {
+				// A próxima quilometragem deve ser maior ou igual à quilometragem atual cadastrada
+				const currentKmForValidation = kmWhenDone || selectedVehicle?.current_km;
+
+				if (currentKmForValidation && nextKm < currentKmForValidation) {
+					throw new Error(
+						`A próxima quilometragem (${nextKm.toLocaleString('pt-BR')} km) não pode ser menor que a quilometragem atual cadastrada (${currentKmForValidation.toLocaleString('pt-BR')} km)`
 					);
 				}
 			}
@@ -211,6 +228,48 @@
 		const formatted = formatKm(target.value);
 		formData.next_km = formatted;
 		target.value = formatted;
+	}
+
+	// Funções para incrementar/decrementar quilometragem
+	function incrementKm() {
+		const currentKm = formData.km_when_done
+			? parseInt(formData.km_when_done.replace(/\D/g, ''))
+			: 0;
+		formData.km_when_done = formatKm((currentKm + 1000).toString());
+	}
+
+	function decrementKm() {
+		const selectedVehicle = vehicles.find((v) => v.id === formData.vehicle_id);
+		const minKm = selectedVehicle?.current_km || 0;
+		const currentKm = formData.km_when_done
+			? parseInt(formData.km_when_done.replace(/\D/g, ''))
+			: minKm;
+		const newKm = Math.max(minKm, currentKm - 1000);
+		formData.km_when_done = formatKm(newKm.toString());
+	}
+
+	function incrementNextKm() {
+		// Se o campo estiver vazio, preencher com a km_when_done
+		if (!formData.next_km) {
+			const kmWhenDone = formData.km_when_done
+				? parseInt(formData.km_when_done.replace(/\D/g, ''))
+				: 0;
+			formData.next_km = formatKm(kmWhenDone.toString());
+		} else {
+			const currentKm = parseInt(formData.next_km.replace(/\D/g, ''));
+			formData.next_km = formatKm((currentKm + 1000).toString());
+		}
+	}
+
+	function decrementNextKm() {
+		const selectedVehicle = vehicles.find((v) => v.id === formData.vehicle_id);
+		const kmWhenDone = formData.km_when_done
+			? parseInt(formData.km_when_done.replace(/\D/g, ''))
+			: undefined;
+		const minKm = kmWhenDone || selectedVehicle?.current_km || 0;
+		const currentKm = formData.next_km ? parseInt(formData.next_km.replace(/\D/g, '')) : minKm;
+		const newKm = Math.max(minKm, currentKm - 1000);
+		formData.next_km = formatKm(newKm.toString());
 	}
 
 	function getVehicleInfo(vehicleId: number) {
@@ -443,14 +502,34 @@
 								<label for="km" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
 									KM quando realizada
 								</label>
-								<input
-									type="text"
-									id="km"
-									value={formData.km_when_done}
-									on:input={handleKmInput}
-									class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
-									placeholder="0 km"
-								/>
+								<div class="relative mt-1 flex gap-2">
+									<button
+										type="button"
+										on:click={decrementKm}
+										class="flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
+									>
+										<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+										</svg>
+									</button>
+									<input
+										type="text"
+										id="km"
+										value={formData.km_when_done}
+										on:input={handleKmInput}
+										class="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+										placeholder="0 km"
+									/>
+									<button
+										type="button"
+										on:click={incrementKm}
+										class="flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
+									>
+										<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+										</svg>
+									</button>
+								</div>
 								{#if formData.vehicle_id > 0}
 									{@const selectedVehicle = vehicles.find((v) => v.id === formData.vehicle_id)}
 									{#if selectedVehicle}
@@ -461,42 +540,80 @@
 								{/if}
 							</div>
 
-							<!-- Próxima Manutenção -->
-							<div>
-								<label
-									for="next_date"
-									class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-								>
-									Próxima Manutenção
-								</label>
-								<input
-									type="date"
-									id="next_date"
-									bind:value={formData.next_service_date}
-									class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
-								/>
-							</div>
-							<!-- Próxima Quilometragem -->
-							<div>
-								<label
-									for="next_km_edit"
-									class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-								>
-									Próxima Quilometragem
-								</label>
-								<input
-									type="text"
-									id="next_km_edit"
-									value={formData.next_km}
-									on:input={handleNextKmInput}
-									class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
-									placeholder="0 km"
-								/>
-								<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-									Quilometragem estimada para a próxima manutenção
-								</p>
-							</div>
 						</div>
+
+						<!-- Próxima Manutenção -->
+						<fieldset class="rounded-lg border border-gray-300 p-4 dark:border-gray-600">
+							<legend class="px-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+								Próxima Manutenção
+							</legend>
+							<div class="grid gap-6 sm:grid-cols-2">
+								<!-- Data -->
+								<div>
+									<label
+										for="next_date"
+										class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+									>
+										Data
+									</label>
+									<input
+										type="date"
+										id="next_date"
+										bind:value={formData.next_service_date}
+										class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+									/>
+								</div>
+
+								<!-- Quilometragem -->
+								<div>
+									<label
+										for="next_km_edit"
+										class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+									>
+										Quilometragem
+									</label>
+									<div class="relative mt-1 flex gap-2">
+										<button
+											type="button"
+											on:click={decrementNextKm}
+											class="flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
+										>
+											<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+											</svg>
+										</button>
+										<input
+											type="text"
+											id="next_km_edit"
+											value={formData.next_km}
+											on:input={handleNextKmInput}
+											class="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+											placeholder="0 km"
+										/>
+										<button
+											type="button"
+											on:click={incrementNextKm}
+											class="flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
+										>
+											<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+											</svg>
+										</button>
+									</div>
+									{#if formData.vehicle_id > 0}
+										{@const selectedVehicle = vehicles.find((v) => v.id === formData.vehicle_id)}
+										{@const currentKm = formData.km_when_done
+											? parseInt(formData.km_when_done.replace(/\D/g, ''))
+											: selectedVehicle?.current_km}
+										{#if currentKm}
+											<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+												Quilometragem mínima: {currentKm.toLocaleString('pt-BR')} km
+											</p>
+										{/if}
+									{/if}
+								</div>
+							</div>
+						</fieldset>
 
 						<!-- Descrição -->
 						<div>
