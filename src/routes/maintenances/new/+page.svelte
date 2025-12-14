@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-timport { page } from '/stores';
+	import { page } from '$app/stores';
 	import { maintenancesApi } from '$lib/api/maintenances';
 	import { vehiclesApi } from '$lib/api/vehicles';
 	import { authStore } from '$lib/stores/auth';
@@ -25,11 +25,10 @@ timport { page } from '/stores';
 		km_when_done: '',
 		service_date: new Date().toISOString().split('T')[0],
 		next_service_date: '',
-		notes: ''
-t	next_km: '',
+		notes: '',
+		next_km: ''
 	};
-		await loadVehicles();
-tonMount(async () => {
+	onMount(async () => {
 		// Verificar se há vehicle_id na URL
 		const vehicleIdParam = $page.url.searchParams.get('vehicle_id');
 		if (vehicleIdParam) {
@@ -38,7 +37,6 @@ tonMount(async () => {
 		}
 
 		await loadVehicles();
-	});
 	});
 
 	async function loadVehicles() {
@@ -69,17 +67,33 @@ tonMount(async () => {
 				throw new Error('Selecione um veículo');
 			}
 
+			// Validar quilometragem
+			const kmWhenDone = formData.km_when_done
+				? parseInt(formData.km_when_done.replace(/\D/g, ''))
+				: undefined;
+
+			if (kmWhenDone !== undefined) {
+				const selectedVehicle = vehicles.find((v) => v.id === formData.vehicle_id);
+				if (selectedVehicle && kmWhenDone < selectedVehicle.current_km) {
+					throw new Error(
+						`A quilometragem informada (${kmWhenDone.toLocaleString('pt-BR')} km) não pode ser menor que a quilometragem atual do veículo (${selectedVehicle.current_km.toLocaleString('pt-BR')} km)`
+					);
+				}
+			}
+
 			const submitData = {
 				vehicle_id: formData.vehicle_id,
 				title: formData.title,
 				description: formData.description || undefined,
 				type: formData.type,
-				cost: formData.cost ? parseFloat(formData.cost.replace(/[^\d,.-]/g, '').replace(',', '.')) : undefined,
-				km_when_done: formData.km_when_done ? parseInt(formData.km_when_done.replace(/\D/g, '')) : undefined,
+				cost: formData.cost
+					? parseFloat(formData.cost.replace(/[^\d,.-]/g, '').replace(',', '.'))
+					: undefined,
+				km_when_done: kmWhenDone,
 				service_date: formData.service_date,
 				next_service_date: formData.next_service_date || undefined,
-				notes: formData.notes || undefined
-t			next_km: formData.next_km ? parseInt(formData.next_km.replace(/D/g, '')) : undefined,
+				notes: formData.notes || undefined,
+				next_km: formData.next_km ? parseInt(formData.next_km.replace(/\D/g, '')) : undefined
 			};
 
 			await maintenancesApi.create(submitData, token);
@@ -118,12 +132,13 @@ t			next_km: formData.next_km ? parseInt(formData.next_km.replace(/D/g, '')) : u
 		const formatted = formatKm(target.value);
 		formData.km_when_done = formatted;
 		target.value = formatted;
-n	function handleNextKmInput(e: Event) {
+	}
+
+	function handleNextKmInput(e: Event) {
 		const target = e.target as HTMLInputElement;
 		const formatted = formatKm(target.value);
 		formData.next_km = formatted;
 		target.value = formatted;
-	}
 	}
 </script>
 
@@ -169,12 +184,17 @@ n	function handleNextKmInput(e: Event) {
 					<div class="grid gap-6 sm:grid-cols-2">
 						<!-- Veículo -->
 						<div class="sm:col-span-2">
-							<label for="vehicle" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+							<label
+								for="vehicle"
+								class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+							>
 								Veículo *
 							</label>
 							{#if vehiclesLoading}
 								<div class="mt-1 flex items-center">
-									<div class="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600"></div>
+									<div
+										class="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600"
+									></div>
 									<span class="text-sm text-gray-500">Carregando veículos...</span>
 								</div>
 							{:else}
@@ -182,13 +202,14 @@ n	function handleNextKmInput(e: Event) {
 									id="vehicle"
 									bind:value={formData.vehicle_id}
 									required
-t							disabled={isVehiclePreSelected}
+									disabled={isVehiclePreSelected}
 									class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 								>
 									<option value={0}>Selecione um veículo...</option>
 									{#each vehicles as vehicle}
 										<option value={vehicle.id}>
-											{vehicle.brand} {vehicle.model} - {vehicle.plate} ({vehicle.year})
+											{vehicle.brand}
+											{vehicle.model} - {vehicle.plate} ({vehicle.year})
 										</option>
 									{/each}
 								</select>
@@ -230,7 +251,10 @@ t							disabled={isVehiclePreSelected}
 
 						<!-- Data do Serviço -->
 						<div>
-							<label for="service_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+							<label
+								for="service_date"
+								class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+							>
 								Data do Serviço *
 							</label>
 							<input
@@ -270,11 +294,22 @@ t							disabled={isVehiclePreSelected}
 								class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 								placeholder="0 km"
 							/>
+							{#if formData.vehicle_id > 0}
+								{@const selectedVehicle = vehicles.find((v) => v.id === formData.vehicle_id)}
+								{#if selectedVehicle}
+									<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+										Quilometragem mínima: {selectedVehicle.current_km.toLocaleString('pt-BR')} km
+									</p>
+								{/if}
+							{/if}
 						</div>
 
 						<!-- Próxima Manutenção -->
 						<div>
-							<label for="next_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+							<label
+								for="next_date"
+								class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+							>
 								Próxima Manutenção
 							</label>
 							<input
@@ -285,27 +320,30 @@ t							disabled={isVehiclePreSelected}
 							/>
 						</div>
 					</div>
-n						<!-- Próxima Quilometragem -->
-						<div>
-							<label for="next_km" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-								Próxima Quilometragem
-							</label>
-							<input
-								type="text"
-								id="next_km"
-								value={formData.next_km}
-								on:input={handleNextKmInput}
-								class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
-								placeholder="0 km"
-							/>
-							<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-								Quilometragem estimada para a próxima manutenção
-							</p>
-						</div>
+					<!-- Próxima Quilometragem -->
+					<div>
+						<label for="next_km" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+							Próxima Quilometragem
+						</label>
+						<input
+							type="text"
+							id="next_km"
+							value={formData.next_km}
+							on:input={handleNextKmInput}
+							class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+							placeholder="0 km"
+						/>
+						<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+							Quilometragem estimada para a próxima manutenção
+						</p>
+					</div>
 
 					<!-- Descrição -->
 					<div>
-						<label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+						<label
+							for="description"
+							class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+						>
 							Descrição
 						</label>
 						<textarea
