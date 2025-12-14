@@ -352,7 +352,8 @@
 									id="vehicle"
 									bind:value={formData.vehicle_id}
 									required
-									class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+									disabled
+									class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 								>
 									<option value={0}>Selecione um veículo...</option>
 									{#each vehicles as vehicle}
