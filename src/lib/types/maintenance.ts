@@ -9,6 +9,7 @@ export interface Maintenance {
     km_when_done?: number;
     service_date: string; // ISO Date string
     next_service_date?: string; // ISO Date string
+    next_km?: number; // Próxima quilometragem para manutenção
     is_completed: boolean;
     completed_at?: string; // ISO Date string
     notes?: string;
@@ -33,6 +34,7 @@ export interface CreateMaintenanceRequest {
     km_when_done?: number;
     service_date: string;
     next_service_date?: string;
+    next_km?: number;
     notes?: string;
 }
 
@@ -46,6 +48,7 @@ export interface UpdateMaintenanceRequest {
     service_date?: string;
     next_service_date?: string;
     notes?: string;
+    next_km?: number;
 }
 
 export interface MaintenanceResponse {

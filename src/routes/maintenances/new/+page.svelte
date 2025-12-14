@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+timport { page } from '/stores';
 	import { maintenancesApi } from '$lib/api/maintenances';
 	import { vehiclesApi } from '$lib/api/vehicles';
 	import { authStore } from '$lib/stores/auth';
@@ -13,6 +14,7 @@
 	let error = '';
 	let vehicles: Vehicle[] = [];
 	let vehiclesLoading = true;
+	let isVehiclePreSelected = false;
 
 	let formData = {
 		vehicle_id: 0,
@@ -24,10 +26,19 @@
 		service_date: new Date().toISOString().split('T')[0],
 		next_service_date: '',
 		notes: ''
+t	next_km: '',
 	};
-
-	onMount(async () => {
 		await loadVehicles();
+tonMount(async () => {
+		// Verificar se há vehicle_id na URL
+		const vehicleIdParam = $page.url.searchParams.get('vehicle_id');
+		if (vehicleIdParam) {
+			formData.vehicle_id = parseInt(vehicleIdParam);
+			isVehiclePreSelected = true;
+		}
+
+		await loadVehicles();
+	});
 	});
 
 	async function loadVehicles() {
@@ -68,6 +79,7 @@
 				service_date: formData.service_date,
 				next_service_date: formData.next_service_date || undefined,
 				notes: formData.notes || undefined
+t			next_km: formData.next_km ? parseInt(formData.next_km.replace(/D/g, '')) : undefined,
 			};
 
 			await maintenancesApi.create(submitData, token);
@@ -106,6 +118,12 @@
 		const formatted = formatKm(target.value);
 		formData.km_when_done = formatted;
 		target.value = formatted;
+n	function handleNextKmInput(e: Event) {
+		const target = e.target as HTMLInputElement;
+		const formatted = formatKm(target.value);
+		formData.next_km = formatted;
+		target.value = formatted;
+	}
 	}
 </script>
 
@@ -164,6 +182,7 @@
 									id="vehicle"
 									bind:value={formData.vehicle_id}
 									required
+t							disabled={isVehiclePreSelected}
 									class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 								>
 									<option value={0}>Selecione um veículo...</option>
@@ -266,6 +285,23 @@
 							/>
 						</div>
 					</div>
+n						<!-- Próxima Quilometragem -->
+						<div>
+							<label for="next_km" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+								Próxima Quilometragem
+							</label>
+							<input
+								type="text"
+								id="next_km"
+								value={formData.next_km}
+								on:input={handleNextKmInput}
+								class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+								placeholder="0 km"
+							/>
+							<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+								Quilometragem estimada para a próxima manutenção
+							</p>
+						</div>
 
 					<!-- Descrição -->
 					<div>

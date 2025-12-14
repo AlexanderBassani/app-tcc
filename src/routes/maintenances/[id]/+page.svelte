@@ -27,6 +27,7 @@
 		km_when_done: '',
 		service_date: '',
 		next_service_date: '',
+t	next_km: '',
 		notes: ''
 	};
 
@@ -82,6 +83,7 @@
 				km_when_done: maintenance.km_when_done ? formatKm(maintenance.km_when_done.toString()) : '',
 				service_date: maintenance.service_date.split('T')[0],
 				next_service_date: maintenance.next_service_date ? maintenance.next_service_date.split('T')[0] : '',
+t			next_km: maintenance.next_km ? maintenance.next_km.toString() : '',
 				notes: maintenance.notes || ''
 			};
 		}
@@ -105,6 +107,7 @@
 				km_when_done: formData.km_when_done ? parseInt(formData.km_when_done.replace(/\D/g, '')) : undefined,
 				service_date: formData.service_date,
 				next_service_date: formData.next_service_date || undefined,
+t			next_km: formData.next_km ? parseInt(formData.next_km.replace(/D/g, '')) : undefined,
 				notes: formData.notes || undefined
 			};
 
@@ -177,6 +180,12 @@
 		const target = e.target as HTMLInputElement;
 		const formatted = formatKm(target.value);
 		formData.km_when_done = formatted;
+		target.value = formatted;
+	}
+n	function handleNextKmInput(e: Event) {
+		const target = e.target as HTMLInputElement;
+		const formatted = formatKm(target.value);
+		formData.next_km = formatted;
 		target.value = formatted;
 	}
 
@@ -396,6 +405,23 @@
 									class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 								/>
 							</div>
+n						<!-- Próxima Quilometragem -->
+						<div>
+							<label for="next_km_edit" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+								Próxima Quilometragem
+							</label>
+							<input
+								type="text"
+								id="next_km_edit"
+								value={formData.next_km}
+								on:input={handleNextKmInput}
+								class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+								placeholder="0 km"
+							/>
+							<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+								Quilometragem estimada para a próxima manutenção
+							</p>
+						</div>
 						</div>
 
 						<!-- Descrição -->
@@ -481,6 +507,12 @@
 							</div>
 						{/if}
 						{#if maintenance.description}
+t					{#if maintenance.next_km}
+							<div>
+								<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Próxima Quilometragem</p>
+								<p class="mt-1 text-lg text-gray-900 dark:text-white">{maintenance.next_km.toLocaleString()} km</p>
+							</div>
+						{/if}
 							<div class="sm:col-span-2">
 								<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Descrição</p>
 								<p class="mt-1 whitespace-pre-wrap text-gray-900 dark:text-white">{maintenance.description}</p>

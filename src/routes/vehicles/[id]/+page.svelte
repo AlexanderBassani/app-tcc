@@ -320,9 +320,13 @@ import VehicleMaintenances from '$lib/components/VehicleMaintenances.svelte';
 									type="number"
 									id="current_km"
 									bind:value={formData.current_km}
+															min={vehicle?.current_km || 0}
 									required
 									class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 								/>
+													<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+								Valor mínimo: {vehicle?.current_km.toLocaleString()} km
+							</p>
 							</div>
 							<div>
 								<label
