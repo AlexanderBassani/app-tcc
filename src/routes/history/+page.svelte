@@ -72,10 +72,10 @@
 			const allMaintenances = maintenancesRes.data || [];
 
 			// Filter maintenances by vehicle
-			const maintenances = allMaintenances.filter(m => m.vehicle_id === selectedVehicleId);
+			const maintenances = allMaintenances.filter((m) => m.vehicle_id === selectedVehicleId);
 
 			// Convert to unified history items
-			const fuelingItems: HistoryItem[] = fuelings.map(f => ({
+			const fuelingItems: HistoryItem[] = fuelings.map((f) => ({
 				id: f.id,
 				type: 'fueling' as const,
 				date: f.date,
@@ -83,7 +83,7 @@
 				data: f
 			}));
 
-			const maintenanceItems: HistoryItem[] = maintenances.map(m => ({
+			const maintenanceItems: HistoryItem[] = maintenances.map((m) => ({
 				id: m.id,
 				type: 'maintenance' as const,
 				date: m.service_date,
@@ -103,8 +103,10 @@
 	}
 
 	function getVehicleInfo(vehicleId: number) {
-		const vehicle = vehicles.find(v => v.id === vehicleId);
-		return vehicle ? `${vehicle.brand} ${vehicle.model} (${vehicle.plate})` : 'Veículo não encontrado';
+		const vehicle = vehicles.find((v) => v.id === vehicleId);
+		return vehicle
+			? `${vehicle.brand} ${vehicle.model} (${vehicle.plate})`
+			: 'Veículo não encontrado';
 	}
 
 	function formatDate(dateString: string) {
@@ -123,7 +125,7 @@
 	}
 
 	function getFuelTypeLabel(type: string) {
-		const fuelType = FUEL_TYPES.find(ft => ft.value === type);
+		const fuelType = FUEL_TYPES.find((ft) => ft.value === type);
 		return fuelType?.label || type;
 	}
 
@@ -147,24 +149,24 @@
 		<div class="space-y-6">
 			<!-- Header -->
 			<div class="flex items-center justify-between">
-				<h1 class="text-2xl font-bold text-gray-800 dark:text-white">Histórico</h1>
+				<h1 class="text-2xl font-bold text-gray-900 dark:text-white">Histórico</h1>
 			</div>
 
 			<!-- Vehicle Selector -->
-			<div class="rounded-lg bg-white p-4 shadow dark:bg-gray-700">
-				<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+			<div class="rounded-lg bg-white p-4 dark:bg-gray-800">
+				<label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
 					Selecione o Veículo
 				</label>
 				<select
 					bind:value={selectedVehicleId}
 					on:change={handleVehicleChange}
-					class="block w-full md:w-96 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
+					class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none md:w-96 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
 					disabled={vehicles.length === 0}
 				>
-					<option value={null}>Selecione um veículo</option>
 					{#each vehicles as vehicle}
 						<option value={vehicle.id}>
-							{vehicle.brand} {vehicle.model} ({vehicle.plate})
+							{vehicle.brand}
+							{vehicle.model} ({vehicle.plate})
 						</option>
 					{/each}
 				</select>
@@ -173,17 +175,19 @@
 			{#if loading}
 				<div class="flex justify-center py-12">
 					<div
-						class="border-primary-500 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"
+						class="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"
 					></div>
 				</div>
 			{:else if error}
-				<div class="rounded-lg bg-red-50 p-4 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+				<div
+					class="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-400"
+				>
 					{error}
 				</div>
 			{:else if !selectedVehicleId}
-				<div class="rounded-lg bg-white p-12 text-center shadow dark:bg-gray-700">
+				<div class="rounded-xl bg-white p-12 text-center shadow-sm dark:bg-gray-800">
 					<svg
-						class="mx-auto h-12 w-12 text-gray-400"
+						class="mx-auto h-16 w-16 text-gray-400"
 						fill="none"
 						stroke="currentColor"
 						viewBox="0 0 24 24"
@@ -195,17 +199,17 @@
 							d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
 						></path>
 					</svg>
-					<h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+					<h3 class="mt-4 text-lg font-semibold text-gray-900 dark:text-white">
 						Selecione um veículo
 					</h3>
-					<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+					<p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
 						Escolha um veículo para visualizar seu histórico.
 					</p>
 				</div>
 			{:else if vehicles.length === 0}
-				<div class="rounded-lg bg-white p-12 text-center shadow dark:bg-gray-700">
+				<div class="rounded-xl bg-white p-12 text-center shadow-sm dark:bg-gray-800">
 					<svg
-						class="mx-auto h-12 w-12 text-gray-400"
+						class="mx-auto h-16 w-16 text-gray-400"
 						fill="none"
 						stroke="currentColor"
 						viewBox="0 0 24 24"
@@ -223,28 +227,33 @@
 							d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 001-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6 0a1 1 0 001 1h2a1 1 0 001-1m-6 0h6"
 						></path>
 					</svg>
-					<h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+					<h3 class="mt-4 text-lg font-semibold text-gray-900 dark:text-white">
 						Nenhum veículo cadastrado
 					</h3>
-					<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+					<p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
 						Cadastre um veículo para começar a visualizar o histórico.
 					</p>
 					<div class="mt-6">
 						<a
 							href="/vehicles/new"
-							class="bg-primary-600 hover:bg-primary-700 inline-flex items-center rounded-md px-4 py-2 text-sm font-medium text-white shadow-sm"
+							class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700"
 						>
-							<svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+							<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+								></path>
 							</svg>
 							Cadastrar Veículo
 						</a>
 					</div>
 				</div>
 			{:else if historyItems.length === 0}
-				<div class="rounded-lg bg-white p-12 text-center shadow dark:bg-gray-700">
+				<div class="rounded-xl bg-white p-12 text-center shadow-sm dark:bg-gray-800">
 					<svg
-						class="mx-auto h-12 w-12 text-gray-400"
+						class="mx-auto h-16 w-16 text-gray-400"
 						fill="none"
 						stroke="currentColor"
 						viewBox="0 0 24 24"
@@ -256,10 +265,10 @@
 							d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
 						></path>
 					</svg>
-					<h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+					<h3 class="mt-4 text-lg font-semibold text-gray-900 dark:text-white">
 						Nenhum registro encontrado
 					</h3>
-					<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+					<p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
 						Este veículo ainda não possui abastecimentos ou manutenções registrados.
 					</p>
 				</div>
@@ -267,10 +276,7 @@
 				<!-- Timeline -->
 				<div class="relative">
 					<!-- Vertical line -->
-					<div
-						class="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-300 dark:bg-gray-600"
-						style="margin-left: 11px;"
-					></div>
+					<div class="absolute top-0 bottom-0 left-6 w-0.5 bg-gray-700"></div>
 
 					<!-- Timeline items -->
 					<div class="space-y-6">
@@ -280,34 +286,35 @@
 								<div
 									class="absolute left-0 flex h-12 w-12 items-center justify-center rounded-full {item.type ===
 									'fueling'
-										? 'bg-blue-100 dark:bg-blue-900/30'
-										: 'bg-orange-100 dark:bg-orange-900/30'}"
+										? 'bg-blue-600'
+										: 'bg-orange-600'}"
 								>
 									{#if item.type === 'fueling'}
 										<!-- Gas pump icon -->
 										<svg
-											class="h-6 w-6 text-blue-600 dark:text-blue-400"
+											xmlns="http://www.w3.org/2000/svg"
+											width="24"
+											height="24"
+											viewBox="0 0 24 24"
 											fill="none"
 											stroke="currentColor"
-											viewBox="0 0 24 24"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											class="h-6 w-6 text-white"
+											><line x1="3" x2="15" y1="22" y2="22"></line><line
+												x1="4"
+												x2="14"
+												y1="9"
+												y2="9"
+											></line><path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"></path><path
+												d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 5"
+											></path></svg
 										>
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M3 10h10a2 2 0 012 2v7a1 1 0 01-1 1H4a1 1 0 01-1-1v-7a2 2 0 012-2zM5 10V7a2 2 0 012-2h4a2 2 0 012 2v3M5 10v3m8-3v3m4-7v11"
-											></path>
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M17 4l3 3-3 3"
-											></path>
-										</svg>
 									{:else}
 										<!-- Wrench icon -->
 										<svg
-											class="h-6 w-6 text-orange-600 dark:text-orange-400"
+											class="h-6 w-6 text-white"
 											fill="none"
 											stroke="currentColor"
 											viewBox="0 0 24 24"
@@ -324,122 +331,136 @@
 
 								<!-- Content card -->
 								<div
-									class="rounded-lg bg-white p-6 shadow transition-shadow hover:shadow-lg dark:bg-gray-700"
+									class="rounded-xl border border-gray-200 bg-gradient-to-br from-gray-800 to-gray-900 p-6 shadow-lg transition-all hover:shadow-xl dark:border-gray-700"
 								>
 									{#if item.type === 'fueling'}
 										{@const fueling = item.data as Fueling}
-										<div class="flex items-start justify-between">
-											<div class="flex-1">
-												<div class="flex items-center gap-3">
-													<h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-														Abastecimento
-													</h3>
+										<div class="flex items-start justify-between gap-4">
+											<div class="flex-1 space-y-3">
+												<!-- Title and Badges -->
+												<div class="flex items-center gap-2">
+													<h3 class="text-lg font-semibold text-white">Abastecimento</h3>
 													<span
-														class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-400"
+														class="inline-flex items-center rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-xs font-semibold text-blue-400"
 													>
 														{getFuelTypeLabel(fueling.fuel_type)}
 													</span>
 													{#if fueling.is_full_tank}
 														<span
-															class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400"
+															class="inline-flex items-center rounded-full border border-green-500/30 bg-green-500/10 px-3 py-1 text-xs font-semibold text-green-400"
 														>
 															Tanque Cheio
 														</span>
 													{/if}
 												</div>
 
-												<div
-													class="mt-3 grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-600 dark:text-gray-300 md:grid-cols-3"
-												>
+												<!-- Date and KM -->
+												<div class="flex gap-6 text-sm text-gray-300">
 													<div>
-														<span class="font-medium">Data:</span>
-														{formatDate(fueling.date)}
+														<span class="text-gray-400">Data:</span>
+														<span class="ml-1">{formatDate(fueling.date)}</span>
 													</div>
 													<div>
-														<span class="font-medium">KM:</span>
-														{Number(fueling.km).toLocaleString()}
+														<span class="text-gray-400">KM:</span>
+														<span class="ml-1">{Number(fueling.km).toLocaleString()}</span>
 													</div>
-													<div>
-														<span class="font-medium">Litros:</span>
-														{Number(fueling.liters).toFixed(2)} L
-													</div>
-													<div>
-														<span class="font-medium">Preço/L:</span>
-														{formatCurrency(Number(fueling.price_per_liter))}
-													</div>
-													<div>
-														<span class="font-medium">Total:</span>
-														<span class="font-semibold text-gray-900 dark:text-white">
-															{formatCurrency(Number(fueling.total_cost))}
-														</span>
-													</div>
-													{#if fueling.gas_station}
-														<div class="col-span-2 md:col-span-1">
-															<span class="font-medium">Posto:</span>
-															{fueling.gas_station}
-														</div>
-													{/if}
 												</div>
 
-												{#if fueling.notes}
-													<div class="mt-3 text-sm text-gray-600 dark:text-gray-300">
-														<span class="font-medium">Observações:</span>
-														{fueling.notes}
+												<!-- Liters and Price -->
+												<div class="flex gap-6 text-sm text-gray-300">
+													<div>
+														<span class="text-gray-400">Litros:</span>
+														<span class="ml-1">{Number(fueling.liters).toFixed(2)} L</span>
+													</div>
+													<div>
+														<span class="text-gray-400">Preço/L:</span>
+														<span class="ml-1"
+															>{formatCurrency(Number(fueling.price_per_liter))}</span
+														>
+													</div>
+												</div>
+
+												<!-- Total Cost -->
+												<div class="text-white">
+													<span class="text-gray-400">Total:</span>
+													<span class="ml-1 text-lg font-bold"
+														>{formatCurrency(Number(fueling.total_cost))}</span
+													>
+												</div>
+
+												<!-- Gas Station -->
+												{#if fueling.gas_station}
+													<div class="text-sm text-gray-300">
+														<span class="text-gray-400">Posto:</span>
+														<span class="ml-1">{fueling.gas_station}</span>
 													</div>
 												{/if}
 											</div>
 
+											<!-- Action Button -->
 											<a
 												href="/fuelings/{fueling.id}"
-												class="ml-4 inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500"
+												class="rounded-lg border border-gray-600 bg-gray-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-600"
 											>
 												Ver
 											</a>
 										</div>
 									{:else}
 										{@const maintenance = item.data as Maintenance}
-										<div class="flex items-start justify-between">
-											<div class="flex-1">
-												<div class="flex items-center gap-3">
-													<h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-														{maintenance.title}
-													</h3>
+										<div class="flex items-start justify-between gap-4">
+											<div class="flex-1 space-y-3">
+												<!-- Title and Status Badge and Type -->
+												<div class="flex items-center gap-2">
+													<h3 class="text-lg font-semibold text-white">Manutenção</h3>
 													<span
-														class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {maintenance.is_completed
-															? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-															: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'}"
+														class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold {maintenance.is_completed
+															? 'border border-green-500/30 bg-green-500/10 text-green-400'
+															: 'border border-red-500/30 bg-red-500/10 text-red-400'}"
 													>
 														{maintenance.is_completed ? 'Concluída' : 'Pendente'}
 													</span>
 													<span
-														class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800 dark:bg-gray-600 dark:text-gray-200"
+														class="inline-flex items-center rounded-full bg-gray-700 px-3 py-1 text-xs font-medium text-gray-300"
 													>
 														{getMaintenanceTypeLabel(maintenance.type)}
 													</span>
 												</div>
 
-												<div class="mt-2 space-y-1 text-sm text-gray-600 dark:text-gray-300">
-													{#if maintenance.description}
-														<p><strong>Descrição:</strong> {maintenance.description}</p>
-													{/if}
-													<div class="flex gap-4 flex-wrap">
-														<p><strong>Data:</strong> {formatDate(maintenance.service_date)}</p>
-														{#if maintenance.cost}
-															<p><strong>Custo:</strong> {formatCurrency(maintenance.cost)}</p>
-														{/if}
-														{#if maintenance.km_when_done}
-															<p><strong>KM:</strong> {maintenance.km_when_done.toLocaleString()}</p>
-														{/if}
+												<!-- Vehicle Info -->
+												<div class="text-white">
+													<p class="text-sm text-gray-400">Veículo:</p>
+													<p class="font-semibold">{getVehicleInfo(maintenance.vehicle_id)}</p>
+												</div>
+
+												<!-- Description -->
+												{#if maintenance.description}
+													<div class="text-white">
+														<p class="text-sm text-gray-400">Descrição:</p>
+														<p class="text-sm">{maintenance.description}</p>
 													</div>
-													{#if maintenance.notes}
-														<p><strong>Observações:</strong> {maintenance.notes}</p>
+												{/if}
+
+												<!-- Date and Cost -->
+												<div class="flex gap-6 text-sm text-gray-300">
+													<div>
+														<span class="text-gray-400">Data:</span>
+														<span class="ml-1">{formatDate(maintenance.service_date)}</span>
+													</div>
+													{#if maintenance.cost}
+														<div>
+															<span class="text-gray-400">Custo:</span>
+															<span class="ml-1 font-semibold"
+																>{formatCurrency(maintenance.cost)}</span
+															>
+														</div>
 													{/if}
 												</div>
 											</div>
 
+											<!-- Action Button -->
 											<a
 												href="/maintenances/{maintenance.id}"
-												class="ml-4 inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500"
+												class="rounded-lg border border-gray-600 bg-gray-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-600"
 											>
 												Ver
 											</a>
