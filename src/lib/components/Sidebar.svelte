@@ -21,29 +21,29 @@
 	});
 </script>
 
-<aside class="w-64 border-r border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700">
+<aside class="w-64 bg-[#1e293b] text-gray-300">
 	<div class="flex h-full flex-col">
 		<!-- Logo -->
-		<div class="flex h-16 items-center gap-3 border-b border-gray-300 px-6 dark:border-gray-600">
-			<div class="bg-primary-600 flex h-10 w-10 items-center justify-center rounded-lg">
-				<span class="text-xl font-bold text-white">M</span>
+		<div class="flex h-16 items-center gap-3 border-b border-gray-700/50 px-6">
+			<div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500">
+				<span class="text-2xl font-bold text-white">M</span>
 			</div>
-			<span class="text-xl font-bold text-gray-800 dark:text-white">MyApp</span>
+			<span class="text-xl font-semibold text-white">MyApp</span>
 		</div>
 
 		<!-- Navigation -->
-		<nav class="flex-1 space-y-1 overflow-y-auto p-4">
+		<nav class="flex-1 space-y-2 overflow-y-auto p-4">
 			<!-- Dashboard -->
 			<a
 				href="/"
-				class="flex cursor-pointer items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors {isActive(
+				class="flex cursor-pointer items-center gap-4 rounded-xl px-4 py-3 text-base transition-all {isActive(
 					'/'
 				)
-					? 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
-					: 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600'}"
+					? 'bg-[#3b4f6f] text-white'
+					: 'text-gray-300 hover:bg-[#2d3a4f]'}"
 			>
 				<svg
-					class="h-5 w-5"
+					class="h-6 w-6"
 					fill="none"
 					stroke="currentColor"
 					viewBox="0 0 24 24"
@@ -61,14 +61,14 @@
 
 			<!-- Admin Section - Only visible for admin users -->
 			{#if isAdmin($authStore.user)}
-				<div class="space-y-1">
+				<div class="space-y-2">
 					<button
 						onclick={() => (usersExpanded = !usersExpanded)}
-						class="flex w-full cursor-pointer items-center justify-between rounded-lg px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600"
+						class="flex w-full cursor-pointer items-center justify-between rounded-xl px-4 py-3 text-base text-gray-300 transition-all hover:bg-[#2d3a4f]"
 					>
-						<div class="flex items-center gap-3">
+						<div class="flex items-center gap-4">
 							<svg
-								class="h-5 w-5"
+								class="h-6 w-6"
 								fill="none"
 								stroke="currentColor"
 								viewBox="0 0 24 24"
@@ -84,7 +84,7 @@
 							<span>Usuários</span>
 						</div>
 						<svg
-							class="h-4 w-4 transition-transform {usersExpanded ? 'rotate-180' : ''}"
+							class="h-5 w-5 transition-transform {usersExpanded ? 'rotate-180' : ''}"
 							fill="none"
 							stroke="currentColor"
 							viewBox="0 0 24 24"
@@ -101,24 +101,24 @@
 
 					<!-- Submenu -->
 					{#if usersExpanded}
-						<div class="ml-4 space-y-1 border-l-2 border-gray-300 pl-4 dark:border-gray-600">
+						<div class="ml-10 space-y-1">
 							<a
 								href="/usuarios"
-								class="block cursor-pointer rounded-lg px-4 py-2 text-sm transition-colors {isActive(
+								class="block cursor-pointer rounded-lg px-4 py-2 text-sm transition-all {isActive(
 									'/usuarios'
 								)
-									? 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
-									: 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600'}"
+									? 'bg-[#3b4f6f] text-white'
+									: 'text-gray-400 hover:bg-[#2d3a4f] hover:text-gray-300'}"
 							>
 								Lista de Usuários
 							</a>
 							<a
 								href="/usuarios/cadastro"
-								class="block cursor-pointer rounded-lg px-4 py-2 text-sm transition-colors {isActive(
+								class="block cursor-pointer rounded-lg px-4 py-2 text-sm transition-all {isActive(
 									'/usuarios/cadastro'
 								)
-									? 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
-									: 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600'}"
+									? 'bg-[#3b4f6f] text-white'
+									: 'text-gray-400 hover:bg-[#2d3a4f] hover:text-gray-300'}"
 							>
 								Cadastro de Usuário
 							</a>
@@ -130,20 +130,19 @@
 			<!-- Vehicles -->
 			<a
 				href="/vehicles"
-				class="flex cursor-pointer items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors {isActive(
+				class="flex cursor-pointer items-center gap-4 rounded-xl px-4 py-3 text-base transition-all {isActive(
 					'/vehicles'
 				)
-					? 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
-					: 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600'}"
+					? 'bg-[#3b4f6f] text-white'
+					: 'text-gray-300 hover:bg-[#2d3a4f]'}"
 			>
 				<svg
-					class="h-5 w-5"
+					class="h-6 w-6"
 					fill="none"
 					stroke="currentColor"
 					viewBox="0 0 24 24"
 					xmlns="http://www.w3.org/2000/svg"
 				>
-					<!-- Car icon -->
 					<path
 						stroke-linecap="round"
 						stroke-linejoin="round"
@@ -163,18 +162,17 @@
 			<!-- Maintenances -->
 			<a
 				href="/maintenances"
-				class="flex cursor-pointer items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors {isActiveSection('/maintenances')
-					? 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
-					: 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600'}"
+				class="flex cursor-pointer items-center gap-4 rounded-xl px-4 py-3 text-base transition-all {isActiveSection('/maintenances')
+					? 'bg-[#3b4f6f] text-white'
+					: 'text-gray-300 hover:bg-[#2d3a4f]'}"
 			>
 				<svg
-					class="h-5 w-5"
+					class="h-6 w-6"
 					fill="none"
 					stroke="currentColor"
 					viewBox="0 0 24 24"
 					xmlns="http://www.w3.org/2000/svg"
 				>
-					<!-- Wrench icon -->
 					<path
 						stroke-linecap="round"
 						stroke-linejoin="round"
@@ -188,38 +186,50 @@
 			<!-- Fuelings -->
 			<a
 				href="/fuelings"
-				class="flex cursor-pointer items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors {isActiveSection('/fuelings')
-					? 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
-					: 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600'}"
+				class="flex cursor-pointer items-center gap-4 rounded-xl px-4 py-3 text-base transition-all {isActiveSection('/fuelings')
+					? 'bg-[#3b4f6f] text-white'
+					: 'text-gray-300 hover:bg-[#2d3a4f]'}"
 			>
 				<svg
-					class="h-5 w-5"
+					class="h-6 w-6"
 					fill="none"
 					stroke="currentColor"
 					viewBox="0 0 24 24"
 					xmlns="http://www.w3.org/2000/svg"
 				>
-					<!-- Gas pump icon -->
 					<path
 						stroke-linecap="round"
 						stroke-linejoin="round"
 						stroke-width="2"
-						d="M3 10h10a2 2 0 012 2v7a1 1 0 01-1 1H4a1 1 0 01-1-1v-7a2 2 0 012-2zM5 10V7a2 2 0 012-2h4a2 2 0 012 2v3M5 10v3m8-3v3m4-7v11"
-					></path>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M17 4l3 3-3 3"
+						d="M3 10h10a2 2 0 012 2v7a1 1 0 01-1 1H4a1 1 0 01-1-1v-7a2 2 0 012-2zM5 10V7a2 2 0 012-2h4a2 2 0 012 2v3"
 					></path>
 				</svg>
 				<span>Abastecimentos</span>
 			</a>
-		</nav>
 
-		<!-- Footer -->
-		<div class="border-t border-gray-300 p-4 dark:border-gray-600">
-			<p class="text-center text-xs text-gray-500 dark:text-gray-400">© 2025 MyApp - TCC PUC</p>
-		</div>
+			<!-- History -->
+			<a
+				href="/history"
+				class="flex cursor-pointer items-center gap-4 rounded-xl px-4 py-3 text-base transition-all {isActiveSection('/history')
+					? 'bg-[#3b4f6f] text-white'
+					: 'text-gray-300 hover:bg-[#2d3a4f]'}"
+			>
+				<svg
+					class="h-6 w-6"
+					fill="none"
+					stroke="currentColor"
+					viewBox="0 0 24 24"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+					></path>
+				</svg>
+				<span>Histórico</span>
+			</a>
+		</nav>
 	</div>
 </aside>
