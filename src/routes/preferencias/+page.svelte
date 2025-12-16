@@ -5,11 +5,11 @@
 	import { preferencesApi } from '$lib/api/preferences';
 
 	// Theme preferences
-	let themeMode = $state('system');
+	let themeMode = $state<'light' | 'dark' | 'system'>('system');
 	let themeColor = $state('blue');
 
 	// Interface preferences
-	let fontSize = $state('medium');
+	let fontSize = $state<'small' | 'medium' | 'large' | 'extra-large'>('medium');
 	let compactMode = $state(false);
 	let animationsEnabled = $state(true);
 
@@ -23,9 +23,9 @@
 	let errorMessage = $state('');
 
 	const themeModes = [
-		{ value: 'light', label: 'Claro' },
-		{ value: 'dark', label: 'Escuro' },
-		{ value: 'system', label: 'Sistema' }
+		{ value: 'light' as const, label: 'Claro' },
+		{ value: 'dark' as const, label: 'Escuro' },
+		{ value: 'system' as const, label: 'Sistema' }
 	];
 
 	const themeColors = [
@@ -37,10 +37,10 @@
 	];
 
 	const fontSizes = [
-		{ value: 'small', label: 'Pequeno' },
-		{ value: 'medium', label: 'Médio' },
-		{ value: 'large', label: 'Grande' },
-		{ value: 'extra-large', label: 'Extra Grande' }
+		{ value: 'small' as const, label: 'Pequeno' },
+		{ value: 'medium' as const, label: 'Médio' },
+		{ value: 'large' as const, label: 'Grande' },
+		{ value: 'extra-large' as const, label: 'Extra Grande' }
 	];
 
 	onMount(() => {
@@ -87,7 +87,7 @@
 			}
 
 			const storedFontSize = localStorage.getItem('fontSize');
-			if (storedFontSize) {
+			if (storedFontSize && (storedFontSize === 'small' || storedFontSize === 'medium' || storedFontSize === 'large' || storedFontSize === 'extra-large')) {
 				fontSize = storedFontSize;
 			}
 

@@ -23,18 +23,8 @@
 			// Salvar no store (localStorage/sessionStorage)
 			authStore.login(response.user, response.token, rememberMe);
 
-			// Salvar token nos cookies via action do servidor
-			const formData = new FormData();
-			formData.append('token', response.token);
-			formData.append('rememberMe', String(rememberMe));
-
-			await fetch('?/login', {
-				method: 'POST',
-				body: formData
-			});
-
-			// Redirecionar para a página inicial
-			window.location.href = '/';
+			// Redirecionar para a página inicial usando SvelteKit
+			await goto('/', { replaceState: true });
 		} catch (e) {
 			console.error('Erro no login:', e);
 			errorMessage =
@@ -170,7 +160,7 @@
 				</button>
 
 				<!-- Divider -->
-				<div class="relative">
+				<!-- <div class="relative">
 					<div class="absolute inset-0 flex items-center">
 						<div class="w-full border-t border-gray-300 dark:border-gray-600"></div>
 					</div>
@@ -179,10 +169,10 @@
 							>Ou continue com</span
 						>
 					</div>
-				</div>
+				</div> -->
 
 				<!-- Social Login Buttons -->
-				<div class="grid grid-cols-2 gap-3">
+				<!-- <div class="grid grid-cols-2 gap-3">
 					<button
 						type="button"
 						class="flex items-center justify-center rounded-lg border border-gray-300 px-4 py-3 transition duration-200 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700"
@@ -218,7 +208,7 @@
 						</svg>
 						<span class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">Facebook</span>
 					</button>
-				</div>
+				</div> -->
 			</form>
 
 			<!-- Footer -->

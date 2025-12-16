@@ -4,6 +4,7 @@
 	import { authStore } from '$lib/stores/auth';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
 
 	let userId: number;
 	let formData = $state({
@@ -18,7 +19,7 @@
 		date_of_birth: '',
 		gender: '' as 'male' | 'female' | 'other' | 'prefer_not_to_say' | '',
 		bio: '',
-		status: 'active' as 'active' | 'inactive',
+		status: 'active' as 'active' | 'inactive' | 'suspended' | 'deleted',
 		preferred_language: 'pt-BR',
 		timezone: 'America/Sao_Paulo',
 		marketing_emails_consent: false
@@ -156,7 +157,7 @@
 
 			// Redirecionar após sucesso
 			setTimeout(() => {
-				window.location.href = '/usuarios';
+				goto('/usuarios');
 			}, 1500);
 		} catch (e: any) {
 			console.error('Erro ao atualizar usuário:', e);
@@ -457,6 +458,8 @@
 							>
 								<option value="active">Ativo</option>
 								<option value="inactive">Inativo</option>
+								<option value="suspended">Suspenso</option>
+								<option value="deleted">Deletado</option>
 							</select>
 						</div>
 					</div>

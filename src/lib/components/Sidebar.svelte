@@ -8,6 +8,10 @@
 		return $page.url.pathname === path;
 	};
 
+	const isActiveSection = (path: string) => {
+		return $page.url.pathname.startsWith(path);
+	};
+
 	// Verifica se estamos em alguma rota de usuários e mantém o menu expandido
 	$effect(() => {
 		const pathname = $page.url.pathname;
@@ -21,7 +25,7 @@
 	<div class="flex h-full flex-col">
 		<!-- Logo -->
 		<div class="flex h-16 items-center gap-3 border-b border-gray-300 px-6 dark:border-gray-600">
-			<div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-600">
+			<div class="bg-primary-600 flex h-10 w-10 items-center justify-center rounded-lg">
 				<span class="text-xl font-bold text-white">M</span>
 			</div>
 			<span class="text-xl font-bold text-gray-800 dark:text-white">MyApp</span>
@@ -122,13 +126,100 @@
 					{/if}
 				</div>
 			{/if}
+
+			<!-- Vehicles -->
+			<a
+				href="/vehicles"
+				class="flex cursor-pointer items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors {isActive(
+					'/vehicles'
+				)
+					? 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
+					: 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600'}"
+			>
+				<svg
+					class="h-5 w-5"
+					fill="none"
+					stroke="currentColor"
+					viewBox="0 0 24 24"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<!-- Car icon -->
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"
+					></path>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 001-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6 0a1 1 0 001 1h2a1 1 0 001-1m-6 0h6"
+					></path>
+				</svg>
+				<span>Veículos</span>
+			</a>
+
+			<!-- Maintenances -->
+			<a
+				href="/maintenances"
+				class="flex cursor-pointer items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors {isActiveSection('/maintenances')
+					? 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
+					: 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600'}"
+			>
+				<svg
+					class="h-5 w-5"
+					fill="none"
+					stroke="currentColor"
+					viewBox="0 0 24 24"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<!-- Wrench icon -->
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"
+					></path>
+				</svg>
+				<span>Manutenções</span>
+			</a>
+
+			<!-- Fuelings -->
+			<a
+				href="/fuelings"
+				class="flex cursor-pointer items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors {isActiveSection('/fuelings')
+					? 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300'
+					: 'text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-600'}"
+			>
+				<svg
+					class="h-5 w-5"
+					fill="none"
+					stroke="currentColor"
+					viewBox="0 0 24 24"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<!-- Gas pump icon -->
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M3 10h10a2 2 0 012 2v7a1 1 0 01-1 1H4a1 1 0 01-1-1v-7a2 2 0 012-2zM5 10V7a2 2 0 012-2h4a2 2 0 012 2v3M5 10v3m8-3v3m4-7v11"
+					></path>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M17 4l3 3-3 3"
+					></path>
+				</svg>
+				<span>Abastecimentos</span>
+			</a>
 		</nav>
 
 		<!-- Footer -->
 		<div class="border-t border-gray-300 p-4 dark:border-gray-600">
-			<p class="text-center text-xs text-gray-500 dark:text-gray-400">
-				© 2025 MyApp - TCC PUC
-			</p>
+			<p class="text-center text-xs text-gray-500 dark:text-gray-400">© 2025 MyApp - TCC PUC</p>
 		</div>
 	</div>
 </aside>

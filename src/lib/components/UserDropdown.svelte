@@ -24,13 +24,13 @@
 				method: 'POST'
 			});
 
-			// Redirecionar usando window.location para forçar reload completo
-			window.location.href = '/login';
+			// Redirecionar para login
+			goto('/login');
 		} catch (error) {
 			console.error('Erro ao fazer logout:', error);
 			// Mesmo com erro, redirecionar
 			authStore.logout();
-			window.location.href = '/login';
+			goto('/login');
 		}
 	}
 

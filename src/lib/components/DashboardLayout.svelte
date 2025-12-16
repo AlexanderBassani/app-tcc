@@ -5,14 +5,14 @@
 	let { children } = $props();
 </script>
 
-<div class="flex h-screen bg-gray-200 dark:bg-gray-800">
+<div class="flex h-screen bg-gray-200 dark:bg-gray-900">
 	<!-- Sidebar -->
 	<Sidebar />
 
 	<!-- Main Content -->
 	<div class="flex flex-1 flex-col overflow-hidden">
 		<!-- Header -->
-		<header class="bg-white shadow-sm dark:bg-gray-700">
+		<header class="bg-white shadow-sm dark:bg-gray-800">
 			<div class="flex h-16 items-center justify-between px-6">
 				<div>
 					<h1 class="text-2xl font-semibold text-gray-800 dark:text-white">Dashboard</h1>
@@ -24,7 +24,7 @@
 		</header>
 
 		<!-- Page Content -->
-		<main class="flex-1 overflow-y-auto bg-gray-200 p-6 dark:bg-gray-800">
+		<main class="flex-1 overflow-y-auto bg-gray-100 p-6 dark:bg-gray-900">
 			{@render children()}
 		</main>
 	</div>
