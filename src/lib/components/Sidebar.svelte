@@ -1,8 +1,18 @@
 <script lang="ts">
 	import { authStore, isAdmin } from '$lib/stores/auth';
 	import { page } from '$app/stores';
+	import { onMount } from 'svelte';
 
 	let usersExpanded = $state(false);
+	let isCollapsed = $state(false);
+
+	// Load collapsed state from localStorage on mount
+	onMount(() => {
+		const savedState = localStorage.getItem('sidebarCollapsed');
+		if (savedState !== null) {
+			isCollapsed = savedState === 'true';
+		}
+	});
 
 	const isActive = (path: string) => {
 		return $page.url.pathname === path;
@@ -19,16 +29,69 @@
 			usersExpanded = true;
 		}
 	});
+
+	function toggleSidebar() {
+		isCollapsed = !isCollapsed;
+		// Save state to localStorage
+		localStorage.setItem('sidebarCollapsed', isCollapsed.toString());
+	}
 </script>
 
-<aside class="w-64 bg-[#1e293b] text-gray-300">
+<aside
+	class="bg-[#1e293b] text-gray-300 transition-all duration-300 {isCollapsed ? 'w-20' : 'w-64'}"
+>
 	<div class="flex h-full flex-col">
-		<!-- Logo -->
-		<div class="flex h-16 items-center gap-3 border-b border-gray-700/50 px-6">
-			<div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500">
-				<span class="text-2xl font-bold text-white">M</span>
-			</div>
-			<span class="text-xl font-semibold text-white">MyApp</span>
+		<!-- Logo and Toggle -->
+		<div class="flex h-16 items-center border-b border-gray-700/50 px-6 {isCollapsed ? 'justify-center' : 'justify-between'}">
+			{#if !isCollapsed}
+				<div class="flex items-center gap-3">
+					<div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500">
+						<span class="text-2xl font-bold text-white">M</span>
+					</div>
+					<span class="text-xl font-semibold text-white">MyApp</span>
+				</div>
+				<button
+					onclick={toggleSidebar}
+					class="rounded-lg p-2 text-gray-400 transition-colors hover:bg-[#2d3a4f] hover:text-white"
+					title="Recolher menu"
+				>
+					<svg
+						class="h-5 w-5"
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
+						xmlns="http://www.w3.org/2000/svg"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M4 6h16M4 12h16M4 18h16"
+						></path>
+					</svg>
+				</button>
+			{:else}
+				<button
+					onclick={toggleSidebar}
+					class="rounded-lg p-2 text-gray-400 transition-colors hover:bg-[#2d3a4f] hover:text-white"
+					title="Expandir menu"
+				>
+					<svg
+						class="h-5 w-5"
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
+						xmlns="http://www.w3.org/2000/svg"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M4 6h16M4 12h16M4 18h16"
+						></path>
+					</svg>
+				</button>
+			{/if}
 		</div>
 
 		<!-- Navigation -->
@@ -36,14 +99,15 @@
 			<!-- Dashboard -->
 			<a
 				href="/"
-				class="flex cursor-pointer items-center gap-4 rounded-xl px-4 py-3 text-base transition-all {isActive(
+				class="flex cursor-pointer items-center gap-4 rounded-xl px-3 py-3 text-base transition-all {isActive(
 					'/'
 				)
 					? 'bg-[#3b4f6f] text-white'
 					: 'text-gray-300 hover:bg-[#2d3a4f]'}"
+				title="Dashboard"
 			>
 				<svg
-					class="h-6 w-6"
+					class="h-6 w-6 flex-shrink-0"
 					fill="none"
 					stroke="currentColor"
 					viewBox="0 0 24 24"
@@ -56,7 +120,9 @@
 						d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
 					></path>
 				</svg>
-				<span>Dashboard</span>
+				{#if !isCollapsed}
+					<span>Dashboard</span>
+				{/if}
 			</a>
 
 			<!-- Admin Section - Only visible for admin users -->
@@ -64,11 +130,12 @@
 				<div class="space-y-2">
 					<button
 						onclick={() => (usersExpanded = !usersExpanded)}
-						class="flex w-full cursor-pointer items-center justify-between rounded-xl px-4 py-3 text-base text-gray-300 transition-all hover:bg-[#2d3a4f]"
+						class="flex w-full cursor-pointer items-center justify-between rounded-xl px-3 py-3 text-base text-gray-300 transition-all hover:bg-[#2d3a4f]"
+						title="Usuários"
 					>
 						<div class="flex items-center gap-4">
 							<svg
-								class="h-6 w-6"
+								class="h-6 w-6 flex-shrink-0"
 								fill="none"
 								stroke="currentColor"
 								viewBox="0 0 24 24"
@@ -81,26 +148,30 @@
 									d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
 								></path>
 							</svg>
-							<span>Usuários</span>
+							{#if !isCollapsed}
+								<span>Usuários</span>
+							{/if}
 						</div>
-						<svg
-							class="h-5 w-5 transition-transform {usersExpanded ? 'rotate-180' : ''}"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M19 9l-7 7-7-7"
-							></path>
-						</svg>
+						{#if !isCollapsed}
+							<svg
+								class="h-5 w-5 transition-transform {usersExpanded ? 'rotate-180' : ''}"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+								xmlns="http://www.w3.org/2000/svg"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M19 9l-7 7-7-7"
+								></path>
+							</svg>
+						{/if}
 					</button>
 
 					<!-- Submenu -->
-					{#if usersExpanded}
+					{#if usersExpanded && !isCollapsed}
 						<div class="ml-10 space-y-1">
 							<a
 								href="/usuarios"
@@ -130,11 +201,12 @@
 			<!-- Vehicles -->
 			<a
 				href="/vehicles"
-				class="flex cursor-pointer items-center gap-4 rounded-xl px-4 py-3 text-base transition-all {isActive(
+				class="flex cursor-pointer items-center gap-4 rounded-xl px-3 py-3 text-base transition-all {isActive(
 					'/vehicles'
 				)
 					? 'bg-[#3b4f6f] text-white'
 					: 'text-gray-300 hover:bg-[#2d3a4f]'}"
+				title="Veículos"
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -155,20 +227,23 @@
 						r="2"
 					></circle></svg
 				>
-				<span>Veículos</span>
+				{#if !isCollapsed}
+					<span>Veículos</span>
+				{/if}
 			</a>
 
 			<!-- Maintenances -->
 			<a
 				href="/maintenances"
-				class="flex cursor-pointer items-center gap-4 rounded-xl px-4 py-3 text-base transition-all {isActiveSection(
+				class="flex cursor-pointer items-center gap-4 rounded-xl px-3 py-3 text-base transition-all {isActiveSection(
 					'/maintenances'
 				)
 					? 'bg-[#3b4f6f] text-white'
 					: 'text-gray-300 hover:bg-[#2d3a4f]'}"
+				title="Manutenções"
 			>
 				<svg
-					class="h-6 w-6"
+					class="h-6 w-6 flex-shrink-0"
 					fill="none"
 					stroke="currentColor"
 					viewBox="0 0 24 24"
@@ -181,17 +256,20 @@
 						d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"
 					></path>
 				</svg>
-				<span>Manutenções</span>
+				{#if !isCollapsed}
+					<span>Manutenções</span>
+				{/if}
 			</a>
 
 			<!-- Fuelings -->
 			<a
 				href="/fuelings"
-				class="flex cursor-pointer items-center gap-4 rounded-xl px-4 py-3 text-base transition-all {isActiveSection(
+				class="flex cursor-pointer items-center gap-4 rounded-xl px-3 py-3 text-base transition-all {isActiveSection(
 					'/fuelings'
 				)
 					? 'bg-[#3b4f6f] text-white'
 					: 'text-gray-300 hover:bg-[#2d3a4f]'}"
+				title="Abastecimentos"
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -209,20 +287,23 @@
 						d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 5"
 					></path></svg
 				>
-				<span>Abastecimentos</span>
+				{#if !isCollapsed}
+					<span>Abastecimentos</span>
+				{/if}
 			</a>
 
 			<!-- History -->
 			<a
 				href="/history"
-				class="flex cursor-pointer items-center gap-4 rounded-xl px-4 py-3 text-base transition-all {isActiveSection(
+				class="flex cursor-pointer items-center gap-4 rounded-xl px-3 py-3 text-base transition-all {isActiveSection(
 					'/history'
 				)
 					? 'bg-[#3b4f6f] text-white'
 					: 'text-gray-300 hover:bg-[#2d3a4f]'}"
+				title="Histórico"
 			>
 				<svg
-					class="h-6 w-6"
+					class="h-6 w-6 flex-shrink-0"
 					fill="none"
 					stroke="currentColor"
 					viewBox="0 0 24 24"
@@ -235,7 +316,9 @@
 						d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
 					></path>
 				</svg>
-				<span>Histórico</span>
+				{#if !isCollapsed}
+					<span>Histórico</span>
+				{/if}
 			</a>
 		</nav>
 	</div>
