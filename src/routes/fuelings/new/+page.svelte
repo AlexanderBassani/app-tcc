@@ -91,7 +91,9 @@
 				date: formData.date,
 				km: km,
 				liters: parseFloat(formData.liters.replace(/[^\d,.-]/g, '').replace(',', '.')),
-				price_per_liter: parseFloat(formData.price_per_liter.replace(/[^\d,.-]/g, '').replace(',', '.')),
+				price_per_liter: parseFloat(
+					formData.price_per_liter.replace(/[^\d,.-]/g, '').replace(',', '.')
+				),
 				fuel_type: formData.fuel_type,
 				is_full_tank: formData.is_full_tank,
 				gas_station: formData.gas_station || undefined,
@@ -167,13 +169,19 @@
 
 	// Calcular total automaticamente
 	let totalCost = $derived.by(() => {
-		const liters = formData.liters ? parseFloat(formData.liters.replace(/[^\d,.-]/g, '').replace(',', '.')) : 0;
-		const pricePerLiter = formData.price_per_liter ? parseFloat(formData.price_per_liter.replace(/[^\d,.-]/g, '').replace(',', '.')) : 0;
+		const liters = formData.liters
+			? parseFloat(formData.liters.replace(/[^\d,.-]/g, '').replace(',', '.'))
+			: 0;
+		const pricePerLiter = formData.price_per_liter
+			? parseFloat(formData.price_per_liter.replace(/[^\d,.-]/g, '').replace(',', '.'))
+			: 0;
 		const total = liters * pricePerLiter;
-		return total > 0 ? new Intl.NumberFormat('pt-BR', {
-			style: 'currency',
-			currency: 'BRL'
-		}).format(total) : 'R$ 0,00';
+		return total > 0
+			? new Intl.NumberFormat('pt-BR', {
+					style: 'currency',
+					currency: 'BRL'
+				}).format(total)
+			: 'R$ 0,00';
 	});
 </script>
 
@@ -215,7 +223,7 @@
 					</div>
 				{/if}
 
-				<form on:submit={handleSubmit} class="space-y-6">
+				<form onsubmit={handleSubmit} class="space-y-6">
 					<div class="grid gap-6 sm:grid-cols-2">
 						<!-- Veículo -->
 						<div class="sm:col-span-2">
@@ -253,10 +261,7 @@
 
 						<!-- Data -->
 						<div>
-							<label
-								for="date"
-								class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-							>
+							<label for="date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
 								Data *
 							</label>
 							<input
@@ -276,29 +281,39 @@
 							<div class="relative mt-1 flex gap-2">
 								<button
 									type="button"
-									on:click={decrementKm}
+									onclick={decrementKm}
 									class="flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
 								>
 									<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M20 12H4"
+										/>
 									</svg>
 								</button>
 								<input
 									type="text"
 									id="km"
 									value={formData.km}
-									on:input={handleKmInput}
+									oninput={handleKmInput}
 									required
 									class="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 									placeholder="0 km"
 								/>
 								<button
 									type="button"
-									on:click={incrementKm}
+									onclick={incrementKm}
 									class="flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
 								>
 									<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M12 4v16m8-8H4"
+										/>
 									</svg>
 								</button>
 							</div>
@@ -314,7 +329,10 @@
 
 						<!-- Tipo de Combustível -->
 						<div>
-							<label for="fuel_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+							<label
+								for="fuel_type"
+								class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+							>
 								Tipo de Combustível *
 							</label>
 							<select
@@ -331,14 +349,17 @@
 
 						<!-- Litros -->
 						<div>
-							<label for="liters" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+							<label
+								for="liters"
+								class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+							>
 								Litros *
 							</label>
 							<input
 								type="text"
 								id="liters"
 								value={formData.liters}
-								on:input={handleLitersInput}
+								oninput={handleLitersInput}
 								required
 								class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 								placeholder="0,00 L"
@@ -354,7 +375,7 @@
 								type="text"
 								id="price"
 								value={formData.price_per_liter}
-								on:input={handlePriceInput}
+								oninput={handlePriceInput}
 								required
 								class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 								placeholder="R$ 0,00"
@@ -366,7 +387,9 @@
 							<label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
 								Total
 							</label>
-							<div class="mt-1 block w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-600 dark:text-white">
+							<div
+								class="mt-1 block w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+							>
 								{totalCost}
 							</div>
 						</div>
@@ -378,9 +401,12 @@
 									type="checkbox"
 									id="is_full_tank"
 									bind:checked={formData.is_full_tank}
-									class="focus:ring-primary-500 h-4 w-4 rounded border-gray-300 text-primary-600 dark:border-gray-600 dark:bg-gray-700"
+									class="focus:ring-primary-500 text-primary-600 h-4 w-4 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700"
 								/>
-								<label for="is_full_tank" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+								<label
+									for="is_full_tank"
+									class="ml-2 block text-sm text-gray-700 dark:text-gray-300"
+								>
 									Tanque cheio
 								</label>
 							</div>
