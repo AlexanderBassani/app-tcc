@@ -137,32 +137,33 @@
 					: 'text-gray-300 hover:bg-[#2d3a4f]'}"
 			>
 				<svg
-					class="h-6 w-6"
+					xmlns="http://www.w3.org/2000/svg"
+					width="24"
+					height="24"
+					viewBox="0 0 24 24"
 					fill="none"
 					stroke="currentColor"
-					viewBox="0 0 24 24"
-					xmlns="http://www.w3.org/2000/svg"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					class="lucide lucide-car h-5 w-5 flex-shrink-0"
+					><path
+						d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"
+					></path><circle cx="7" cy="17" r="2"></circle><path d="M9 17h6"></path><circle
+						cx="17"
+						cy="17"
+						r="2"
+					></circle></svg
 				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"
-					></path>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 001-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6 0a1 1 0 001 1h2a1 1 0 001-1m-6 0h6"
-					></path>
-				</svg>
 				<span>Veículos</span>
 			</a>
 
 			<!-- Maintenances -->
 			<a
 				href="/maintenances"
-				class="flex cursor-pointer items-center gap-4 rounded-xl px-4 py-3 text-base transition-all {isActiveSection('/maintenances')
+				class="flex cursor-pointer items-center gap-4 rounded-xl px-4 py-3 text-base transition-all {isActiveSection(
+					'/maintenances'
+				)
 					? 'bg-[#3b4f6f] text-white'
 					: 'text-gray-300 hover:bg-[#2d3a4f]'}"
 			>
@@ -186,31 +187,37 @@
 			<!-- Fuelings -->
 			<a
 				href="/fuelings"
-				class="flex cursor-pointer items-center gap-4 rounded-xl px-4 py-3 text-base transition-all {isActiveSection('/fuelings')
+				class="flex cursor-pointer items-center gap-4 rounded-xl px-4 py-3 text-base transition-all {isActiveSection(
+					'/fuelings'
+				)
 					? 'bg-[#3b4f6f] text-white'
 					: 'text-gray-300 hover:bg-[#2d3a4f]'}"
 			>
 				<svg
-					class="h-6 w-6"
+					xmlns="http://www.w3.org/2000/svg"
+					width="24"
+					height="24"
+					viewBox="0 0 24 24"
 					fill="none"
 					stroke="currentColor"
-					viewBox="0 0 24 24"
-					xmlns="http://www.w3.org/2000/svg"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					class="lucide lucide-fuel h-5 w-5 flex-shrink-0"
+					><line x1="3" x2="15" y1="22" y2="22"></line><line x1="4" x2="14" y1="9" y2="9"
+					></line><path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"></path><path
+						d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 5"
+					></path></svg
 				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M3 10h10a2 2 0 012 2v7a1 1 0 01-1 1H4a1 1 0 01-1-1v-7a2 2 0 012-2zM5 10V7a2 2 0 012-2h4a2 2 0 012 2v3"
-					></path>
-				</svg>
 				<span>Abastecimentos</span>
 			</a>
 
 			<!-- History -->
 			<a
 				href="/history"
-				class="flex cursor-pointer items-center gap-4 rounded-xl px-4 py-3 text-base transition-all {isActiveSection('/history')
+				class="flex cursor-pointer items-center gap-4 rounded-xl px-4 py-3 text-base transition-all {isActiveSection(
+					'/history'
+				)
 					? 'bg-[#3b4f6f] text-white'
 					: 'text-gray-300 hover:bg-[#2d3a4f]'}"
 			>

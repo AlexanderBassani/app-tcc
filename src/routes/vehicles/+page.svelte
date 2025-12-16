@@ -32,44 +32,50 @@
 			const maintenances = maintenancesRes.data || [];
 
 			// Associar última manutenção a cada veículo ativo
-			activeVehicles = activeRes.data.map(vehicle => {
-				const vehicleMaintenances = maintenances.filter(m => m.vehicle_id === vehicle.id);
-				const lastMaintenance = vehicleMaintenances.length > 0
-					? vehicleMaintenances.sort((a, b) =>
-						new Date(b.service_date).getTime() - new Date(a.service_date).getTime()
-					)[0]
-					: null;
+			activeVehicles = activeRes.data.map((vehicle) => {
+				const vehicleMaintenances = maintenances.filter((m) => m.vehicle_id === vehicle.id);
+				const lastMaintenance =
+					vehicleMaintenances.length > 0
+						? vehicleMaintenances.sort(
+								(a, b) => new Date(b.service_date).getTime() - new Date(a.service_date).getTime()
+							)[0]
+						: null;
 
 				return {
 					...vehicle,
-					last_maintenance: lastMaintenance ? {
-						id: lastMaintenance.id,
-						title: lastMaintenance.title,
-						service_date: lastMaintenance.service_date,
-						is_completed: lastMaintenance.is_completed,
-						type: lastMaintenance.type
-					} : null
+					last_maintenance: lastMaintenance
+						? {
+								id: lastMaintenance.id,
+								title: lastMaintenance.title,
+								service_date: lastMaintenance.service_date,
+								is_completed: lastMaintenance.is_completed,
+								type: lastMaintenance.type
+							}
+						: null
 				};
 			});
 
 			// Associar última manutenção a cada veículo inativo
-			inactiveVehicles = inactiveRes.data.map(vehicle => {
-				const vehicleMaintenances = maintenances.filter(m => m.vehicle_id === vehicle.id);
-				const lastMaintenance = vehicleMaintenances.length > 0
-					? vehicleMaintenances.sort((a, b) =>
-						new Date(b.service_date).getTime() - new Date(a.service_date).getTime()
-					)[0]
-					: null;
+			inactiveVehicles = inactiveRes.data.map((vehicle) => {
+				const vehicleMaintenances = maintenances.filter((m) => m.vehicle_id === vehicle.id);
+				const lastMaintenance =
+					vehicleMaintenances.length > 0
+						? vehicleMaintenances.sort(
+								(a, b) => new Date(b.service_date).getTime() - new Date(a.service_date).getTime()
+							)[0]
+						: null;
 
 				return {
 					...vehicle,
-					last_maintenance: lastMaintenance ? {
-						id: lastMaintenance.id,
-						title: lastMaintenance.title,
-						service_date: lastMaintenance.service_date,
-						is_completed: lastMaintenance.is_completed,
-						type: lastMaintenance.type
-					} : null
+					last_maintenance: lastMaintenance
+						? {
+								id: lastMaintenance.id,
+								title: lastMaintenance.title,
+								service_date: lastMaintenance.service_date,
+								is_completed: lastMaintenance.is_completed,
+								type: lastMaintenance.type
+							}
+						: null
 				};
 			});
 		} catch (err: any) {
@@ -83,58 +89,115 @@
 		return new Date(dateString).toLocaleDateString('pt-BR');
 	}
 
-	function getMaintenanceStatusBadge(isCompleted: boolean) {
-		return isCompleted
-			? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-			: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
+	function getMaintenanceStatusClass(lastMaintenance: any) {
+		if (!lastMaintenance) {
+			return 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300';
+		}
+		if (lastMaintenance.is_completed) {
+			return 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300';
+		}
+		// Check if overdue
+		const daysUntilDue = Math.ceil(
+			(new Date(lastMaintenance.service_date).getTime() - new Date().getTime()) /
+				(1000 * 60 * 60 * 24)
+		);
+		if (daysUntilDue < 0) {
+			return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
+		} else if (daysUntilDue <= 7) {
+			return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400';
+		}
+		return 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300';
+	}
+
+	function getMaintenanceStatusText(lastMaintenance: any) {
+		if (!lastMaintenance) {
+			return 'Nenhuma manutenção registrada';
+		}
+		return formatDate(lastMaintenance.service_date);
+	}
+
+	function getMaintenanceBadgeText(lastMaintenance: any) {
+		if (!lastMaintenance) {
+			return '';
+		}
+		if (lastMaintenance.is_completed) {
+			return '';
+		}
+		const daysUntilDue = Math.ceil(
+			(new Date(lastMaintenance.service_date).getTime() - new Date().getTime()) /
+				(1000 * 60 * 60 * 24)
+		);
+		if (daysUntilDue < 0) {
+			return 'Atrasada';
+		} else if (daysUntilDue <= 7) {
+			return 'Pendente';
+		}
+		return '';
 	}
 </script>
 
 <ProtectedRoute>
 	<DashboardLayout>
 		<div class="space-y-6">
+			<!-- Header -->
 			<div class="flex items-center justify-between">
-				<h1 class="text-2xl font-bold text-gray-800 dark:text-white">Meus Veículos</h1>
+				<h1 class="text-2xl font-bold text-gray-900 dark:text-white">Meus Veículos</h1>
 				<a
 					href="/vehicles/new"
-					class="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 rounded-lg px-4 py-2 text-white transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
+					class="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
 				>
+					<svg
+						class="h-5 w-5"
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
+						xmlns="http://www.w3.org/2000/svg"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+						></path>
+					</svg>
 					Novo Veículo
 				</a>
 			</div>
 
 			<!-- Tabs -->
-			<div class="border-b border-gray-200 dark:border-gray-700">
-				<nav class="-mb-px flex space-x-8">
+			<div class="rounded-lg bg-white p-1 dark:bg-gray-800">
+				<div class="flex gap-2">
 					<button
 						onclick={() => (activeTab = 'active')}
-						class="border-b-2 px-1 py-4 text-sm font-medium whitespace-nowrap transition-colors {activeTab ===
+						class="flex-1 rounded-md px-4 py-2.5 text-sm font-medium transition-colors {activeTab ===
 						'active'
-							? 'border-primary-500 text-primary-600 dark:text-primary-400'
-							: 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'}"
+							? 'bg-blue-600 text-white shadow-sm'
+							: 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700'}"
 					>
 						Ativos ({activeVehicles.length})
 					</button>
 					<button
 						onclick={() => (activeTab = 'inactive')}
-						class="border-b-2 px-1 py-4 text-sm font-medium whitespace-nowrap transition-colors {activeTab ===
+						class="flex-1 rounded-md px-4 py-2.5 text-sm font-medium transition-colors {activeTab ===
 						'inactive'
-							? 'border-primary-500 text-primary-600 dark:text-primary-400'
-							: 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'}"
+							? 'bg-blue-600 text-white shadow-sm'
+							: 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700'}"
 					>
 						Inativos ({inactiveVehicles.length})
 					</button>
-				</nav>
+				</div>
 			</div>
 
 			{#if loading}
 				<div class="flex justify-center py-12">
 					<div
-						class="border-primary-500 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"
+						class="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"
 					></div>
 				</div>
 			{:else if error}
-				<div class="rounded-lg bg-red-50 p-4 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+				<div
+					class="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-400"
+				>
 					{error}
 				</div>
 			{:else}
@@ -142,123 +205,18 @@
 					{#each activeTab === 'active' ? activeVehicles : inactiveVehicles as vehicle}
 						<a
 							href="/vehicles/{vehicle.id}"
-							class="group relative block overflow-hidden rounded-lg bg-white shadow transition-all hover:-translate-y-1 hover:shadow-md dark:bg-gray-700"
+							class="group relative block overflow-hidden rounded-xl border border-gray-200 bg-gradient-to-br from-gray-800 to-gray-900 p-6 shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl dark:border-gray-700"
 						>
-							<div class="p-6">
-								<div class="flex items-start justify-between">
-									<div>
-										<h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-											{vehicle.brand}
-											{vehicle.model}
-										</h3>
-										<p class="text-sm text-gray-500 dark:text-gray-400">
-											{vehicle.year} • {vehicle.plate}
-										</p>
-									</div>
-									<div
-										class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-500 dark:bg-gray-600 dark:text-gray-400"
-									>
-										<svg
-											class="h-6 w-6"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-											xmlns="http://www.w3.org/2000/svg"
-										>
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
-											></path>
-										</svg>
-									</div>
-								</div>
-
-								<div class="mt-4 space-y-2">
-									<div class="flex items-center text-sm text-gray-600 dark:text-gray-300">
-										<svg
-											class="mr-2 h-4 w-4"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-											xmlns="http://www.w3.org/2000/svg"
-										>
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M13 10V3L4 14h7v7l9-11h-7z"
-											></path>
-										</svg>
-										{vehicle.current_km.toLocaleString()} km
-									</div>
-									<div class="flex items-center text-sm text-gray-600 dark:text-gray-300">
-										<svg
-											class="mr-2 h-4 w-4"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-											xmlns="http://www.w3.org/2000/svg"
-										>
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"
-											></path>
-										</svg>
-										{vehicle.color}
-									</div>
-								</div>
-
-								<!-- Última Manutenção -->
-								{#if vehicle.last_maintenance}
-									<div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
-										<p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
-											Última manutenção:
-										</p>
-										<div class="flex items-start justify-between gap-2">
-											<div class="flex-1 min-w-0">
-												<p class="text-sm font-medium text-gray-900 dark:text-white truncate">
-													{vehicle.last_maintenance.title}
-												</p>
-												<p class="text-xs text-gray-500 dark:text-gray-400">
-													{formatDate(vehicle.last_maintenance.service_date)}
-												</p>
-											</div>
-											<span
-												class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium {getMaintenanceStatusBadge(
-													vehicle.last_maintenance.is_completed
-												)}"
-											>
-												{vehicle.last_maintenance.is_completed ? 'Concluída' : 'Pendente'}
-											</span>
-										</div>
-									</div>
-								{:else}
-									<div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
-										<p class="text-xs text-gray-500 dark:text-gray-400">
-											Nenhuma manutenção registrada
-										</p>
-									</div>
-								{/if}
-							</div>
-							<div class="bg-gray-50 px-6 py-3 dark:bg-gray-600/50">
-								<p class="text-xs text-gray-500 dark:text-gray-400">
-									Adicionado em {formatDate(vehicle.created_at)}
-								</p>
-							</div>
-						</a>
-					{/each}
-
-					{#if (activeTab === 'active' ? activeVehicles : inactiveVehicles).length === 0}
-						<div class="col-span-full py-12 text-center">
-							<div
-								class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700"
+							<!-- Refresh Icon (top right) -->
+							<button
+								class="absolute right-6 top-6 rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-700 hover:text-white"
+								onclick={(e) => {
+									e.preventDefault();
+									loadVehicles();
+								}}
 							>
 								<svg
-									class="h-6 w-6 text-gray-400"
+									class="h-5 w-5"
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
@@ -268,24 +226,146 @@
 										stroke-linecap="round"
 										stroke-linejoin="round"
 										stroke-width="2"
-										d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+										d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
 									></path>
 								</svg>
+							</button>
+
+							<!-- Vehicle Name -->
+							<div class="mb-4">
+								<h3 class="text-xl font-bold text-white">
+									{vehicle.brand}
+									{vehicle.model}
+								</h3>
+								<p class="text-sm text-gray-400">
+									{vehicle.year} • {vehicle.plate}
+								</p>
 							</div>
-							<h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+
+							<!-- Mileage -->
+							<div class="mb-3 flex items-center gap-2 text-white">
+								<svg
+									class="h-5 w-5 text-blue-400"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M13 10V3L4 14h7v7l9-11h-7z"
+									></path>
+								</svg>
+								<span class="font-medium">{vehicle.current_km.toLocaleString()} km</span>
+							</div>
+
+							<!-- Color -->
+							<div class="mb-4 flex items-center gap-2 text-white">
+								<svg
+									class="h-5 w-5 text-pink-400"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
+									></path>
+								</svg>
+								<span class="font-medium">{vehicle.color}</span>
+							</div>
+
+							<!-- Last Maintenance Section -->
+							<div class="border-t border-gray-700 pt-4">
+								<div class="mb-2 flex items-center justify-between">
+									<span class="text-xs font-medium text-gray-400">Última manutenção:</span>
+									{#if getMaintenanceBadgeText(vehicle.last_maintenance)}
+										<span
+											class="rounded-full px-2.5 py-1 text-xs font-semibold {getMaintenanceStatusClass(
+												vehicle.last_maintenance
+											)}"
+										>
+											{getMaintenanceBadgeText(vehicle.last_maintenance)}
+										</span>
+									{/if}
+								</div>
+								<div class="text-sm text-gray-300">
+									{getMaintenanceStatusText(vehicle.last_maintenance)}
+								</div>
+							</div>
+
+							<!-- Footer - Added date -->
+							<div class="mt-4 text-xs text-gray-500">
+								Adicionado em {formatDate(vehicle.created_at)}
+							</div>
+						</a>
+					{/each}
+
+					{#if (activeTab === 'active' ? activeVehicles : inactiveVehicles).length === 0}
+						<div class="col-span-full py-12 text-center">
+							<div
+								class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800"
+							>
+								<svg
+									class="h-8 w-8 text-gray-400"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"
+									/>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 001-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6 0a1 1 0 001 1h2a1 1 0 001-1m-6 0h6"
+									/>
+								</svg>
+							</div>
+							<h3 class="mt-4 text-lg font-semibold text-gray-900 dark:text-white">
 								Nenhum veículo encontrado
 							</h3>
-							<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-								Comece adicionando um novo veículo.
+							<p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+								{#if activeTab === 'active'}
+									Comece adicionando um novo veículo à sua frota.
+								{:else}
+									Não há veículos inativos no momento.
+								{/if}
 							</p>
-							<div class="mt-6">
-								<a
-									href="/vehicles/new"
-									class="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 inline-flex items-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm focus:ring-2 focus:ring-offset-2 focus:outline-none"
-								>
-									Novo Veículo
-								</a>
-							</div>
+							{#if activeTab === 'active'}
+								<div class="mt-6">
+									<a
+										href="/vehicles/new"
+										class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+									>
+										<svg
+											class="h-5 w-5"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+											xmlns="http://www.w3.org/2000/svg"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+											></path>
+										</svg>
+										Novo Veículo
+									</a>
+								</div>
+							{/if}
 						</div>
 					{/if}
 				</div>
