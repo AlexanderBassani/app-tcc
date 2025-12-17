@@ -1,9 +1,48 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import DashboardLayout from '$lib/components/DashboardLayout.svelte';
 	import ProtectedRoute from '$lib/components/ProtectedRoute.svelte';
 	import { authStore } from '$lib/stores/auth';
+	import { dashboardApi } from '$lib/api/dashboard';
+	import type { MonthlyExpense, RecentActivity, UpcomingReminder } from '$lib/types/dashboard';
 
-	// Mock Data - Statistics Cards
+	let loading = true;
+	let error = '';
+	let monthlyExpenses: MonthlyExpense[] = [];
+	let recentActivities: RecentActivity[] = [];
+	let upcomingReminders: UpcomingReminder[] = [];
+	let periodTotal = 0;
+	let periodAvg = 0;
+
+	onMount(async () => {
+		await loadDashboardData();
+	});
+
+	async function loadDashboardData() {
+		try {
+			loading = true;
+			const token = $authStore.token;
+			if (!token) throw new Error('Usuário não autenticado');
+
+			// Load all dashboard data
+			const [overviewRes] = await Promise.all([
+				dashboardApi.getOverview(token, { months: 6 })
+			]);
+
+			monthlyExpenses = overviewRes.data.expenses.monthly;
+			periodTotal = overviewRes.data.expenses.period_total;
+			periodAvg = overviewRes.data.expenses.period_avg;
+			recentActivities = overviewRes.data.recent_activities;
+			upcomingReminders = overviewRes.data.upcoming_reminders;
+		} catch (err: any) {
+			error = err.message || 'Erro ao carregar dados do dashboard';
+			console.error('Dashboard error:', err);
+		} finally {
+			loading = false;
+		}
+	}
+
+	// Mock Data - Statistics Cards (will be replaced with real data later)
 	const stats = [
 		{
 			title: 'Total de Veículos',
@@ -43,140 +82,89 @@
 		}
 	];
 
-	// Recent Activities
-	const recentActivities = [
-		{
-			id: 1,
-			type: 'fueling',
-			vehicle: 'Honda Civic - ABC-1234',
-			description: 'Abastecimento de 45L',
-			date: '2025-12-15',
-			amount: 'R$ 315,00'
-		},
-		{
-			id: 2,
-			type: 'maintenance',
-			vehicle: 'Toyota Corolla - XYZ-5678',
-			description: 'Troca de óleo',
-			date: '2025-12-14',
-			amount: 'R$ 280,00'
-		},
-		{
-			id: 3,
-			type: 'fueling',
-			vehicle: 'Volkswagen Golf - DEF-9012',
-			description: 'Abastecimento de 38L',
-			date: '2025-12-13',
-			amount: 'R$ 266,00'
-		},
-		{
-			id: 4,
-			type: 'maintenance',
-			vehicle: 'Honda Civic - ABC-1234',
-			description: 'Revisão dos 10.000km',
-			date: '2025-12-12',
-			amount: 'R$ 450,00'
-		},
-		{
-			id: 5,
-			type: 'fueling',
-			vehicle: 'Ford Focus - GHI-3456',
-			description: 'Abastecimento de 42L',
-			date: '2025-12-11',
-			amount: 'R$ 294,00'
-		}
-	];
+	// Computed values
+	$: monthlySpending = monthlyExpenses.map((expense) => ({
+		month: getMonthLabel(expense.month_num),
+		fuel: expense.fuel,
+		maintenance: expense.maintenance,
+		others: expense.other,
+		total: expense.total
+	}));
 
-	// Monthly Spending with breakdown
-	const monthlySpending = [
-		{
-			month: 'Jun',
-			fuel: 320,
-			maintenance: 150,
-			others: 80,
-			total: 550
-		},
-		{
-			month: 'Jul',
-			fuel: 280,
-			maintenance: 200,
-			others: 60,
-			total: 540
-		},
-		{
-			month: 'Ago',
-			fuel: 350,
-			maintenance: 100,
-			others: 90,
-			total: 540
-		},
-		{
-			month: 'Set',
-			fuel: 310,
-			maintenance: 250,
-			others: 65,
-			total: 625
-		},
-		{
-			month: 'Out',
-			fuel: 290,
-			maintenance: 180,
-			others: 90,
-			total: 560
-		},
-		{
-			month: 'Nov',
-			fuel: 330,
-			maintenance: 120,
-			others: 95,
-			total: 545
-		}
-	];
+	$: maxSpending = monthlySpending.length > 0 ? Math.max(...monthlySpending.map((m) => m.total)) : 1;
 
-	const maxSpending = Math.max(...monthlySpending.map((m) => m.total));
+	$: categoryDistribution = calculateCategoryDistribution();
 
-	// Distribution by Category (Donut Chart)
-	const categoryDistribution = [
-		{ label: 'Combustível', value: 1880, color: '#3b82f6', percentage: 56 },
-		{ label: 'Manutenção', value: 1000, color: '#f97316', percentage: 30 },
-		{ label: 'Outros', value: 480, color: '#ec4899', percentage: 14 }
-	];
+	$: totalDistribution = categoryDistribution.reduce((sum, cat) => sum + cat.value, 0);
 
-	const totalDistribution = categoryDistribution.reduce((sum, cat) => sum + cat.value, 0);
+	function getMonthLabel(monthNum: number): string {
+		const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+		return months[monthNum - 1] || '';
+	}
 
-	// Upcoming Maintenances
-	const upcomingMaintenances = [
-		{
-			vehicle: 'Honda Civic - ABC-1234',
-			type: 'Troca de Pneus',
-			dueDate: '2025-12-20',
-			daysLeft: 4
-		},
-		{
-			vehicle: 'Toyota Corolla - XYZ-5678',
-			type: 'Revisão 20.000km',
-			dueDate: '2025-12-25',
-			daysLeft: 9
-		},
-		{
-			vehicle: 'Volkswagen Golf - DEF-9012',
-			type: 'Alinhamento e Balanceamento',
-			dueDate: '2026-01-05',
-			daysLeft: 20
-		}
-	];
+	function calculateCategoryDistribution() {
+		if (monthlyExpenses.length === 0) return [];
+
+		const totalFuel = monthlyExpenses.reduce((sum, m) => sum + m.fuel, 0);
+		const totalMaintenance = monthlyExpenses.reduce((sum, m) => sum + m.maintenance, 0);
+		const totalOther = monthlyExpenses.reduce((sum, m) => sum + m.other, 0);
+		const total = totalFuel + totalMaintenance + totalOther;
+
+		if (total === 0) return [];
+
+		return [
+			{
+				label: 'Combustível',
+				value: totalFuel,
+				color: '#3b82f6',
+				percentage: Math.round((totalFuel / total) * 100)
+			},
+			{
+				label: 'Manutenção',
+				value: totalMaintenance,
+				color: '#f97316',
+				percentage: Math.round((totalMaintenance / total) * 100)
+			},
+			{
+				label: 'Outros',
+				value: totalOther,
+				color: '#ec4899',
+				percentage: Math.round((totalOther / total) * 100)
+			}
+		];
+	}
+
+	function formatCurrency(value: number): string {
+		return new Intl.NumberFormat('pt-BR', {
+			style: 'currency',
+			currency: 'BRL'
+		}).format(value);
+	}
 </script>
 
 <ProtectedRoute>
 	<DashboardLayout>
-		<div class="space-y-6">
-			<!-- Welcome Section -->
-			<div class="rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 p-6 text-white shadow-lg">
-				<h2 class="text-2xl font-bold">
-					Olá, {$authStore.user?.first_name || 'Usuário'}!
-				</h2>
-				<p class="mt-2 text-blue-100">Bem-vindo ao painel de controle do AutoTrack</p>
+		{#if loading}
+			<div class="flex justify-center py-12">
+				<div
+					class="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"
+				></div>
 			</div>
+		{:else if error}
+			<div
+				class="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-400"
+			>
+				{error}
+			</div>
+		{:else}
+			<div class="space-y-6">
+				<!-- Welcome Section -->
+				<div class="rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 p-6 text-white shadow-lg">
+					<h2 class="text-2xl font-bold">
+						Olá, {$authStore.user?.first_name || 'Usuário'}!
+					</h2>
+					<p class="mt-2 text-blue-100">Bem-vindo ao painel de controle do AutoTrack</p>
+				</div>
 
 			<!-- Statistics Cards Grid -->
 			<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -443,28 +431,50 @@
 					<h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
 						Manutenções Próximas
 					</h3>
-					<div class="space-y-4">
-						{#each upcomingMaintenances as maintenance}
-							<div class="border-l-4 border-blue-500 bg-blue-50 p-3 dark:bg-blue-900/20">
-								<p class="text-sm font-semibold text-gray-900 dark:text-white">
-									{maintenance.vehicle}
-								</p>
-								<p class="mt-1 text-xs text-gray-600 dark:text-gray-400">
-									{maintenance.type}
-								</p>
-								<div class="mt-2 flex items-center justify-between">
-									<span class="text-xs text-gray-500 dark:text-gray-400"
-										>{maintenance.dueDate}</span
-									>
-									<span
-										class="rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
-									>
-										{maintenance.daysLeft} dias
-									</span>
+					{#if upcomingReminders.length === 0}
+						<p class="text-sm text-gray-500 dark:text-gray-400">
+							Nenhuma manutenção próxima agendada
+						</p>
+					{:else}
+						<div class="space-y-4">
+							{#each upcomingReminders.slice(0, 3) as reminder}
+								<div
+									class="border-l-4 p-3 {reminder.is_urgent
+										? 'border-red-500 bg-red-50 dark:bg-red-900/20'
+										: 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'}"
+								>
+									<p class="text-sm font-semibold text-gray-900 dark:text-white">
+										{reminder.vehicle_info}
+									</p>
+									<p class="mt-1 text-xs text-gray-600 dark:text-gray-400">
+										{reminder.title}
+									</p>
+									<div class="mt-2 flex items-center justify-between">
+										{#if reminder.remind_at_date}
+											<span class="text-xs text-gray-500 dark:text-gray-400">
+												{new Date(reminder.remind_at_date).toLocaleDateString('pt-BR')}
+											</span>
+										{/if}
+										{#if reminder.days_until !== undefined}
+											<span
+												class="rounded-full px-2 py-1 text-xs font-medium {reminder.is_urgent
+													? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
+													: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'}"
+											>
+												{reminder.days_until} dias
+											</span>
+										{:else if reminder.km_until !== undefined}
+											<span
+												class="rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
+											>
+												{reminder.km_until} km
+											</span>
+										{/if}
+									</div>
 								</div>
-							</div>
-						{/each}
-					</div>
+							{/each}
+						</div>
+					{/if}
 				</div>
 
 				<!-- Recent Activities -->
@@ -474,66 +484,73 @@
 					<h3 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">
 						Atividades Recentes
 					</h3>
-					<div class="space-y-4">
-						{#each recentActivities.slice(0, 3) as activity}
-							<div class="flex items-start gap-4 border-b border-gray-100 pb-4 last:border-0 dark:border-gray-700">
+					{#if recentActivities.length === 0}
+						<p class="text-sm text-gray-500 dark:text-gray-400">Nenhuma atividade recente</p>
+					{:else}
+						<div class="space-y-4">
+							{#each recentActivities.slice(0, 3) as activity}
 								<div
-									class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg {activity.type ===
-									'fueling'
-										? 'bg-green-100 dark:bg-green-900/20'
-										: 'bg-orange-100 dark:bg-orange-900/20'}"
+									class="flex items-start gap-4 border-b border-gray-100 pb-4 last:border-0 dark:border-gray-700"
 								>
-									{#if activity.type === 'fueling'}
-										<svg
-											class="h-5 w-5 text-green-600 dark:text-green-400"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-										>
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M3 10h10a2 2 0 012 2v7a1 1 0 01-1 1H4a1 1 0 01-1-1v-7a2 2 0 012-2z"
-											/>
-										</svg>
-									{:else}
-										<svg
-											class="h-5 w-5 text-orange-600 dark:text-orange-400"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-										>
-											<path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"
-											/>
-										</svg>
-									{/if}
+									<div
+										class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg {activity.type ===
+										'fuel'
+											? 'bg-green-100 dark:bg-green-900/20'
+											: 'bg-orange-100 dark:bg-orange-900/20'}"
+									>
+										{#if activity.type === 'fuel'}
+											<svg
+												class="h-5 w-5 text-green-600 dark:text-green-400"
+												fill="none"
+												stroke="currentColor"
+												viewBox="0 0 24 24"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M3 10h10a2 2 0 012 2v7a1 1 0 01-1 1H4a1 1 0 01-1-1v-7a2 2 0 012-2z"
+												/>
+											</svg>
+										{:else}
+											<svg
+												class="h-5 w-5 text-orange-600 dark:text-orange-400"
+												fill="none"
+												stroke="currentColor"
+												viewBox="0 0 24 24"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"
+												/>
+											</svg>
+										{/if}
+									</div>
+									<div class="min-w-0 flex-1">
+										<p class="text-sm font-medium text-gray-900 dark:text-white">
+											{activity.description}
+										</p>
+										<p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+											{activity.vehicle_info}
+										</p>
+										<p class="mt-1 text-xs text-gray-500 dark:text-gray-500">
+											{new Date(activity.date).toLocaleDateString('pt-BR')}
+										</p>
+									</div>
+									<div class="text-right">
+										<p class="text-sm font-semibold text-gray-900 dark:text-white">
+											{formatCurrency(activity.amount)}
+										</p>
+									</div>
 								</div>
-								<div class="flex-1 min-w-0">
-									<p class="text-sm font-medium text-gray-900 dark:text-white">
-										{activity.description}
-									</p>
-									<p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-										{activity.vehicle}
-									</p>
-									<p class="mt-1 text-xs text-gray-500 dark:text-gray-500">
-										{new Date(activity.date).toLocaleDateString('pt-BR')}
-									</p>
-								</div>
-								<div class="text-right">
-									<p class="text-sm font-semibold text-gray-900 dark:text-white">
-										{activity.amount}
-									</p>
-								</div>
-							</div>
-						{/each}
-					</div>
+							{/each}
+						</div>
+					{/if}
 				</div>
 			</div>
 		</div>
+		{/if}
 	</DashboardLayout>
 </ProtectedRoute>
