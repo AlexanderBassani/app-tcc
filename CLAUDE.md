@@ -1,3 +1,70 @@
+# Mudanças Pendentes
+
+## ✅ TAREFA CONCLUÍDA: Formulário de manutenção reformulado
+
+### Status Final
+- ✅ Tipos atualizados em `maintenance.ts`
+- ✅ Formulário completo implementado (703 linhas)
+- ⏳ Aguardando teste e commit
+
+###  Plano de Implementação
+
+#### Fase 1: Atualizar tipos (CONCLUÍDO ✅)
+- ✅ Renomear campos conforme API
+- ✅ Adicionar novos campos (service_provider_id, invoice_number, warranty_until)
+- ✅ Criar constantes para categorias e sugestões
+
+#### Fase 2: Criar novo formulário (EM ANÁLISE)
+O formulário será **MUITO GRANDE** (~800+ linhas). Recursos planejados:
+
+**Campos básicos:**
+1. Veículo (select com km atual)
+2. Tipo de manutenção (input com autocomplete)
+3. Categoria (radio buttons com ícones)
+4. Descrição (textarea com contador)
+5. Custo (input com máscara R$)
+6. KM no serviço (input com validação)
+7. Data do serviço (date picker)
+
+**Campos avançados (colapsáveis):**
+8. Prestador de serviço (select opcional)
+9. Próxima manutenção (KM + Data)
+10. Nota fiscal
+11. Garantia até
+
+**Features extras:**
+- Validações em tempo real
+- Máscaras de input
+- Sugestões inteligentes
+- Preview em tempo real
+- Estados de loading
+- Mensagens de erro inline
+- Modo responsivo
+
+#### Opções de Implementação
+
+**Opção A - Formulário Completo (Recomendado)**
+- ~800 linhas de código
+- Todos os recursos da especificação
+- Tempo estimado: 2-3 horas de implementação
+- Melhor UX
+
+**Opção B - Formulário Simples**
+- ~200 linhas
+- Apenas campos obrigatórios + básicos
+- Adicionar recursos depois conforme necessidade
+- Mais rápido
+
+**Opção C - Incremental**
+- Começar com campos obrigatórios
+- Adicionar um grupo de campos por vez
+- Testar entre cada adição
+
+### Decisão Necessária
+Por favor, escolha uma opção (A, B ou C) para prosseguir
+
+---
+
 # Mudanças Pendentes - Dashboard
 
 ## 🐛 PROBLEMA IDENTIFICADO: Dados não estão sendo exibidos no gráfico

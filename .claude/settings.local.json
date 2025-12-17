@@ -7,7 +7,10 @@
       "Bash(find:*)",
       "Bash(git push:*)",
       "Read(//c/Users/alexa/Desktop/PUC/tcc/api/**)",
-      "Bash(git diff:*)"
+      "Bash(git diff:*)",
+      "Bash(gh pr create:*)",
+      "Bash(git fetch:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []
