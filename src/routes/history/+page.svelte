@@ -22,57 +22,30 @@
 	let vehicles: Vehicle[] = [];
 	let selectedVehicleId: number | null = null;
 	let historyItems: HistoryItem[] = [];
+	let filteredHistoryItems: HistoryItem[] = [];
 	let loading = true;
 	let error = '';
 
 	onMount(async () => {
-		await loadVehicles();
+		await loadData();
 	});
 
-	async function loadVehicles() {
+	async function loadData() {
 		try {
 			loading = true;
 			const token = $authStore.token;
 			if (!token) throw new Error('Usuário não autenticado');
 
-			const vehiclesRes = await vehiclesApi.list(token);
-			vehicles = vehiclesRes.data || [];
-
-			// Select first vehicle by default
-			if (vehicles.length > 0) {
-				selectedVehicleId = vehicles[0].id;
-				await loadHistory();
-			}
-		} catch (err: any) {
-			error = err.message || 'Erro ao carregar veículos';
-		} finally {
-			loading = false;
-		}
-	}
-
-	async function loadHistory() {
-		if (!selectedVehicleId) {
-			historyItems = [];
-			return;
-		}
-
-		try {
-			loading = true;
-			error = '';
-			const token = $authStore.token;
-			if (!token) throw new Error('Usuário não autenticado');
-
-			// Fetch both fuelings and maintenances for the selected vehicle
-			const [fuelingsRes, maintenancesRes] = await Promise.all([
-				fuelingsApi.list(token, { vehicleId: selectedVehicleId, limit: 1000 }),
+			// Fetch vehicles, fuelings and maintenances
+			const [vehiclesRes, fuelingsRes, maintenancesRes] = await Promise.all([
+				vehiclesApi.list(token),
+				fuelingsApi.list(token, { limit: 1000 }),
 				maintenancesApi.list(token)
 			]);
 
+			vehicles = vehiclesRes.data || [];
 			const fuelings = fuelingsRes.data || [];
-			const allMaintenances = maintenancesRes.data || [];
-
-			// Filter maintenances by vehicle
-			const maintenances = allMaintenances.filter((m) => m.vehicle_id === selectedVehicleId);
+			const maintenances = maintenancesRes.data || [];
 
 			// Convert to unified history items
 			const fuelingItems: HistoryItem[] = fuelings.map((f) => ({
@@ -95,11 +68,18 @@
 			historyItems = [...fuelingItems, ...maintenanceItems].sort((a, b) => {
 				return new Date(b.date).getTime() - new Date(a.date).getTime();
 			});
+
+			// Apply vehicle filter
+			filterHistoryItems();
 		} catch (err: any) {
 			error = err.message || 'Erro ao carregar histórico';
 		} finally {
 			loading = false;
 		}
+	}
+
+	async function loadHistory() {
+		await loadData();
 	}
 
 	function getVehicleInfo(vehicleId: number) {
@@ -139,8 +119,23 @@
 		return types[type as keyof typeof types] || type;
 	}
 
-	async function handleVehicleChange() {
-		await loadHistory();
+	function filterHistoryItems() {
+		if (selectedVehicleId === null) {
+			filteredHistoryItems = historyItems;
+		} else {
+			filteredHistoryItems = historyItems.filter(
+				(item) => item.vehicle_id === selectedVehicleId
+			);
+		}
+	}
+
+	function handleVehicleChange() {
+		filterHistoryItems();
+	}
+
+	function clearFilters() {
+		selectedVehicleId = null;
+		filterHistoryItems();
 	}
 </script>
 
@@ -152,24 +147,38 @@
 				<h1 class="text-2xl font-bold text-gray-900 dark:text-white">Histórico</h1>
 			</div>
 
-			<!-- Vehicle Selector -->
+			<!-- Filters -->
 			<div class="rounded-lg bg-white p-4 dark:bg-gray-800">
-				<label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-					Selecione o Veículo
-				</label>
-				<select
-					bind:value={selectedVehicleId}
-					on:change={handleVehicleChange}
-					class="block w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none md:w-96 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-					disabled={vehicles.length === 0}
-				>
-					{#each vehicles as vehicle}
-						<option value={vehicle.id}>
-							{vehicle.brand}
-							{vehicle.model} ({vehicle.plate})
-						</option>
-					{/each}
-				</select>
+				<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+					<div>
+						<label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+							Filtrar por Veículo
+						</label>
+						<select
+							bind:value={selectedVehicleId}
+							on:change={handleVehicleChange}
+							class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+						>
+							<option value={null}>Todos os veículos</option>
+							{#each vehicles as vehicle}
+								<option value={vehicle.id}>
+									{vehicle.brand} {vehicle.model} ({vehicle.plate})
+								</option>
+							{/each}
+						</select>
+					</div>
+				</div>
+
+				{#if selectedVehicleId !== null}
+					<div class="mt-4">
+						<button
+							on:click={clearFilters}
+							class="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+						>
+							Limpar filtros
+						</button>
+					</div>
+				{/if}
 			</div>
 
 			{#if loading}
@@ -183,28 +192,6 @@
 					class="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-400"
 				>
 					{error}
-				</div>
-			{:else if !selectedVehicleId}
-				<div class="rounded-xl bg-white p-12 text-center shadow-sm dark:bg-gray-800">
-					<svg
-						class="mx-auto h-16 w-16 text-gray-400"
-						fill="none"
-						stroke="currentColor"
-						viewBox="0 0 24 24"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-						></path>
-					</svg>
-					<h3 class="mt-4 text-lg font-semibold text-gray-900 dark:text-white">
-						Selecione um veículo
-					</h3>
-					<p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-						Escolha um veículo para visualizar seu histórico.
-					</p>
 				</div>
 			{:else if vehicles.length === 0}
 				<div class="rounded-xl bg-white p-12 text-center shadow-sm dark:bg-gray-800">
@@ -250,6 +237,28 @@
 						</a>
 					</div>
 				</div>
+			{:else if filteredHistoryItems.length === 0 && selectedVehicleId !== null}
+				<div class="rounded-xl bg-white p-12 text-center shadow-sm dark:bg-gray-800">
+					<svg
+						class="mx-auto h-16 w-16 text-gray-400"
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+						></path>
+					</svg>
+					<h3 class="mt-4 text-lg font-semibold text-gray-900 dark:text-white">
+						Nenhum registro encontrado
+					</h3>
+					<p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+						Não há registros para o veículo selecionado.
+					</p>
+				</div>
 			{:else if historyItems.length === 0}
 				<div class="rounded-xl bg-white p-12 text-center shadow-sm dark:bg-gray-800">
 					<svg
@@ -269,7 +278,7 @@
 						Nenhum registro encontrado
 					</h3>
 					<p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-						Este veículo ainda não possui abastecimentos ou manutenções registrados.
+						Não há abastecimentos ou manutenções registrados.
 					</p>
 				</div>
 			{:else}
@@ -280,7 +289,7 @@
 
 					<!-- Timeline items -->
 					<div class="space-y-6">
-						{#each historyItems as item (item.type + '-' + item.id)}
+						{#each filteredHistoryItems as item (item.type + '-' + item.id)}
 							<div class="relative pl-16">
 								<!-- Icon circle -->
 								<div
@@ -354,6 +363,12 @@
 													{/if}
 												</div>
 
+												<!-- Vehicle Info -->
+												<div class="text-white">
+													<p class="text-sm text-gray-400">Veículo:</p>
+													<p class="font-semibold">{getVehicleInfo(fueling.vehicle_id)}</p>
+												</div>
+
 												<!-- Date and KM -->
 												<div class="flex gap-6 text-sm text-gray-300">
 													<div>
@@ -380,21 +395,21 @@
 													</div>
 												</div>
 
-												<!-- Total Cost -->
-												<div class="text-white">
-													<span class="text-gray-400">Total:</span>
-													<span class="ml-1 text-lg font-bold"
-														>{formatCurrency(Number(fueling.total_cost))}</span
-													>
-												</div>
-
-												<!-- Gas Station -->
-												{#if fueling.gas_station}
-													<div class="text-sm text-gray-300">
-														<span class="text-gray-400">Posto:</span>
-														<span class="ml-1">{fueling.gas_station}</span>
+												<!-- Total Cost and Gas Station -->
+												<div class="flex items-baseline gap-6 text-sm text-gray-300">
+													<div>
+														<span class="text-gray-400">Total:</span>
+														<span class="ml-1 text-lg font-bold text-white"
+															>{formatCurrency(Number(fueling.total_cost))}</span
+														>
 													</div>
-												{/if}
+													{#if fueling.gas_station}
+														<div>
+															<span class="text-gray-400">Posto:</span>
+															<span class="ml-1">{fueling.gas_station}</span>
+														</div>
+													{/if}
+												</div>
 											</div>
 
 											<!-- Action Button -->
@@ -431,6 +446,14 @@
 													<p class="text-sm text-gray-400">Veículo:</p>
 													<p class="font-semibold">{getVehicleInfo(maintenance.vehicle_id)}</p>
 												</div>
+
+												<!-- Title -->
+												{#if maintenance.title}
+													<div class="text-white">
+														<p class="text-sm text-gray-400">Título:</p>
+														<p class="font-medium">{maintenance.title}</p>
+													</div>
+												{/if}
 
 												<!-- Description -->
 												{#if maintenance.description}
