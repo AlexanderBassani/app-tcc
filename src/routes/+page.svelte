@@ -96,22 +96,39 @@
 
 	$: maxSpending = monthlySpending.length > 0 ? Math.max(...monthlySpending.map((m) => m.total)) : 1;
 
+	// Calculate Y-axis maximum value (rounded up for clean labels)
+	$: chartMaxValue = calculateChartMaxValue(maxSpending);
+
 	// Calculate Y-axis labels dynamically
-	$: yAxisLabels = calculateYAxisLabels(maxSpending);
+	$: yAxisLabels = calculateYAxisLabels(chartMaxValue);
 
-	function calculateYAxisLabels(max: number): string[] {
-		if (max === 0) return ['R$0', 'R$0', 'R$0', 'R$0', 'R$0'];
+	function calculateChartMaxValue(max: number): number {
+		if (max === 0) return 0;
 
-		// Round up to nearest nice number
-		const step = Math.ceil(max / 4 / 100) * 100;
-		const maxLabel = step * 4;
+		// Round up to nearest nice number for better readability
+		let step: number;
+		if (max <= 100) {
+			step = Math.ceil(max / 4 / 10) * 10;
+		} else if (max <= 1000) {
+			step = Math.ceil(max / 4 / 50) * 50;
+		} else if (max <= 10000) {
+			step = Math.ceil(max / 4 / 100) * 100;
+		} else {
+			step = Math.ceil(max / 4 / 500) * 500;
+		}
+
+		return step * 4;
+	}
+
+	function calculateYAxisLabels(maxValue: number): string[] {
+		if (maxValue === 0) return ['R$ 0,00', 'R$ 0,00', 'R$ 0,00', 'R$ 0,00', 'R$ 0,00'];
 
 		return [
-			formatCurrency(maxLabel),
-			formatCurrency(maxLabel * 0.75),
-			formatCurrency(maxLabel * 0.5),
-			formatCurrency(maxLabel * 0.25),
-			'R$0'
+			formatCurrency(maxValue),
+			formatCurrency(maxValue * 0.75),
+			formatCurrency(maxValue * 0.5),
+			formatCurrency(maxValue * 0.25),
+			'R$ 0,00'
 		];
 	}
 
@@ -311,7 +328,7 @@
 							<!-- Chart -->
 							<div class="ml-16 flex h-64 items-end justify-between gap-3">
 								{#each monthlySpending as data}
-									{@const barHeight = maxSpending > 0 ? (data.total / maxSpending) * 240 : 0}
+									{@const barHeight = chartMaxValue > 0 ? (data.total / chartMaxValue) * 240 : 0}
 									{@const fuelPercent = data.total > 0 ? (data.fuel / data.total) * 100 : 0}
 									{@const maintenancePercent = data.total > 0 ? (data.maintenance / data.total) * 100 : 0}
 									{@const othersPercent = data.total > 0 ? (data.others / data.total) * 100 : 0}
