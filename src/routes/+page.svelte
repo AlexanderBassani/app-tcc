@@ -313,21 +313,26 @@
 								{#each monthlySpending as data}
 								<div class="group relative flex flex-1 flex-col items-center gap-3">
 									<!-- Stacked Bar Container -->
-									<div class="relative flex w-full flex-col-reverse" style="height: {(data.total / maxSpending) * 240}px">
+									{@const barHeight = maxSpending > 0 ? (data.total / maxSpending) * 240 : 0}
+									{@const fuelPercent = data.total > 0 ? (data.fuel / data.total) * 100 : 0}
+									{@const maintenancePercent = data.total > 0 ? (data.maintenance / data.total) * 100 : 0}
+									{@const othersPercent = data.total > 0 ? (data.others / data.total) * 100 : 0}
+
+									<div class="relative flex w-full flex-col-reverse" style="height: {barHeight}px">
 										<!-- Combustível (blue) - bottom -->
 										<div
 											class="w-full bg-blue-500 transition-all group-hover:bg-blue-600"
-											style="height: {(data.fuel / data.total) * 100}%"
+											style="height: {fuelPercent}%"
 										></div>
 										<!-- Manutenção (orange) - middle -->
 										<div
 											class="w-full bg-orange-500 transition-all group-hover:bg-orange-600"
-											style="height: {(data.maintenance / data.total) * 100}%"
+											style="height: {maintenancePercent}%"
 										></div>
 										<!-- Outros (magenta) - top -->
 										<div
 											class="w-full bg-pink-500 transition-all group-hover:bg-pink-600"
-											style="height: {(data.others / data.total) * 100}%; border-radius: 4px 4px 0 0;"
+											style="height: {othersPercent}%; border-radius: 4px 4px 0 0;"
 										></div>
 
 										<!-- Tooltip -->
