@@ -319,23 +319,23 @@
 									<div class="group relative flex flex-1 flex-col items-center gap-3">
 										<!-- Stacked Bar Container -->
 										<div class="relative flex w-full flex-col-reverse" style="height: {barHeight}px">
-										<!-- Combustível (blue) - bottom -->
-										<div
-											class="w-full bg-blue-500 transition-all group-hover:bg-blue-600"
-											style="height: {fuelPercent}%"
-										></div>
-										<!-- Manutenção (orange) - middle -->
-										<div
-											class="w-full bg-orange-500 transition-all group-hover:bg-orange-600"
-											style="height: {maintenancePercent}%"
-										></div>
-										<!-- Outros (magenta) - top -->
-										<div
-											class="w-full bg-pink-500 transition-all group-hover:bg-pink-600"
-											style="height: {othersPercent}%; border-radius: 4px 4px 0 0;"
-										></div>
+											<!-- Combustível (blue) - bottom -->
+											<div
+												class="w-full bg-blue-500 transition-all group-hover:bg-blue-600"
+												style="height: {fuelPercent}%"
+											></div>
+											<!-- Manutenção (orange) - middle -->
+											<div
+												class="w-full bg-orange-500 transition-all group-hover:bg-orange-600"
+												style="height: {maintenancePercent}%"
+											></div>
+											<!-- Outros (magenta) - top -->
+											<div
+												class="w-full bg-pink-500 transition-all group-hover:bg-pink-600"
+												style="height: {othersPercent}%; border-radius: 4px 4px 0 0;"
+											></div>
 
-										<!-- Tooltip -->
+											<!-- Tooltip -->
 										<div
 											class="absolute -top-16 left-1/2 z-10 hidden w-32 -translate-x-1/2 rounded-lg bg-gray-900 p-2 text-xs text-white shadow-xl group-hover:block"
 										>
@@ -357,6 +357,7 @@
 													<span class="font-bold">R$ {data.total}</span>
 												</div>
 											</div>
+										</div>
 										</div>
 
 										<!-- Month Label -->
