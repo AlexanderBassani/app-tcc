@@ -96,6 +96,25 @@
 
 	$: maxSpending = monthlySpending.length > 0 ? Math.max(...monthlySpending.map((m) => m.total)) : 1;
 
+	// Calculate Y-axis labels dynamically
+	$: yAxisLabels = calculateYAxisLabels(maxSpending);
+
+	function calculateYAxisLabels(max: number): string[] {
+		if (max === 0) return ['R$0', 'R$0', 'R$0', 'R$0', 'R$0'];
+
+		// Round up to nearest nice number
+		const step = Math.ceil(max / 4 / 100) * 100;
+		const maxLabel = step * 4;
+
+		return [
+			formatCurrency(maxLabel),
+			formatCurrency(maxLabel * 0.75),
+			formatCurrency(maxLabel * 0.5),
+			formatCurrency(maxLabel * 0.25),
+			'R$0'
+		];
+	}
+
 	$: categoryDistribution = calculateCategoryDistribution();
 
 	$: totalDistribution =
@@ -284,11 +303,9 @@
 							<div
 								class="absolute left-0 top-0 flex h-64 flex-col justify-between text-xs text-gray-400"
 							>
-								<span>R$800</span>
-								<span>R$600</span>
-								<span>R$400</span>
-								<span>R$200</span>
-								<span>R$0</span>
+								{#each yAxisLabels as label}
+									<span>{label}</span>
+								{/each}
 							</div>
 
 							<!-- Chart -->
