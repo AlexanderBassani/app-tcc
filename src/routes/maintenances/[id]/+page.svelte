@@ -7,29 +7,28 @@
 	import { authStore } from '$lib/stores/auth';
 	import type { Maintenance } from '$lib/types/maintenance';
 	import type { Vehicle } from '$lib/types/vehicle';
-	import { MAINTENANCE_TYPES } from '$lib/types/maintenance';
 	import DashboardLayout from '$lib/components/DashboardLayout.svelte';
 	import MaintenanceAttachments from '$lib/components/MaintenanceAttachments.svelte';
 
-	let maintenance: Maintenance | null = null;
-	let vehicles: Vehicle[] = [];
-	let loading = true;
-	let error = '';
-	let isEditing = false;
-	let isSaving = false;
+	let maintenance = $state<Maintenance | null>(null);
+	let vehicles = $state<Vehicle[]>([]);
+	let loading = $state(true);
+	let error = $state('');
+	let isEditing = $state(false);
+	let isSaving = $state(false);
 
-	let formData = {
+	let formData = $state({
 		vehicle_id: 0,
 		title: '',
 		description: '',
-		type: 'preventiva' as 'preventiva' | 'corretiva' | 'revisao' | 'outros',
+		type: '',
 		cost: '',
 		km_when_done: '',
 		service_date: '',
 		next_service_date: '',
 		next_km: '',
 		notes: ''
-	};
+	});
 
 	onMount(async () => {
 		await Promise.all([loadMaintenance(), loadVehicles()]);
@@ -117,9 +116,7 @@
 			}
 
 			// Validar próxima quilometragem
-			const nextKm = formData.next_km
-				? parseInt(formData.next_km.replace(/\D/g, ''))
-				: undefined;
+			const nextKm = formData.next_km ? parseInt(formData.next_km.replace(/\D/g, '')) : undefined;
 
 			if (nextKm !== undefined) {
 				// A próxima quilometragem deve ser maior ou igual à quilometragem atual cadastrada
@@ -223,6 +220,7 @@
 		formData.km_when_done = formatted;
 		target.value = formatted;
 	}
+
 	function handleNextKmInput(e: Event) {
 		const target = e.target as HTMLInputElement;
 		const formatted = formatKm(target.value);
@@ -230,7 +228,6 @@
 		target.value = formatted;
 	}
 
-	// Funções para incrementar/decrementar quilometragem
 	function incrementKm() {
 		const currentKm = formData.km_when_done
 			? parseInt(formData.km_when_done.replace(/\D/g, ''))
@@ -377,7 +374,7 @@
 				<div class="flex gap-2">
 					{#if !isEditing}
 						<button
-							on:click={() => (isEditing = true)}
+							onclick={() => (isEditing = true)}
 							class="rounded-lg bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
 						>
 							Editar
@@ -397,7 +394,7 @@
 						</div>
 					{/if}
 
-					<form on:submit={handleUpdate} class="space-y-6">
+					<form onsubmit={handleUpdate} class="space-y-6">
 						<div class="grid gap-6 sm:grid-cols-2">
 							<!-- Veículo -->
 							<div class="sm:col-span-2">
@@ -450,16 +447,13 @@
 								>
 									Tipo *
 								</label>
-								<select
+								<input
+									type="text"
 									id="type"
 									bind:value={formData.type}
 									required
 									class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
-								>
-									{#each MAINTENANCE_TYPES as type}
-										<option value={type.value}>{type.label}</option>
-									{/each}
-								</select>
+								/>
 							</div>
 
 							<!-- Data do Serviço -->
@@ -491,7 +485,7 @@
 									type="text"
 									id="cost"
 									value={formData.cost}
-									on:input={handleCostInput}
+									oninput={handleCostInput}
 									class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 									placeholder="R$ 0,00"
 								/>
@@ -505,28 +499,40 @@
 								<div class="relative mt-1 flex gap-2">
 									<button
 										type="button"
-										on:click={decrementKm}
+										onclick={decrementKm}
+										aria-label="Diminuir quilometragem em 1000 km"
 										class="flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
 									>
 										<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M20 12H4"
+											/>
 										</svg>
 									</button>
 									<input
 										type="text"
 										id="km"
 										value={formData.km_when_done}
-										on:input={handleKmInput}
+										oninput={handleKmInput}
 										class="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 										placeholder="0 km"
 									/>
 									<button
 										type="button"
-										on:click={incrementKm}
+										onclick={incrementKm}
+										aria-label="Aumentar quilometragem em 1000 km"
 										class="flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
 									>
 										<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M12 4v16m8-8H4"
+											/>
 										</svg>
 									</button>
 								</div>
@@ -539,7 +545,6 @@
 									{/if}
 								{/if}
 							</div>
-
 						</div>
 
 						<!-- Próxima Manutenção -->
@@ -575,28 +580,40 @@
 									<div class="relative mt-1 flex gap-2">
 										<button
 											type="button"
-											on:click={decrementNextKm}
+											onclick={decrementNextKm}
+											aria-label="Diminuir próxima quilometragem em 1000 km"
 											class="flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
 										>
 											<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M20 12H4"
+												/>
 											</svg>
 										</button>
 										<input
 											type="text"
 											id="next_km_edit"
 											value={formData.next_km}
-											on:input={handleNextKmInput}
+											oninput={handleNextKmInput}
 											class="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 											placeholder="0 km"
 										/>
 										<button
 											type="button"
-											on:click={incrementNextKm}
+											onclick={incrementNextKm}
+											aria-label="Aumentar próxima quilometragem em 1000 km"
 											class="flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
 										>
 											<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M12 4v16m8-8H4"
+												/>
 											</svg>
 										</button>
 									</div>
@@ -649,7 +666,7 @@
 						<div class="flex justify-end gap-3 border-t border-gray-200 pt-4 dark:border-gray-600">
 							<button
 								type="button"
-								on:click={() => {
+								onclick={() => {
 									isEditing = false;
 									resetForm();
 								}}
@@ -757,7 +774,7 @@
 				<div class="mt-4 flex flex-wrap gap-4">
 					{#if !maintenance.is_completed}
 						<button
-							on:click={handleComplete}
+							onclick={handleComplete}
 							class="rounded-md border border-green-300 bg-green-50 px-4 py-2 text-sm font-medium text-green-700 hover:bg-green-100 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none dark:border-green-700 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50"
 						>
 							Marcar como Concluída
@@ -765,7 +782,7 @@
 					{/if}
 
 					<button
-						on:click={handleDelete}
+						onclick={handleDelete}
 						class="rounded-md border border-red-300 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-100 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none dark:border-red-700 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50"
 					>
 						Excluir Manutenção

@@ -13,16 +13,20 @@ export interface Maintenance {
     user_id: number;
     vehicle_id: number;
     service_provider_id?: number;
-    type: string; // Nome da manutenção (ex: "Troca de óleo")
+    title: string; // Título da manutenção (ex: "Troca de óleo")
+    type: string; // Tipo/categoria (preventiva, corretiva, etc)
     category?: MaintenanceCategory;
     description?: string;
-    cost: number;
-    km_at_service: number;
+    cost?: number;
+    km_when_done?: number; // Quilometragem quando o serviço foi realizado
     service_date: string; // ISO Date string (YYYY-MM-DD)
-    next_service_km?: number;
+    next_km?: number; // Próxima quilometragem recomendada
     next_service_date?: string; // ISO Date string (YYYY-MM-DD)
     invoice_number?: string;
     warranty_until?: string; // ISO Date string (YYYY-MM-DD)
+    notes?: string; // Notas adicionais
+    is_completed: boolean; // Status de conclusão
+    completed_at?: string; // Data de conclusão
     created_at: string;
     updated_at: string;
     // Relations
@@ -32,6 +36,7 @@ export interface Maintenance {
         model: string;
         plate: string;
         year: number;
+        current_km: number;
     };
     service_provider?: {
         id: number;
@@ -43,31 +48,35 @@ export interface Maintenance {
 export interface CreateMaintenanceRequest {
     vehicle_id: number;
     service_provider_id?: number;
+    title: string;
     type: string;
     category?: MaintenanceCategory;
     description?: string;
-    cost: number;
-    km_at_service: number;
+    cost?: number;
+    km_when_done?: number;
     service_date: string; // YYYY-MM-DD
-    next_service_km?: number;
+    next_km?: number;
     next_service_date?: string; // YYYY-MM-DD
     invoice_number?: string;
     warranty_until?: string; // YYYY-MM-DD
+    notes?: string;
 }
 
 export interface UpdateMaintenanceRequest {
     vehicle_id?: number;
     service_provider_id?: number;
+    title?: string;
     type?: string;
     category?: MaintenanceCategory;
     description?: string;
     cost?: number;
-    km_at_service?: number;
+    km_when_done?: number;
     service_date?: string;
-    next_service_km?: number;
+    next_km?: number;
     next_service_date?: string;
     invoice_number?: string;
     warranty_until?: string;
+    notes?: string;
 }
 
 export interface MaintenanceResponse {
