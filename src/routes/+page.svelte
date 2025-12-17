@@ -144,8 +144,7 @@
 
 		const totalFuel = monthlyExpenses.reduce((sum, m) => sum + m.fuel, 0);
 		const totalMaintenance = monthlyExpenses.reduce((sum, m) => sum + m.maintenance, 0);
-		const totalOther = monthlyExpenses.reduce((sum, m) => sum + m.others, 0);
-		const total = totalFuel + totalMaintenance + totalOther;
+		const total = totalFuel + totalMaintenance;
 
 		if (total === 0) return [];
 
@@ -161,12 +160,6 @@
 				value: totalMaintenance,
 				color: '#f97316',
 				percentage: Math.round((totalMaintenance / total) * 100)
-			},
-			{
-				label: 'Outros',
-				value: totalOther,
-				color: '#ec4899',
-				percentage: Math.round((totalOther / total) * 100)
 			}
 		];
 	}
@@ -394,10 +387,6 @@
 						<div class="flex items-center gap-2">
 							<div class="h-3 w-3 rounded-sm bg-orange-500"></div>
 							<span class="text-gray-300">Manutenção</span>
-						</div>
-						<div class="flex items-center gap-2">
-							<div class="h-3 w-3 rounded-sm bg-pink-500"></div>
-							<span class="text-gray-300">Outros</span>
 						</div>
 					</div>
 				</div>
