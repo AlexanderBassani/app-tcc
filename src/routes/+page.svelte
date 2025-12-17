@@ -301,15 +301,15 @@
 						<div class="relative">
 							<!-- Y-axis labels -->
 							<div
-								class="absolute left-0 top-0 flex h-64 flex-col justify-between text-xs text-gray-400"
+								class="absolute left-0 top-0 z-10 flex h-64 flex-col justify-between text-xs text-gray-400"
 							>
 								{#each yAxisLabels as label}
-									<span>{label}</span>
+									<span class="bg-[#1e293b] px-1">{label}</span>
 								{/each}
 							</div>
 
 							<!-- Chart -->
-							<div class="ml-12 flex h-64 items-end justify-between gap-3">
+							<div class="ml-16 flex h-64 items-end justify-between gap-3">
 								{#each monthlySpending as data}
 									{@const barHeight = maxSpending > 0 ? (data.total / maxSpending) * 240 : 0}
 									{@const fuelPercent = data.total > 0 ? (data.fuel / data.total) * 100 : 0}
