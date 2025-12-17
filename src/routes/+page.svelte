@@ -311,14 +311,14 @@
 							<!-- Chart -->
 							<div class="ml-12 flex h-64 items-end justify-between gap-3">
 								{#each monthlySpending as data}
-								<div class="group relative flex flex-1 flex-col items-center gap-3">
-									<!-- Stacked Bar Container -->
 									{@const barHeight = maxSpending > 0 ? (data.total / maxSpending) * 240 : 0}
 									{@const fuelPercent = data.total > 0 ? (data.fuel / data.total) * 100 : 0}
 									{@const maintenancePercent = data.total > 0 ? (data.maintenance / data.total) * 100 : 0}
 									{@const othersPercent = data.total > 0 ? (data.others / data.total) * 100 : 0}
 
-									<div class="relative flex w-full flex-col-reverse" style="height: {barHeight}px">
+									<div class="group relative flex flex-1 flex-col items-center gap-3">
+										<!-- Stacked Bar Container -->
+										<div class="relative flex w-full flex-col-reverse" style="height: {barHeight}px">
 										<!-- Combustível (blue) - bottom -->
 										<div
 											class="w-full bg-blue-500 transition-all group-hover:bg-blue-600"
@@ -358,11 +358,10 @@
 												</div>
 											</div>
 										</div>
-									</div>
 
-									<!-- Month Label -->
-									<span class="text-xs font-medium text-gray-400">{data.month}</span>
-								</div>
+										<!-- Month Label -->
+										<span class="text-xs font-medium text-gray-400">{data.month}</span>
+									</div>
 								{/each}
 							</div>
 						</div>
