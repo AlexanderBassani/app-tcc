@@ -65,8 +65,10 @@
 	}
 
 	function getVehicleInfo(vehicleId: number) {
-		const vehicle = vehicles.find(v => v.id === vehicleId);
-		return vehicle ? `${vehicle.brand} ${vehicle.model} (${vehicle.plate})` : 'Veículo não encontrado';
+		const vehicle = vehicles.find((v) => v.id === vehicleId);
+		return vehicle
+			? `${vehicle.brand} ${vehicle.model} (${vehicle.plate})`
+			: 'Veículo não encontrado';
 	}
 
 	function formatDate(dateString: string) {
@@ -81,7 +83,7 @@
 	}
 
 	function getFuelTypeLabel(type: string) {
-		const fuelType = FUEL_TYPES.find(ft => ft.value === type);
+		const fuelType = FUEL_TYPES.find((ft) => ft.value === type);
 		return fuelType?.label || type;
 	}
 
@@ -138,29 +140,34 @@
 		<div class="space-y-6">
 			<!-- Header -->
 			<div class="flex items-center justify-between">
-				<h1 class="text-2xl font-bold text-gray-800 dark:text-white">Abastecimentos</h1>
+				<h1 class="text-2xl font-bold text-gray-900 dark:text-white">Abastecimentos</h1>
 				<a
 					href="/fuelings/new"
-					class="bg-primary-600 hover:bg-primary-700 inline-flex items-center rounded-md px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors"
+					class="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
 				>
-					<svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+					<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+						></path>
 					</svg>
 					Novo Abastecimento
 				</a>
 			</div>
 
 			<!-- Filters -->
-			<div class="rounded-lg bg-white p-4 shadow dark:bg-gray-700">
+			<div class="rounded-lg bg-white p-4 dark:bg-gray-800">
 				<div class="grid grid-cols-1 gap-4 md:grid-cols-4">
 					<div>
-						<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+						<label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
 							Veículo
 						</label>
 						<select
 							bind:value={selectedVehicle}
 							on:change={handleFilterChange}
-							class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
+							class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
 						>
 							<option value={undefined}>Todos os veículos</option>
 							{#each vehicles as vehicle}
@@ -172,37 +179,37 @@
 					</div>
 
 					<div>
-						<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+						<label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
 							Data Inicial
 						</label>
 						<input
 							type="date"
 							bind:value={startDate}
 							on:change={handleFilterChange}
-							class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
+							class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
 						/>
 					</div>
 
 					<div>
-						<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+						<label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
 							Data Final
 						</label>
 						<input
 							type="date"
 							bind:value={endDate}
 							on:change={handleFilterChange}
-							class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
+							class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
 						/>
 					</div>
 
 					<div>
-						<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+						<label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
 							Ordenar por
 						</label>
 						<select
 							bind:value={sortBy}
 							on:change={handleFilterChange}
-							class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
+							class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
 						>
 							{#each SORT_OPTIONS as option}
 								<option value={option.value}>{option.label}</option>
@@ -215,7 +222,7 @@
 					<div class="mt-4">
 						<button
 							on:click={clearFilters}
-							class="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+							class="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
 						>
 							Limpar filtros
 						</button>
@@ -226,17 +233,19 @@
 			{#if loading}
 				<div class="flex justify-center py-12">
 					<div
-						class="border-primary-500 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"
+						class="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"
 					></div>
 				</div>
 			{:else if error}
-				<div class="rounded-lg bg-red-50 p-4 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+				<div
+					class="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-400"
+				>
 					{error}
 				</div>
 			{:else if fuelings.length === 0}
-				<div class="rounded-lg bg-white p-12 text-center shadow dark:bg-gray-700">
+				<div class="rounded-xl bg-white p-12 text-center shadow-sm dark:bg-gray-800">
 					<svg
-						class="mx-auto h-12 w-12 text-gray-400"
+						class="mx-auto h-16 w-16 text-gray-400"
 						fill="none"
 						stroke="currentColor"
 						viewBox="0 0 24 24"
@@ -248,19 +257,24 @@
 							d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
 						></path>
 					</svg>
-					<h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+					<h3 class="mt-4 text-lg font-semibold text-gray-900 dark:text-white">
 						Nenhum abastecimento encontrado
 					</h3>
-					<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+					<p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
 						Comece registrando seu primeiro abastecimento.
 					</p>
 					<div class="mt-6">
 						<a
 							href="/fuelings/new"
-							class="bg-primary-600 hover:bg-primary-700 inline-flex items-center rounded-md px-4 py-2 text-sm font-medium text-white shadow-sm"
+							class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700"
 						>
-							<svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+							<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+								></path>
 							</svg>
 							Novo Abastecimento
 						</a>
@@ -270,76 +284,89 @@
 				<!-- Fueling List -->
 				<div class="space-y-4">
 					{#each fuelings as fueling, index (fueling.id)}
-						<div class="rounded-lg bg-white p-6 shadow transition-shadow hover:shadow-lg dark:bg-gray-700">
-							<div class="flex items-start justify-between">
-								<div class="flex-1">
-									<div class="flex items-center gap-3">
-										<h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-											{getVehicleInfo(fueling.vehicle_id)}
-										</h3>
-										<span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+						<div
+							class="rounded-xl border border-gray-200 bg-gradient-to-br from-gray-800 to-gray-900 p-6 shadow-lg transition-all hover:shadow-xl dark:border-gray-700"
+						>
+							<div class="flex items-start justify-between gap-4">
+								<div class="flex-1 space-y-3">
+									<!-- Fuel Type and Full Tank Badges -->
+									<div class="flex items-center gap-2">
+										<span
+											class="inline-flex items-center rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-xs font-semibold text-blue-400"
+										>
 											{getFuelTypeLabel(fueling.fuel_type)}
 										</span>
 										{#if fueling.is_full_tank}
-											<span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400">
+											<span
+												class="inline-flex items-center rounded-full border border-green-500/30 bg-green-500/10 px-3 py-1 text-xs font-semibold text-green-400"
+											>
 												Tanque Cheio
 											</span>
 										{/if}
 									</div>
 
-									<div class="mt-3 grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-600 dark:text-gray-300 md:grid-cols-4">
+									<!-- Vehicle Info -->
+									<div class="text-white">
+										<p class="text-sm text-gray-400">Veículo:</p>
+										<p class="font-semibold">{getVehicleInfo(fueling.vehicle_id)}</p>
+									</div>
+
+									<!-- Date and KM -->
+									<div class="flex gap-6 text-sm text-gray-300">
 										<div>
-											<span class="font-medium">Data:</span>
-											{formatDate(fueling.date)}
+											<span class="text-gray-400">Data:</span>
+											<span class="ml-1">{formatDate(fueling.date)}</span>
 										</div>
 										<div>
-											<span class="font-medium">KM:</span>
-											{Number(fueling.km).toLocaleString()}
+											<span class="text-gray-400">KM:</span>
+											<span class="ml-1">{Number(fueling.km).toLocaleString()}</span>
+										</div>
+									</div>
+
+									<!-- Liters, Price and Consumption -->
+									<div class="flex gap-6 text-sm text-gray-300">
+										<div>
+											<span class="text-gray-400">Litros:</span>
+											<span class="ml-1">{Number(fueling.liters).toFixed(2)} L</span>
 										</div>
 										<div>
-											<span class="font-medium">Litros:</span>
-											{Number(fueling.liters).toFixed(2)} L
+											<span class="text-gray-400">Preço/L:</span>
+											<span class="ml-1">{formatCurrency(Number(fueling.price_per_liter))}</span>
 										</div>
 										<div>
-											<span class="font-medium">Preço/L:</span>
-											{formatCurrency(Number(fueling.price_per_liter))}
+											<span class="text-gray-400">Consumo:</span>
+											<span class="ml-1">{calculateConsumption(fueling, index)}</span>
 										</div>
+									</div>
+
+									<!-- Total Cost and Gas Station -->
+									<div class="flex items-baseline gap-6 text-sm text-gray-300">
 										<div>
-											<span class="font-medium">Total:</span>
-											<span class="font-semibold text-gray-900 dark:text-white">
-												{formatCurrency(Number(fueling.total_cost))}
-											</span>
-										</div>
-										<div>
-											<span class="font-medium">Consumo:</span>
-											{calculateConsumption(fueling, index)}
+											<span class="text-gray-400">Total:</span>
+											<span class="ml-1 text-lg font-bold text-white"
+												>{formatCurrency(Number(fueling.total_cost))}</span
+											>
 										</div>
 										{#if fueling.gas_station}
-											<div class="col-span-2">
-												<span class="font-medium">Posto:</span>
-												{fueling.gas_station}
+											<div>
+												<span class="text-gray-400">Posto:</span>
+												<span class="ml-1">{fueling.gas_station}</span>
 											</div>
 										{/if}
 									</div>
-
-									{#if fueling.notes}
-										<div class="mt-3 text-sm text-gray-600 dark:text-gray-300">
-											<span class="font-medium">Observações:</span>
-											{fueling.notes}
-										</div>
-									{/if}
 								</div>
 
+								<!-- Action Buttons -->
 								<div class="flex gap-2">
 									<a
 										href="/fuelings/{fueling.id}"
-										class="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500"
+										class="rounded-lg border border-gray-600 bg-gray-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-600"
 									>
-										Editar
+										Ver
 									</a>
 									<button
 										on:click={() => handleDelete(fueling.id)}
-										class="inline-flex items-center rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 shadow-sm hover:bg-red-100 dark:border-red-700 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50"
+										class="rounded-lg border border-red-600 bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700"
 									>
 										Excluir
 									</button>
@@ -355,17 +382,17 @@
 						<button
 							on:click={() => handlePageChange(page - 1)}
 							disabled={page === 1}
-							class="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-gray-600 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500"
+							class="inline-flex items-center rounded-lg border border-gray-600 bg-gray-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
 						>
 							Anterior
 						</button>
-						<span class="text-sm text-gray-700 dark:text-gray-300">
+						<span class="text-sm text-gray-300">
 							Página {page} de {totalPages}
 						</span>
 						<button
 							on:click={() => handlePageChange(page + 1)}
 							disabled={page === totalPages}
-							class="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-gray-600 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500"
+							class="inline-flex items-center rounded-lg border border-gray-600 bg-gray-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
 						>
 							Próxima
 						</button>
