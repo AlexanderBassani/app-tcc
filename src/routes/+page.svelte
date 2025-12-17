@@ -83,19 +83,25 @@
 	];
 
 	// Computed values
-	$: monthlySpending = monthlyExpenses.map((expense) => ({
-		month: getMonthLabel(expense.month_num),
-		fuel: expense.fuel,
-		maintenance: expense.maintenance,
-		others: expense.other,
-		total: expense.total
-	}));
+	$: monthlySpending =
+		monthlyExpenses && monthlyExpenses.length > 0
+			? monthlyExpenses.map((expense) => ({
+					month: getMonthLabel(expense.month_num),
+					fuel: expense.fuel,
+					maintenance: expense.maintenance,
+					others: expense.other,
+					total: expense.total
+			  }))
+			: [];
 
 	$: maxSpending = monthlySpending.length > 0 ? Math.max(...monthlySpending.map((m) => m.total)) : 1;
 
 	$: categoryDistribution = calculateCategoryDistribution();
 
-	$: totalDistribution = categoryDistribution.reduce((sum, cat) => sum + cat.value, 0);
+	$: totalDistribution =
+		categoryDistribution && categoryDistribution.length > 0
+			? categoryDistribution.reduce((sum, cat) => sum + cat.value, 0)
+			: 0;
 
 	function getMonthLabel(monthNum: number): string {
 		const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
@@ -273,19 +279,26 @@
 					</h3>
 
 					<!-- Chart Container -->
-					<div class="relative">
-						<!-- Y-axis labels -->
-						<div class="absolute left-0 top-0 flex h-64 flex-col justify-between text-xs text-gray-400">
-							<span>R$800</span>
-							<span>R$600</span>
-							<span>R$400</span>
-							<span>R$200</span>
-							<span>R$0</span>
+					{#if !monthlySpending || monthlySpending.length === 0}
+						<div class="flex h-64 items-center justify-center">
+							<p class="text-sm text-gray-400">Nenhum dado disponível</p>
 						</div>
+					{:else}
+						<div class="relative">
+							<!-- Y-axis labels -->
+							<div
+								class="absolute left-0 top-0 flex h-64 flex-col justify-between text-xs text-gray-400"
+							>
+								<span>R$800</span>
+								<span>R$600</span>
+								<span>R$400</span>
+								<span>R$200</span>
+								<span>R$0</span>
+							</div>
 
-						<!-- Chart -->
-						<div class="ml-12 flex h-64 items-end justify-between gap-3">
-							{#each monthlySpending as data}
+							<!-- Chart -->
+							<div class="ml-12 flex h-64 items-end justify-between gap-3">
+								{#each monthlySpending as data}
 								<div class="group relative flex flex-1 flex-col items-center gap-3">
 									<!-- Stacked Bar Container -->
 									<div class="relative flex w-full flex-col-reverse" style="height: {(data.total / maxSpending) * 240}px">
@@ -333,9 +346,10 @@
 									<!-- Month Label -->
 									<span class="text-xs font-medium text-gray-400">{data.month}</span>
 								</div>
-							{/each}
+								{/each}
+							</div>
 						</div>
-					</div>
+					{/if}
 
 					<!-- Legend -->
 					<div class="mt-6 flex items-center justify-center gap-6 text-sm">
@@ -360,21 +374,26 @@
 				>
 					<h3 class="mb-6 text-lg font-semibold text-white">Distribuição por Categoria</h3>
 
-					<div class="flex flex-col items-center justify-center gap-6">
-						<!-- Donut Chart SVG -->
-						<div class="relative h-48 w-48 shrink-0">
-							<svg viewBox="0 0 200 200" class="h-full w-full -rotate-90 transform">
-								<!-- Background Circle -->
-								<circle
-									cx="100"
-									cy="100"
-									r="80"
-									fill="none"
-									stroke="#1e293b"
-									stroke-width="40"
-								/>
-								<!-- Donut segments -->
-								{#each categoryDistribution as category, i}
+					{#if !categoryDistribution || categoryDistribution.length === 0}
+						<div class="flex h-64 items-center justify-center">
+							<p class="text-sm text-gray-400">Nenhum dado disponível</p>
+						</div>
+					{:else}
+						<div class="flex flex-col items-center justify-center gap-6">
+							<!-- Donut Chart SVG -->
+							<div class="relative h-48 w-48 shrink-0">
+								<svg viewBox="0 0 200 200" class="h-full w-full -rotate-90 transform">
+									<!-- Background Circle -->
+									<circle
+										cx="100"
+										cy="100"
+										r="80"
+										fill="none"
+										stroke="#1e293b"
+										stroke-width="40"
+									/>
+									<!-- Donut segments -->
+									{#each categoryDistribution as category, i}
 									{@const circumference = 2 * Math.PI * 80}
 									{@const offset = categoryDistribution
 										.slice(0, i)
@@ -417,9 +436,10 @@
 										<p class="text-xs text-gray-400">{category.percentage}%</p>
 									</div>
 								</div>
-							{/each}
+								{/each}
+							</div>
 						</div>
-					</div>
+					{/if}
 				</div>
 			</div>
 
@@ -431,7 +451,7 @@
 					<h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
 						Manutenções Próximas
 					</h3>
-					{#if upcomingReminders.length === 0}
+					{#if !upcomingReminders || upcomingReminders.length === 0}
 						<p class="text-sm text-gray-500 dark:text-gray-400">
 							Nenhuma manutenção próxima agendada
 						</p>
@@ -484,7 +504,7 @@
 					<h3 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">
 						Atividades Recentes
 					</h3>
-					{#if recentActivities.length === 0}
+					{#if !recentActivities || recentActivities.length === 0}
 						<p class="text-sm text-gray-500 dark:text-gray-400">Nenhuma atividade recente</p>
 					{:else}
 						<div class="space-y-4">
