@@ -2,53 +2,51 @@
 
 export interface MonthlyExpense {
 	month: string;
-	year: number;
-	month_num: number;
 	total: number;
 	fuel: number;
 	maintenance: number;
-	other: number;
-	breakdown: {
-		fuel_percentage: number;
-		maintenance_percentage: number;
-		other_percentage: number;
-	};
+	others: number;
 }
 
 export interface RecentActivity {
 	type: 'fuel' | 'maintenance';
 	id: number;
 	date: string;
-	description: string;
-	amount: number;
-	details?: any;
-	vehicle_id: number;
-	vehicle_info: string;
+	description: string | null;
+	cost: number;
+	vehicle: string;
+	fuel_type?: string | null;
 }
 
 export interface UpcomingReminder {
 	id: number;
-	type: 'maintenance' | 'licensing' | 'insurance';
+	type: 'maintenance' | 'tax' | 'license' | 'insurance';
 	title: string;
-	description?: string;
-	remind_at_km?: number;
-	remind_at_date?: string;
+	description: string | null;
+	date: string | null;
+	km: number | null;
 	vehicle_id: number;
-	vehicle_info: string;
-	current_km?: number;
-	days_until?: number;
-	km_until?: number;
-	is_urgent: boolean;
+	vehicle: string;
+	days_until: number | null;
+	km_until: number | null;
 }
 
 export interface DashboardOverview {
 	expenses: {
 		monthly: MonthlyExpense[];
-		period_total: number;
-		period_avg: number;
+		totals: {
+			fuel: number;
+			maintenance: number;
+			others: number;
+			total: number;
+			fuel_percentage: number;
+			maintenance_percentage: number;
+			others_percentage: number;
+		};
 	};
 	recent_activities: RecentActivity[];
-	upcoming_reminders: UpcomingReminder[];
+	upcoming_maintenances: UpcomingReminder[];
+	total_vehicles: number;
 }
 
 export interface MonthlyExpensesData {

@@ -30,10 +30,10 @@
 			]);
 
 			monthlyExpenses = overviewRes.data.expenses.monthly;
-			periodTotal = overviewRes.data.expenses.period_total;
-			periodAvg = overviewRes.data.expenses.period_avg;
+			periodTotal = overviewRes.data.expenses.totals.total;
+			periodAvg = overviewRes.data.expenses.totals.total / (overviewRes.data.expenses.monthly.length || 1);
 			recentActivities = overviewRes.data.recent_activities;
-			upcomingReminders = overviewRes.data.upcoming_reminders;
+			upcomingReminders = overviewRes.data.upcoming_maintenances;
 		} catch (err: any) {
 			error = err.message || 'Erro ao carregar dados do dashboard';
 			console.error('Dashboard error:', err);
@@ -86,10 +86,10 @@
 	$: monthlySpending =
 		monthlyExpenses && monthlyExpenses.length > 0
 			? monthlyExpenses.map((expense) => ({
-					month: getMonthLabel(expense.month_num),
+					month: expense.month,
 					fuel: expense.fuel,
 					maintenance: expense.maintenance,
-					others: expense.other,
+					others: expense.others,
 					total: expense.total
 			  }))
 			: [];
@@ -103,17 +103,12 @@
 			? categoryDistribution.reduce((sum, cat) => sum + cat.value, 0)
 			: 0;
 
-	function getMonthLabel(monthNum: number): string {
-		const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-		return months[monthNum - 1] || '';
-	}
-
 	function calculateCategoryDistribution() {
-		if (monthlyExpenses.length === 0) return [];
+		if (!monthlyExpenses || monthlyExpenses.length === 0) return [];
 
 		const totalFuel = monthlyExpenses.reduce((sum, m) => sum + m.fuel, 0);
 		const totalMaintenance = monthlyExpenses.reduce((sum, m) => sum + m.maintenance, 0);
-		const totalOther = monthlyExpenses.reduce((sum, m) => sum + m.other, 0);
+		const totalOther = monthlyExpenses.reduce((sum, m) => sum + m.others, 0);
 		const total = totalFuel + totalMaintenance + totalOther;
 
 		if (total === 0) return [];
@@ -458,32 +453,33 @@
 					{:else}
 						<div class="space-y-4">
 							{#each upcomingReminders.slice(0, 3) as reminder}
+								{@const isUrgent = reminder.days_until !== null && reminder.days_until <= 7}
 								<div
-									class="border-l-4 p-3 {reminder.is_urgent
+									class="border-l-4 p-3 {isUrgent
 										? 'border-red-500 bg-red-50 dark:bg-red-900/20'
 										: 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'}"
 								>
 									<p class="text-sm font-semibold text-gray-900 dark:text-white">
-										{reminder.vehicle_info}
+										{reminder.vehicle}
 									</p>
 									<p class="mt-1 text-xs text-gray-600 dark:text-gray-400">
 										{reminder.title}
 									</p>
 									<div class="mt-2 flex items-center justify-between">
-										{#if reminder.remind_at_date}
+										{#if reminder.date}
 											<span class="text-xs text-gray-500 dark:text-gray-400">
-												{new Date(reminder.remind_at_date).toLocaleDateString('pt-BR')}
+												{new Date(reminder.date).toLocaleDateString('pt-BR')}
 											</span>
 										{/if}
-										{#if reminder.days_until !== undefined}
+										{#if reminder.days_until !== null}
 											<span
-												class="rounded-full px-2 py-1 text-xs font-medium {reminder.is_urgent
+												class="rounded-full px-2 py-1 text-xs font-medium {isUrgent
 													? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
 													: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'}"
 											>
 												{reminder.days_until} dias
 											</span>
-										{:else if reminder.km_until !== undefined}
+										{:else if reminder.km_until !== null}
 											<span
 												class="rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
 											>
@@ -550,10 +546,10 @@
 									</div>
 									<div class="min-w-0 flex-1">
 										<p class="text-sm font-medium text-gray-900 dark:text-white">
-											{activity.description}
+											{activity.description || 'Sem descrição'}
 										</p>
 										<p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-											{activity.vehicle_info}
+											{activity.vehicle}
 										</p>
 										<p class="mt-1 text-xs text-gray-500 dark:text-gray-500">
 											{new Date(activity.date).toLocaleDateString('pt-BR')}
@@ -561,7 +557,7 @@
 									</div>
 									<div class="text-right">
 										<p class="text-sm font-semibold text-gray-900 dark:text-white">
-											{formatCurrency(activity.amount)}
+											{formatCurrency(activity.cost)}
 										</p>
 									</div>
 								</div>
