@@ -13,8 +13,7 @@ export interface Maintenance {
     user_id: number;
     vehicle_id: number;
     service_provider_id?: number;
-    title: string; // Título da manutenção (ex: "Troca de óleo")
-    type: string; // Tipo/categoria (preventiva, corretiva, etc)
+    type: string; // Tipo de manutenção (ex: "Troca de óleo", "Alinhamento")
     category?: MaintenanceCategory;
     description?: string;
     cost?: number;
@@ -48,7 +47,6 @@ export interface Maintenance {
 export interface CreateMaintenanceRequest {
     vehicle_id: number;
     service_provider_id?: number;
-    title: string;
     type: string;
     category?: MaintenanceCategory;
     description?: string;
@@ -65,7 +63,6 @@ export interface CreateMaintenanceRequest {
 export interface UpdateMaintenanceRequest {
     vehicle_id?: number;
     service_provider_id?: number;
-    title?: string;
     type?: string;
     category?: MaintenanceCategory;
     description?: string;
