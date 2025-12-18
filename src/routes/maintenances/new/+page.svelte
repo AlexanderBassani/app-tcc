@@ -350,7 +350,7 @@
 			{/if}
 
 			<!-- Form -->
-			<form on:submit={handleSubmit} class="space-y-6">
+			<form onsubmit={handleSubmit} class="space-y-6">
 				<!-- Basic Information Card -->
 				<div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
 					<h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
