@@ -9,6 +9,7 @@ export interface Vehicle {
     current_km: number;
     purchase_date: string; // ISO Date string
     is_active: boolean;
+    is_primary: boolean;
     notes?: string;
     created_at: string;
     updated_at: string;
@@ -22,6 +23,7 @@ export interface CreateVehicleRequest {
     color: string;
     current_km: number;
     purchase_date: string;
+    is_primary?: boolean;
     notes?: string;
 }
 
@@ -33,6 +35,7 @@ export interface UpdateVehicleRequest {
     color?: string;
     current_km?: number;
     purchase_date?: string;
+    is_primary?: boolean;
     notes?: string;
 }
 

@@ -376,7 +376,7 @@
 									bind:value={formData.vehicle_id}
 									required
 									disabled={isVehiclePreSelected}
-									class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+									class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:disabled:bg-gray-600 dark:disabled:text-gray-300"
 								>
 									<option value={0}>Selecione um veículo...</option>
 									{#each vehicles as vehicle}
