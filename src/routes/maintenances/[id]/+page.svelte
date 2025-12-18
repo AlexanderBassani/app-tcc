@@ -465,10 +465,20 @@
 				</div>
 
 				<div class="flex gap-2">
-					{#if !isEditing}
+					{#if isEditing}
+						<button
+							onclick={() => {
+								isEditing = false;
+								resetForm();
+							}}
+							class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+						>
+							Cancelar Edição
+						</button>
+					{:else}
 						<button
 							onclick={() => (isEditing = true)}
-							class="rounded-lg bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+							class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700"
 						>
 							Editar
 						</button>
@@ -931,117 +941,116 @@
 						</button>
 					</div>
 				</form>
-			{:else}
-				<!-- View Mode -->
-				<div class="space-y-6">
-					<!-- Basic Info Card -->
-					<div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-						<div class="grid gap-6 sm:grid-cols-2">
+			{/if}
+
+			<!-- View Mode - Always visible when not editing -->
+			{#if !isEditing}
+				<div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+					<div class="grid gap-6 sm:grid-cols-2">
+						<div class="sm:col-span-2">
+							<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Veículo</p>
+							<p class="mt-1 text-lg text-gray-900 dark:text-white">
+								{getVehicleInfo(maintenance.vehicle_id)}
+							</p>
+						</div>
+						<div>
+							<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Tipo</p>
+							<p class="mt-1 text-lg text-gray-900 dark:text-white">
+								{getTypeLabel(maintenance.type)}
+							</p>
+						</div>
+						<div>
+							<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Data do Serviço</p>
+							<p class="mt-1 text-lg text-gray-900 dark:text-white">
+								{formatDate(maintenance.service_date)}
+							</p>
+						</div>
+						{#if maintenance.cost}
+							<div>
+								<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Custo</p>
+								<p class="mt-1 text-lg text-gray-900 dark:text-white">
+									{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
+										maintenance.cost
+									)}
+								</p>
+							</div>
+						{/if}
+						{#if maintenance.km_when_done}
+							<div>
+								<p class="text-sm font-medium text-gray-500 dark:text-gray-400">
+									KM quando realizada
+								</p>
+								<p class="mt-1 text-lg text-gray-900 dark:text-white">
+									{maintenance.km_when_done.toLocaleString('pt-BR')} km
+								</p>
+							</div>
+						{/if}
+						{#if maintenance.next_service_date}
+							<div>
+								<p class="text-sm font-medium text-gray-500 dark:text-gray-400">
+									Próxima Manutenção
+								</p>
+								<p class="mt-1 text-lg text-gray-900 dark:text-white">
+									{formatDate(maintenance.next_service_date)}
+								</p>
+							</div>
+						{/if}
+						{#if maintenance.next_km}
+							<div>
+								<p class="text-sm font-medium text-gray-500 dark:text-gray-400">
+									Próxima Quilometragem
+								</p>
+								<p class="mt-1 text-lg text-gray-900 dark:text-white">
+									{maintenance.next_km.toLocaleString('pt-BR')} km
+								</p>
+							</div>
+						{/if}
+						{#if maintenance.description}
 							<div class="sm:col-span-2">
-								<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Veículo</p>
-								<p class="mt-1 text-lg text-gray-900 dark:text-white">
-									{getVehicleInfo(maintenance.vehicle_id)}
+								<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Descrição</p>
+								<p class="mt-1 whitespace-pre-wrap text-gray-900 dark:text-white">
+									{maintenance.description}
 								</p>
 							</div>
-							<div>
-								<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Tipo</p>
-								<p class="mt-1 text-lg text-gray-900 dark:text-white">
-									{getTypeLabel(maintenance.type)}
+						{/if}
+						{#if maintenance.notes}
+							<div class="sm:col-span-2">
+								<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Notas</p>
+								<p class="mt-1 whitespace-pre-wrap text-gray-900 dark:text-white">
+									{maintenance.notes}
 								</p>
 							</div>
-							<div>
-								<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Data do Serviço</p>
-								<p class="mt-1 text-lg text-gray-900 dark:text-white">
-									{formatDate(maintenance.service_date)}
-								</p>
-							</div>
-							{#if maintenance.cost}
-								<div>
-									<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Custo</p>
-									<p class="mt-1 text-lg text-gray-900 dark:text-white">
-										{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
-											maintenance.cost
-										)}
-									</p>
-								</div>
-							{/if}
-							{#if maintenance.km_when_done}
-								<div>
-									<p class="text-sm font-medium text-gray-500 dark:text-gray-400">
-										KM quando realizada
-									</p>
-									<p class="mt-1 text-lg text-gray-900 dark:text-white">
-										{maintenance.km_when_done.toLocaleString('pt-BR')} km
-									</p>
-								</div>
-							{/if}
-							{#if maintenance.next_service_date}
-								<div>
-									<p class="text-sm font-medium text-gray-500 dark:text-gray-400">
-										Próxima Manutenção
-									</p>
-									<p class="mt-1 text-lg text-gray-900 dark:text-white">
-										{formatDate(maintenance.next_service_date)}
-									</p>
-								</div>
-							{/if}
-							{#if maintenance.next_km}
-								<div>
-									<p class="text-sm font-medium text-gray-500 dark:text-gray-400">
-										Próxima Quilometragem
-									</p>
-									<p class="mt-1 text-lg text-gray-900 dark:text-white">
-										{maintenance.next_km.toLocaleString('pt-BR')} km
-									</p>
-								</div>
-							{/if}
-							{#if maintenance.description}
-								<div class="sm:col-span-2">
-									<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Descrição</p>
-									<p class="mt-1 whitespace-pre-wrap text-gray-900 dark:text-white">
-										{maintenance.description}
-									</p>
-								</div>
-							{/if}
-							{#if maintenance.notes}
-								<div class="sm:col-span-2">
-									<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Notas</p>
-									<p class="mt-1 whitespace-pre-wrap text-gray-900 dark:text-white">
-										{maintenance.notes}
-									</p>
-								</div>
-							{/if}
-						</div>
-					</div>
-
-					<!-- Attachments -->
-					<div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-						<MaintenanceAttachments maintenanceId={maintenance.id} />
-					</div>
-
-					<!-- Actions -->
-					<div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-						<h3 class="text-lg font-medium text-gray-900 dark:text-white">Ações</h3>
-						<div class="mt-4 flex flex-wrap gap-4">
-							{#if !maintenance.is_completed}
-								<button
-									onclick={handleComplete}
-									class="rounded-md border border-green-300 bg-green-50 px-4 py-2 text-sm font-medium text-green-700 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:border-green-700 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50"
-								>
-									Marcar como Concluída
-								</button>
-							{/if}
-
-							<button
-								onclick={handleDelete}
-								class="rounded-md border border-red-300 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:border-red-700 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50"
-							>
-								Excluir Manutenção
-							</button>
-						</div>
+						{/if}
 					</div>
 				</div>
 			{/if}
+
+			<!-- Attachments - Always visible -->
+			<div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+				<MaintenanceAttachments maintenanceId={maintenance.id} />
+			</div>
+
+			<!-- Actions - Always visible -->
+			<div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+				<h3 class="text-lg font-medium text-gray-900 dark:text-white">Ações</h3>
+				<div class="mt-4 flex flex-wrap gap-4">
+					{#if !maintenance.is_completed}
+						<button
+							onclick={handleComplete}
+							class="rounded-md border border-green-300 bg-green-50 px-4 py-2 text-sm font-medium text-green-700 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:border-green-700 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50"
+						>
+							Marcar como Concluída
+						</button>
+					{/if}
+
+					<button
+						onclick={handleDelete}
+						class="rounded-md border border-red-300 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:border-red-700 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50"
+					>
+						Excluir Manutenção
+					</button>
+				</div>
+			</div>
 		</div>
 	{:else}
 		<div class="p-12 text-center">
