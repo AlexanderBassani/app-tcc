@@ -151,10 +151,14 @@
 			<div class="rounded-lg bg-white p-4 dark:bg-gray-800">
 				<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 					<div>
-						<label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+						<label
+							for="vehicle-filter"
+							class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
+						>
 							Filtrar por Veículo
 						</label>
 						<select
+							id="vehicle-filter"
 							bind:value={selectedVehicleId}
 							on:change={handleVehicleChange}
 							class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
@@ -446,14 +450,6 @@
 													<p class="text-sm text-gray-600 dark:text-gray-400">Veículo:</p>
 													<p class="font-semibold">{getVehicleInfo(maintenance.vehicle_id)}</p>
 												</div>
-
-												<!-- Title -->
-												{#if maintenance.title}
-													<div class="text-gray-900 dark:text-white">
-														<p class="text-sm text-gray-600 dark:text-gray-400">Título:</p>
-														<p class="font-medium">{maintenance.title}</p>
-													</div>
-												{/if}
 
 												<!-- Description -->
 												{#if maintenance.description}
