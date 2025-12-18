@@ -437,9 +437,9 @@
 
 						<!-- Category -->
 						<div class="sm:col-span-2">
-							<label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+							<div class="block text-sm font-medium text-gray-700 dark:text-gray-300">
 								Categoria
-							</label>
+							</div>
 							<div class="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-4">
 								{#each MAINTENANCE_CATEGORIES as category}
 									<label
@@ -535,6 +535,7 @@
 								<button
 									type="button"
 									onclick={() => adjustKm(-1000)}
+									aria-label="Diminuir quilometragem em 1000 km"
 									class="flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
 								>
 									<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -553,6 +554,7 @@
 								<button
 									type="button"
 									onclick={() => adjustKm(1000)}
+									aria-label="Aumentar quilometragem em 1000 km"
 									class="flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
 								>
 									<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -611,6 +613,7 @@
 											<button
 												type="button"
 												onclick={() => adjustNextKm(-1000)}
+												aria-label="Diminuir próxima quilometragem em 1000 km"
 												class="flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
 											>
 												<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -633,6 +636,7 @@
 											<button
 												type="button"
 												onclick={() => adjustNextKm(1000)}
+												aria-label="Aumentar próxima quilometragem em 1000 km"
 												class="flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
 											>
 												<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

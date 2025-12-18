@@ -205,11 +205,11 @@
 					{#each activeTab === 'active' ? activeVehicles : inactiveVehicles as vehicle}
 						<a
 							href="/vehicles/{vehicle.id}"
-							class="group relative block overflow-hidden rounded-xl border border-gray-200 bg-gradient-to-br from-gray-800 to-gray-900 p-6 shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl dark:border-gray-700"
+							class="group relative block overflow-hidden rounded-xl border border-gray-200 bg-white p-6 shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl dark:border-gray-700 dark:bg-gradient-to-br dark:from-gray-800 dark:to-gray-900"
 						>
 							<!-- Refresh Icon (top right) -->
 							<button
-								class="absolute right-6 top-6 rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-700 hover:text-white"
+								class="absolute right-6 top-6 rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-700 dark:hover:text-white"
 								onclick={(e) => {
 									e.preventDefault();
 									loadVehicles();
@@ -233,17 +233,17 @@
 
 							<!-- Vehicle Name -->
 							<div class="mb-4">
-								<h3 class="text-xl font-bold text-white">
+								<h3 class="text-xl font-bold text-gray-900 dark:text-white">
 									{vehicle.brand}
 									{vehicle.model}
 								</h3>
-								<p class="text-sm text-gray-400">
+								<p class="text-sm text-gray-600 dark:text-gray-400">
 									{vehicle.year} • {vehicle.plate}
 								</p>
 							</div>
 
 							<!-- Mileage -->
-							<div class="mb-3 flex items-center gap-2 text-white">
+							<div class="mb-3 flex items-center gap-2 text-gray-900 dark:text-white">
 								<svg
 									class="h-5 w-5 text-blue-400"
 									fill="none"
@@ -262,7 +262,7 @@
 							</div>
 
 							<!-- Color -->
-							<div class="mb-4 flex items-center gap-2 text-white">
+							<div class="mb-4 flex items-center gap-2 text-gray-900 dark:text-white">
 								<svg
 									class="h-5 w-5 text-pink-400"
 									fill="none"

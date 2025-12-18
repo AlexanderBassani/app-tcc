@@ -234,7 +234,7 @@
 				<div class="space-y-4">
 					{#each filteredMaintenances as maintenance (maintenance.id)}
 						<div
-							class="rounded-xl border border-gray-200 bg-gradient-to-br from-gray-800 to-gray-900 p-6 shadow-lg transition-all hover:shadow-xl dark:border-gray-700"
+							class="rounded-xl border border-gray-200 bg-white p-6 shadow-lg transition-all hover:shadow-xl dark:border-gray-700 dark:bg-gradient-to-br dark:from-gray-800 dark:to-gray-900"
 						>
 							<div class="flex items-start justify-between gap-4">
 								<div class="flex-1 space-y-3">
@@ -248,35 +248,35 @@
 											{getStatusBadge(maintenance).text}
 										</span>
 										<span
-											class="inline-flex items-center rounded-full bg-gray-700 px-3 py-1 text-xs font-medium text-gray-300"
+											class="inline-flex items-center rounded-full bg-gray-200 px-3 py-1 text-xs font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-300"
 										>
 											{getTypeLabel(maintenance.type)}
 										</span>
 									</div>
 
 									<!-- Vehicle Info -->
-									<div class="text-white">
-										<p class="text-sm text-gray-400">Veículo:</p>
+									<div class="text-gray-900 dark:text-white">
+										<p class="text-sm text-gray-600 dark:text-gray-400">Veículo:</p>
 										<p class="font-semibold">{getVehicleInfo(maintenance.vehicle_id)}</p>
 									</div>
 
 									<!-- Description -->
 									{#if maintenance.description}
-										<div class="text-white">
-											<p class="text-sm text-gray-400">Descrição:</p>
+										<div class="text-gray-900 dark:text-white">
+											<p class="text-sm text-gray-600 dark:text-gray-400">Descrição:</p>
 											<p class="text-sm">{maintenance.description}</p>
 										</div>
 									{/if}
 
 									<!-- Date and Cost -->
-									<div class="flex gap-6 text-sm text-gray-300">
+									<div class="flex gap-6 text-sm text-gray-700 dark:text-gray-300">
 										<div>
-											<span class="text-gray-400">Data:</span>
+											<span class="text-gray-600 dark:text-gray-400">Data:</span>
 											<span class="ml-1">{formatDate(maintenance.service_date)}</span>
 										</div>
 										{#if maintenance.cost}
 											<div>
-												<span class="text-gray-400">Custo:</span>
+												<span class="text-gray-600 dark:text-gray-400">Custo:</span>
 												<span class="ml-1 font-semibold">{formatCurrency(maintenance.cost)}</span>
 											</div>
 										{/if}
@@ -287,7 +287,7 @@
 								<div class="flex gap-2">
 									<a
 										href="/maintenances/{maintenance.id}"
-										class="rounded-lg border border-gray-600 bg-gray-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-600"
+										class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
 									>
 										Ver
 									</a>

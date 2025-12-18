@@ -38,21 +38,21 @@
 </script>
 
 <aside
-	class="bg-[#1e293b] text-gray-300 transition-all duration-300 {isCollapsed ? 'w-20' : 'w-64'}"
+	class="bg-white text-gray-700 transition-all duration-300 dark:bg-[#1e293b] dark:text-gray-300 {isCollapsed ? 'w-20' : 'w-64'}"
 >
 	<div class="flex h-full flex-col">
 		<!-- Logo and Toggle -->
-		<div class="flex h-16 items-center border-b border-gray-700/50 px-6 {isCollapsed ? 'justify-center' : 'justify-between'}">
+		<div class="flex h-16 items-center border-b border-gray-200 px-6 dark:border-gray-700/50 {isCollapsed ? 'justify-center' : 'justify-between'}">
 			{#if !isCollapsed}
 				<div class="flex items-center gap-3">
 					<div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500">
 						<span class="text-2xl font-bold text-white">M</span>
 					</div>
-					<span class="text-xl font-semibold text-white">MyApp</span>
+					<span class="text-xl font-semibold text-gray-900 dark:text-white">MyApp</span>
 				</div>
 				<button
 					onclick={toggleSidebar}
-					class="rounded-lg p-2 text-gray-400 transition-colors hover:bg-[#2d3a4f] hover:text-white"
+					class="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-[#2d3a4f] dark:hover:text-white"
 					title="Recolher menu"
 				>
 					<svg
@@ -73,7 +73,7 @@
 			{:else}
 				<button
 					onclick={toggleSidebar}
-					class="rounded-lg p-2 text-gray-400 transition-colors hover:bg-[#2d3a4f] hover:text-white"
+					class="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-[#2d3a4f] dark:hover:text-white"
 					title="Expandir menu"
 				>
 					<svg
@@ -102,8 +102,8 @@
 				class="flex cursor-pointer items-center gap-4 rounded-xl px-3 py-3 text-base transition-all {isActive(
 					'/'
 				)
-					? 'bg-[#3b4f6f] text-white'
-					: 'text-gray-300 hover:bg-[#2d3a4f]'}"
+					? 'bg-blue-50 text-blue-600 dark:bg-[#3b4f6f] dark:text-white'
+					: 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-[#2d3a4f]'}"
 				title="Dashboard"
 			>
 				<svg
@@ -130,7 +130,7 @@
 				<div class="space-y-2">
 					<button
 						onclick={() => (usersExpanded = !usersExpanded)}
-						class="flex w-full cursor-pointer items-center justify-between rounded-xl px-3 py-3 text-base text-gray-300 transition-all hover:bg-[#2d3a4f]"
+						class="flex w-full cursor-pointer items-center justify-between rounded-xl px-3 py-3 text-base text-gray-700 transition-all hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-[#2d3a4f]"
 						title="Usuários"
 					>
 						<div class="flex items-center gap-4">
@@ -178,8 +178,8 @@
 								class="block cursor-pointer rounded-lg px-4 py-2 text-sm transition-all {isActive(
 									'/usuarios'
 								)
-									? 'bg-[#3b4f6f] text-white'
-									: 'text-gray-400 hover:bg-[#2d3a4f] hover:text-gray-300'}"
+									? 'bg-blue-50 text-blue-600 dark:bg-[#3b4f6f] dark:text-white'
+									: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-[#2d3a4f] dark:hover:text-gray-300'}"
 							>
 								Lista de Usuários
 							</a>
@@ -188,8 +188,8 @@
 								class="block cursor-pointer rounded-lg px-4 py-2 text-sm transition-all {isActive(
 									'/usuarios/cadastro'
 								)
-									? 'bg-[#3b4f6f] text-white'
-									: 'text-gray-400 hover:bg-[#2d3a4f] hover:text-gray-300'}"
+									? 'bg-blue-50 text-blue-600 dark:bg-[#3b4f6f] dark:text-white'
+									: 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-[#2d3a4f] dark:hover:text-gray-300'}"
 							>
 								Cadastro de Usuário
 							</a>
@@ -204,8 +204,8 @@
 				class="flex cursor-pointer items-center gap-4 rounded-xl px-3 py-3 text-base transition-all {isActive(
 					'/vehicles'
 				)
-					? 'bg-[#3b4f6f] text-white'
-					: 'text-gray-300 hover:bg-[#2d3a4f]'}"
+					? 'bg-blue-50 text-blue-600 dark:bg-[#3b4f6f] dark:text-white'
+					: 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-[#2d3a4f]'}"
 				title="Veículos"
 			>
 				<svg
@@ -238,8 +238,8 @@
 				class="flex cursor-pointer items-center gap-4 rounded-xl px-3 py-3 text-base transition-all {isActiveSection(
 					'/maintenances'
 				)
-					? 'bg-[#3b4f6f] text-white'
-					: 'text-gray-300 hover:bg-[#2d3a4f]'}"
+					? 'bg-blue-50 text-blue-600 dark:bg-[#3b4f6f] dark:text-white'
+					: 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-[#2d3a4f]'}"
 				title="Manutenções"
 			>
 				<svg
@@ -267,8 +267,8 @@
 				class="flex cursor-pointer items-center gap-4 rounded-xl px-3 py-3 text-base transition-all {isActiveSection(
 					'/fuelings'
 				)
-					? 'bg-[#3b4f6f] text-white'
-					: 'text-gray-300 hover:bg-[#2d3a4f]'}"
+					? 'bg-blue-50 text-blue-600 dark:bg-[#3b4f6f] dark:text-white'
+					: 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-[#2d3a4f]'}"
 				title="Abastecimentos"
 			>
 				<svg
@@ -298,8 +298,8 @@
 				class="flex cursor-pointer items-center gap-4 rounded-xl px-3 py-3 text-base transition-all {isActiveSection(
 					'/history'
 				)
-					? 'bg-[#3b4f6f] text-white'
-					: 'text-gray-300 hover:bg-[#2d3a4f]'}"
+					? 'bg-blue-50 text-blue-600 dark:bg-[#3b4f6f] dark:text-white'
+					: 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-[#2d3a4f]'}"
 				title="Histórico"
 			>
 				<svg

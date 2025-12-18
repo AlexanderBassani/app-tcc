@@ -285,7 +285,7 @@
 				<div class="space-y-4">
 					{#each fuelings as fueling, index (fueling.id)}
 						<div
-							class="rounded-xl border border-gray-200 bg-gradient-to-br from-gray-800 to-gray-900 p-6 shadow-lg transition-all hover:shadow-xl dark:border-gray-700"
+							class="rounded-xl border border-gray-200 bg-white p-6 shadow-lg transition-all hover:shadow-xl dark:border-gray-700 dark:bg-gradient-to-br dark:from-gray-800 dark:to-gray-900"
 						>
 							<div class="flex items-start justify-between gap-4">
 								<div class="flex-1 space-y-3">
@@ -306,50 +306,50 @@
 									</div>
 
 									<!-- Vehicle Info -->
-									<div class="text-white">
-										<p class="text-sm text-gray-400">Veículo:</p>
+									<div class="text-gray-900 dark:text-white">
+										<p class="text-sm text-gray-600 dark:text-gray-400">Veículo:</p>
 										<p class="font-semibold">{getVehicleInfo(fueling.vehicle_id)}</p>
 									</div>
 
 									<!-- Date and KM -->
-									<div class="flex gap-6 text-sm text-gray-300">
+									<div class="flex gap-6 text-sm text-gray-700 dark:text-gray-300">
 										<div>
-											<span class="text-gray-400">Data:</span>
+											<span class="text-gray-600 dark:text-gray-400">Data:</span>
 											<span class="ml-1">{formatDate(fueling.date)}</span>
 										</div>
 										<div>
-											<span class="text-gray-400">KM:</span>
+											<span class="text-gray-600 dark:text-gray-400">KM:</span>
 											<span class="ml-1">{Number(fueling.km).toLocaleString()}</span>
 										</div>
 									</div>
 
 									<!-- Liters, Price and Consumption -->
-									<div class="flex gap-6 text-sm text-gray-300">
+									<div class="flex gap-6 text-sm text-gray-700 dark:text-gray-300">
 										<div>
-											<span class="text-gray-400">Litros:</span>
+											<span class="text-gray-600 dark:text-gray-400">Litros:</span>
 											<span class="ml-1">{Number(fueling.liters).toFixed(2)} L</span>
 										</div>
 										<div>
-											<span class="text-gray-400">Preço/L:</span>
+											<span class="text-gray-600 dark:text-gray-400">Preço/L:</span>
 											<span class="ml-1">{formatCurrency(Number(fueling.price_per_liter))}</span>
 										</div>
 										<div>
-											<span class="text-gray-400">Consumo:</span>
+											<span class="text-gray-600 dark:text-gray-400">Consumo:</span>
 											<span class="ml-1">{calculateConsumption(fueling, index)}</span>
 										</div>
 									</div>
 
 									<!-- Total Cost and Gas Station -->
-									<div class="flex items-baseline gap-6 text-sm text-gray-300">
+									<div class="flex items-baseline gap-6 text-sm text-gray-700 dark:text-gray-300">
 										<div>
-											<span class="text-gray-400">Total:</span>
-											<span class="ml-1 text-lg font-bold text-white"
+											<span class="text-gray-600 dark:text-gray-400">Total:</span>
+											<span class="ml-1 text-lg font-bold text-gray-900 dark:text-white"
 												>{formatCurrency(Number(fueling.total_cost))}</span
 											>
 										</div>
 										{#if fueling.gas_station}
 											<div>
-												<span class="text-gray-400">Posto:</span>
+												<span class="text-gray-600 dark:text-gray-400">Posto:</span>
 												<span class="ml-1">{fueling.gas_station}</span>
 											</div>
 										{/if}
@@ -360,7 +360,7 @@
 								<div class="flex gap-2">
 									<a
 										href="/fuelings/{fueling.id}"
-										class="rounded-lg border border-gray-600 bg-gray-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-600"
+										class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
 									>
 										Ver
 									</a>
@@ -382,17 +382,17 @@
 						<button
 							on:click={() => handlePageChange(page - 1)}
 							disabled={page === 1}
-							class="inline-flex items-center rounded-lg border border-gray-600 bg-gray-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
+							class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
 						>
 							Anterior
 						</button>
-						<span class="text-sm text-gray-300">
+						<span class="text-sm text-gray-700 dark:text-gray-300">
 							Página {page} de {totalPages}
 						</span>
 						<button
 							on:click={() => handlePageChange(page + 1)}
 							disabled={page === totalPages}
-							class="inline-flex items-center rounded-lg border border-gray-600 bg-gray-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
+							class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
 						>
 							Próxima
 						</button>

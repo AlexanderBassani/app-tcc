@@ -294,8 +294,8 @@
 
 				<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
 					<!-- Monthly Spending Chart -->
-					<div class="rounded-xl bg-gradient-to-br from-[#1e293b] to-[#0f172a] p-6 shadow-lg">
-						<h3 class="mb-6 text-lg font-semibold text-white">Comparativo Mensal</h3>
+					<div class="rounded-xl bg-white p-6 shadow-lg dark:bg-gradient-to-br dark:from-[#1e293b] dark:to-[#0f172a]">
+						<h3 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">Comparativo Mensal</h3>
 
 						<!-- Chart Container -->
 						{#if !monthlySpending || monthlySpending.length === 0}
@@ -303,18 +303,18 @@
 								<p class="text-sm text-gray-400">Nenhum dado disponível</p>
 							</div>
 						{:else}
-							<div class="relative">
+							<div class="relative pl-20">
 								<!-- Y-axis labels -->
 								<div
-									class="absolute top-0 left-0 z-10 flex h-64 flex-col justify-between text-xs text-gray-400"
+									class="absolute top-0 left-0 flex h-64 w-16 flex-col items-end justify-between pr-2 text-xs text-gray-600 dark:text-gray-400"
 								>
 									{#each yAxisLabels as label}
-										<span class="bg-[#1e293b] px-1">{label}</span>
+										<span>{label}</span>
 									{/each}
 								</div>
 
 								<!-- Chart -->
-								<div class="ml-16 flex h-64 items-end justify-between gap-3">
+								<div class="flex h-64 items-end justify-between gap-3">
 									{#each monthlySpending as data}
 										{@const barHeight = chartMaxValue > 0 ? (data.total / chartMaxValue) * 240 : 0}
 										{@const fuelPercent = data.total > 0 ? (data.fuel / data.total) * 100 : 0}
@@ -391,8 +391,8 @@
 					</div>
 
 					<!-- Distribution by Category -->
-					<div class="rounded-xl bg-gradient-to-br from-[#1e293b] to-[#0f172a] p-6 shadow-lg">
-						<h3 class="mb-6 text-lg font-semibold text-white">Distribuição por Categoria</h3>
+					<div class="rounded-xl bg-white p-6 shadow-lg dark:bg-gradient-to-br dark:from-[#1e293b] dark:to-[#0f172a]">
+						<h3 class="mb-6 text-lg font-semibold text-gray-900 dark:text-white">Distribuição por Categoria</h3>
 
 
 						{#if !categoryDistribution || categoryDistribution.length === 0}
@@ -438,10 +438,10 @@
 									<!-- Center text -->
 									<div class="absolute inset-0 flex items-center justify-center">
 										<div class="text-center">
-											<p class="text-xl font-bold text-white">
+											<p class="text-xl font-bold text-gray-900 dark:text-white">
 												{formatCurrency(totalDistribution)}
 											</p>
-											<p class="text-xs text-gray-400">Total</p>
+											<p class="text-xs text-gray-600 dark:text-gray-400">Total</p>
 										</div>
 									</div>
 								</div>
@@ -455,13 +455,13 @@
 													class="h-3 w-3 rounded-sm"
 													style="background-color: {category.color}"
 												></div>
-												<span class="text-sm font-medium text-gray-300">{category.label}</span>
+												<span class="text-sm font-medium text-gray-700 dark:text-gray-300">{category.label}</span>
 											</div>
 											<div class="text-right">
-												<p class="text-sm font-bold text-white">
+												<p class="text-sm font-bold text-gray-900 dark:text-white">
 													{formatCurrency(category.value)}
 												</p>
-												<p class="text-xs text-gray-400">{category.percentage}%</p>
+												<p class="text-xs text-gray-600 dark:text-gray-400">{category.percentage}%</p>
 											</div>
 										</div>
 									{/each}

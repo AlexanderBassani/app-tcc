@@ -285,7 +285,7 @@
 				<!-- Timeline -->
 				<div class="relative">
 					<!-- Vertical line -->
-					<div class="absolute top-0 bottom-0 left-6 w-0.5 bg-gray-700"></div>
+					<div class="absolute top-0 bottom-0 left-6 w-0.5 bg-gray-300 dark:bg-gray-700"></div>
 
 					<!-- Timeline items -->
 					<div class="space-y-6">
@@ -340,7 +340,7 @@
 
 								<!-- Content card -->
 								<div
-									class="rounded-xl border border-gray-200 bg-gradient-to-br from-gray-800 to-gray-900 p-6 shadow-lg transition-all hover:shadow-xl dark:border-gray-700"
+									class="rounded-xl border border-gray-200 bg-white p-6 shadow-lg transition-all hover:shadow-xl dark:border-gray-700 dark:bg-gradient-to-br dark:from-gray-800 dark:to-gray-900"
 								>
 									{#if item.type === 'fueling'}
 										{@const fueling = item.data as Fueling}
@@ -348,7 +348,7 @@
 											<div class="flex-1 space-y-3">
 												<!-- Title and Badges -->
 												<div class="flex items-center gap-2">
-													<h3 class="text-lg font-semibold text-white">Abastecimento</h3>
+													<h3 class="text-lg font-semibold text-gray-900 dark:text-white">Abastecimento</h3>
 													<span
 														class="inline-flex items-center rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-xs font-semibold text-blue-400"
 													>
@@ -364,31 +364,31 @@
 												</div>
 
 												<!-- Vehicle Info -->
-												<div class="text-white">
-													<p class="text-sm text-gray-400">Veículo:</p>
+												<div class="text-gray-900 dark:text-white">
+													<p class="text-sm text-gray-600 dark:text-gray-400">Veículo:</p>
 													<p class="font-semibold">{getVehicleInfo(fueling.vehicle_id)}</p>
 												</div>
 
 												<!-- Date and KM -->
-												<div class="flex gap-6 text-sm text-gray-300">
+												<div class="flex gap-6 text-sm text-gray-700 dark:text-gray-300">
 													<div>
-														<span class="text-gray-400">Data:</span>
+														<span class="text-gray-600 dark:text-gray-400">Data:</span>
 														<span class="ml-1">{formatDate(fueling.date)}</span>
 													</div>
 													<div>
-														<span class="text-gray-400">KM:</span>
+														<span class="text-gray-600 dark:text-gray-400">KM:</span>
 														<span class="ml-1">{Number(fueling.km).toLocaleString()}</span>
 													</div>
 												</div>
 
 												<!-- Liters and Price -->
-												<div class="flex gap-6 text-sm text-gray-300">
+												<div class="flex gap-6 text-sm text-gray-700 dark:text-gray-300">
 													<div>
-														<span class="text-gray-400">Litros:</span>
+														<span class="text-gray-600 dark:text-gray-400">Litros:</span>
 														<span class="ml-1">{Number(fueling.liters).toFixed(2)} L</span>
 													</div>
 													<div>
-														<span class="text-gray-400">Preço/L:</span>
+														<span class="text-gray-600 dark:text-gray-400">Preço/L:</span>
 														<span class="ml-1"
 															>{formatCurrency(Number(fueling.price_per_liter))}</span
 														>
@@ -396,16 +396,16 @@
 												</div>
 
 												<!-- Total Cost and Gas Station -->
-												<div class="flex items-baseline gap-6 text-sm text-gray-300">
+												<div class="flex items-baseline gap-6 text-sm text-gray-700 dark:text-gray-300">
 													<div>
-														<span class="text-gray-400">Total:</span>
-														<span class="ml-1 text-lg font-bold text-white"
+														<span class="text-gray-600 dark:text-gray-400">Total:</span>
+														<span class="ml-1 text-lg font-bold text-gray-900 dark:text-white"
 															>{formatCurrency(Number(fueling.total_cost))}</span
 														>
 													</div>
 													{#if fueling.gas_station}
 														<div>
-															<span class="text-gray-400">Posto:</span>
+															<span class="text-gray-600 dark:text-gray-400">Posto:</span>
 															<span class="ml-1">{fueling.gas_station}</span>
 														</div>
 													{/if}
@@ -415,7 +415,7 @@
 											<!-- Action Button -->
 											<a
 												href="/fuelings/{fueling.id}"
-												class="rounded-lg border border-gray-600 bg-gray-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-600"
+												class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
 											>
 												Ver
 											</a>
@@ -426,7 +426,7 @@
 											<div class="flex-1 space-y-3">
 												<!-- Title and Status Badge and Type -->
 												<div class="flex items-center gap-2">
-													<h3 class="text-lg font-semibold text-white">Manutenção</h3>
+													<h3 class="text-lg font-semibold text-gray-900 dark:text-white">Manutenção</h3>
 													<span
 														class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold {maintenance.is_completed
 															? 'border border-green-500/30 bg-green-500/10 text-green-400'
@@ -435,43 +435,43 @@
 														{maintenance.is_completed ? 'Concluída' : 'Pendente'}
 													</span>
 													<span
-														class="inline-flex items-center rounded-full bg-gray-700 px-3 py-1 text-xs font-medium text-gray-300"
+														class="inline-flex items-center rounded-full bg-gray-200 px-3 py-1 text-xs font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-300"
 													>
 														{getMaintenanceTypeLabel(maintenance.type)}
 													</span>
 												</div>
 
 												<!-- Vehicle Info -->
-												<div class="text-white">
-													<p class="text-sm text-gray-400">Veículo:</p>
+												<div class="text-gray-900 dark:text-white">
+													<p class="text-sm text-gray-600 dark:text-gray-400">Veículo:</p>
 													<p class="font-semibold">{getVehicleInfo(maintenance.vehicle_id)}</p>
 												</div>
 
 												<!-- Title -->
 												{#if maintenance.title}
-													<div class="text-white">
-														<p class="text-sm text-gray-400">Título:</p>
+													<div class="text-gray-900 dark:text-white">
+														<p class="text-sm text-gray-600 dark:text-gray-400">Título:</p>
 														<p class="font-medium">{maintenance.title}</p>
 													</div>
 												{/if}
 
 												<!-- Description -->
 												{#if maintenance.description}
-													<div class="text-white">
-														<p class="text-sm text-gray-400">Descrição:</p>
+													<div class="text-gray-900 dark:text-white">
+														<p class="text-sm text-gray-600 dark:text-gray-400">Descrição:</p>
 														<p class="text-sm">{maintenance.description}</p>
 													</div>
 												{/if}
 
 												<!-- Date and Cost -->
-												<div class="flex gap-6 text-sm text-gray-300">
+												<div class="flex gap-6 text-sm text-gray-700 dark:text-gray-300">
 													<div>
-														<span class="text-gray-400">Data:</span>
+														<span class="text-gray-600 dark:text-gray-400">Data:</span>
 														<span class="ml-1">{formatDate(maintenance.service_date)}</span>
 													</div>
 													{#if maintenance.cost}
 														<div>
-															<span class="text-gray-400">Custo:</span>
+															<span class="text-gray-600 dark:text-gray-400">Custo:</span>
 															<span class="ml-1 font-semibold"
 																>{formatCurrency(maintenance.cost)}</span
 															>
@@ -483,7 +483,7 @@
 											<!-- Action Button -->
 											<a
 												href="/maintenances/{maintenance.id}"
-												class="rounded-lg border border-gray-600 bg-gray-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-600"
+												class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
 											>
 												Ver
 											</a>
