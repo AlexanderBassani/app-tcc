@@ -70,7 +70,7 @@
 		}
 	});
 
-	onMount(async () => {
+	onMount(() => {
 		// Check if vehicle_id is pre-selected via URL
 		const vehicleIdParam = $page.url.searchParams.get('vehicle_id');
 		if (vehicleIdParam) {
@@ -78,7 +78,7 @@
 			isVehiclePreSelected = true;
 		}
 
-		await loadVehicles();
+		loadVehicles();
 
 		// Close suggestions dropdown when clicking outside
 		function handleClickOutside(event: MouseEvent) {
@@ -501,7 +501,7 @@
 								type="text"
 								id="cost"
 								value={formData.cost}
-								on:input={handleCostInput}
+								oninput={handleCostInput}
 								required
 								class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
 								placeholder="R$ 0,00"
@@ -534,7 +534,7 @@
 							<div class="mt-1 flex gap-2">
 								<button
 									type="button"
-									on:click={() => adjustKm(-1000)}
+									onclick={() => adjustKm(-1000)}
 									class="flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
 								>
 									<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -545,14 +545,14 @@
 									type="text"
 									id="km"
 									value={formData.km_at_service}
-									on:input={handleKmInput}
+									oninput={handleKmInput}
 									required
 									class="block flex-1 rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
 									placeholder="0 km"
 								/>
 								<button
 									type="button"
-									on:click={() => adjustKm(1000)}
+									onclick={() => adjustKm(1000)}
 									class="flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
 								>
 									<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -578,7 +578,7 @@
 				<div class="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
 					<button
 						type="button"
-						on:click={() => (showAdvanced = !showAdvanced)}
+						onclick={() => (showAdvanced = !showAdvanced)}
 						class="flex w-full items-center justify-between text-lg font-semibold text-gray-900 dark:text-white"
 					>
 						<span>Opções Avançadas</span>
@@ -610,7 +610,7 @@
 										<div class="mt-1 flex gap-2">
 											<button
 												type="button"
-												on:click={() => adjustNextKm(-1000)}
+												onclick={() => adjustNextKm(-1000)}
 												class="flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
 											>
 												<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -626,13 +626,13 @@
 												type="text"
 												id="next_km"
 												value={formData.next_service_km}
-												on:input={handleNextKmInput}
+												oninput={handleNextKmInput}
 												class="block flex-1 rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
 												placeholder="0 km"
 											/>
 											<button
 												type="button"
-												on:click={() => adjustNextKm(1000)}
+												onclick={() => adjustNextKm(1000)}
 												class="flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3 py-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
 											>
 												<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -703,21 +703,21 @@
 										<div class="mt-2 flex flex-wrap gap-2">
 											<button
 												type="button"
-												on:click={() => setWarrantyPreset(6)}
+												onclick={() => setWarrantyPreset(6)}
 												class="rounded-md bg-gray-100 px-2 py-1 text-xs hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
 											>
 												+6 meses
 											</button>
 											<button
 												type="button"
-												on:click={() => setWarrantyPreset(12)}
+												onclick={() => setWarrantyPreset(12)}
 												class="rounded-md bg-gray-100 px-2 py-1 text-xs hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
 											>
 												+1 ano
 											</button>
 											<button
 												type="button"
-												on:click={() => setWarrantyPreset(24)}
+												onclick={() => setWarrantyPreset(24)}
 												class="rounded-md bg-gray-100 px-2 py-1 text-xs hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
 											>
 												+2 anos

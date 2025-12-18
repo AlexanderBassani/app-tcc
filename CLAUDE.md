@@ -1,3 +1,22 @@
+# ⚠️ REGRAS IMPORTANTES
+
+## 🚫 NÃO FAZER COMMITS E PUSH AUTOMATICAMENTE
+
+**NUNCA faça commits ou push sem pedir permissão explícita do usuário!**
+
+- ❌ NÃO execute `git commit` por iniciativa própria
+- ❌ NÃO execute `git push` automaticamente
+- ✅ SEMPRE pergunte ao usuário antes de commitar
+- ✅ ESPERE confirmação explícita antes de fazer push
+
+**Exceção:** Apenas faça commit/push quando o usuário **explicitamente** pedir:
+- "faça o commit"
+- "commita isso"
+- "pode commitar"
+- "faz o push"
+
+---
+
 # Mudanças Pendentes
 
 ## ✅ TAREFA CONCLUÍDA: Formulário de manutenção reformulado
@@ -146,4 +165,4 @@ Depois:
 
 ---
 
-_Última atualização: 2025-12-17_
+_Última atualização: 2025-12-18_
