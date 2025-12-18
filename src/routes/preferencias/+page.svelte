@@ -252,9 +252,9 @@
 
 			<!-- Theme Mode -->
 			<div class="mb-6">
-				<label class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+				<div class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
 					Modo do Tema
-				</label>
+				</div>
 				<div class="grid grid-cols-3 gap-3">
 					{#each themeModes as mode}
 						<button
@@ -273,9 +273,9 @@
 
 			<!-- Theme Color -->
 			<div>
-				<label class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+				<div class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
 					Cor do Tema
-				</label>
+				</div>
 				<div class="flex gap-3">
 					{#each themeColors as color}
 						<button
@@ -300,9 +300,9 @@
 
 			<!-- Font Size -->
 			<div class="mb-6">
-				<label class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+				<div class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
 					Tamanho da Fonte
-				</label>
+				</div>
 				<div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
 					{#each fontSizes as size}
 						<button

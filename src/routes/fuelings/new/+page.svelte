@@ -282,6 +282,7 @@
 								<button
 									type="button"
 									onclick={decrementKm}
+									aria-label="Diminuir quilometragem"
 									class="flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
 								>
 									<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -305,6 +306,7 @@
 								<button
 									type="button"
 									onclick={incrementKm}
+									aria-label="Aumentar quilometragem"
 									class="flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
 								>
 									<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -384,9 +386,9 @@
 
 						<!-- Total (calculado) -->
 						<div>
-							<label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+							<div class="block text-sm font-medium text-gray-700 dark:text-gray-300">
 								Total
-							</label>
+							</div>
 							<div
 								class="mt-1 block w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 							>

@@ -161,10 +161,11 @@
 			<div class="rounded-lg bg-white p-4 dark:bg-gray-800">
 				<div class="grid grid-cols-1 gap-4 md:grid-cols-4">
 					<div>
-						<label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+						<label for="filter-vehicle" class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
 							Veículo
 						</label>
 						<select
+							id="filter-vehicle"
 							bind:value={selectedVehicle}
 							on:change={handleFilterChange}
 							class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
@@ -179,10 +180,11 @@
 					</div>
 
 					<div>
-						<label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+						<label for="filter-start-date" class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
 							Data Inicial
 						</label>
 						<input
+							id="filter-start-date"
 							type="date"
 							bind:value={startDate}
 							on:change={handleFilterChange}
@@ -191,10 +193,11 @@
 					</div>
 
 					<div>
-						<label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+						<label for="filter-end-date" class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
 							Data Final
 						</label>
 						<input
+							id="filter-end-date"
 							type="date"
 							bind:value={endDate}
 							on:change={handleFilterChange}
@@ -203,10 +206,11 @@
 					</div>
 
 					<div>
-						<label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+						<label for="filter-sort-by" class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
 							Ordenar por
 						</label>
 						<select
+							id="filter-sort-by"
 							bind:value={sortBy}
 							on:change={handleFilterChange}
 							class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-700 dark:text-white"

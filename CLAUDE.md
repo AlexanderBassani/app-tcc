@@ -17,6 +17,113 @@
 
 ---
 
+## 📋 PADRÕES DE CÓDIGO - Svelte 5 e Acessibilidade
+
+**SEMPRE siga estas diretrizes ao criar ou modificar arquivos Svelte:**
+
+### Svelte 5 - Melhores Práticas
+
+#### 1. Reatividade - Use Runes
+```svelte
+<!-- ❌ ERRADO - Svelte 4 (deprecated) -->
+let count = 0;
+let user = { name: 'John' };
+
+<!-- ✅ CORRETO - Svelte 5 -->
+let count = $state(0);
+let user = $state({ name: 'John' });
+let doubled = $derived(count * 2);
+```
+
+#### 2. Event Handlers - Use Atributos Nativos
+```svelte
+<!-- ❌ ERRADO - Svelte 4 (deprecated) -->
+<button on:click={handleClick}>Click</button>
+<form on:submit={handleSubmit}>
+<input on:input={handleInput} />
+
+<!-- ✅ CORRETO - Svelte 5 -->
+<button onclick={handleClick}>Click</button>
+<form onsubmit={handleSubmit}>
+<input oninput={handleInput} />
+```
+
+### WCAG - Diretrizes de Acessibilidade
+
+#### 1. Labels Devem Ter Controles Associados
+```svelte
+<!-- ❌ ERRADO -->
+<label class="...">Nome</label>
+<input type="text" />
+
+<!-- ✅ CORRETO -->
+<label for="name" class="...">Nome</label>
+<input id="name" type="text" />
+```
+
+#### 2. Botões Sem Texto Precisam de ARIA Labels
+```svelte
+<!-- ❌ ERRADO -->
+<button onclick={increment}>
+  <svg><!-- ícone + --></svg>
+</button>
+
+<!-- ✅ CORRETO -->
+<button onclick={increment} aria-label="Aumentar valor">
+  <svg><!-- ícone + --></svg>
+</button>
+```
+
+#### 3. Labels para Grupos de Botões - Use DIV
+```svelte
+<!-- ❌ ERRADO - label sem controle associado -->
+<label class="...">Escolha um tema</label>
+<div class="grid">
+  <button>Claro</button>
+  <button>Escuro</button>
+</div>
+
+<!-- ✅ CORRETO - div em vez de label -->
+<div class="...">Escolha um tema</div>
+<div class="grid">
+  <button>Claro</button>
+  <button>Escuro</button>
+</div>
+```
+
+#### 4. Campos Calculados/Read-only - Use DIV
+```svelte
+<!-- ❌ ERRADO -->
+<label>Total</label>
+<div class="read-only">{total}</div>
+
+<!-- ✅ CORRETO -->
+<div class="label-style">Total</div>
+<div class="read-only">{total}</div>
+```
+
+### Checklist Obrigatório
+
+Antes de criar/modificar um arquivo Svelte, verifique:
+
+- [ ] Variáveis reativas usam `$state()`
+- [ ] Valores derivados usam `$derived` ou `$derived.by()`
+- [ ] Event handlers usam `onclick`, `oninput`, `onsubmit`, etc.
+- [ ] Todos os `<label>` têm atributo `for` correspondente ao `id` do input
+- [ ] Botões com apenas ícones têm `aria-label`
+- [ ] Links sem texto têm `aria-label`
+- [ ] Grupos de botões/opções usam `<div>` em vez de `<label>`
+- [ ] Campos read-only usam `<div>` em vez de `<label>`
+
+### Ferramentas de Verificação
+
+Execute regularmente:
+```bash
+npm run check  # Verifica warnings de Svelte e TypeScript
+```
+
+---
+
 # Mudanças Pendentes
 
 ## ✅ TAREFA CONCLUÍDA: Formulário de manutenção reformulado

@@ -10,14 +10,14 @@
 	import { FUEL_TYPES } from '$lib/types/fueling';
 	import DashboardLayout from '$lib/components/DashboardLayout.svelte';
 
-	let fueling: Fueling | null = null;
-	let vehicles: Vehicle[] = [];
-	let loading = true;
-	let error = '';
-	let isEditing = false;
-	let isSaving = false;
+	let fueling = $state<Fueling | null>(null);
+	let vehicles = $state<Vehicle[]>([]);
+	let loading = $state(true);
+	let error = $state('');
+	let isEditing = $state(false);
+	let isSaving = $state(false);
 
-	let formData = {
+	let formData = $state({
 		vehicle_id: 0,
 		date: '',
 		km: '',
@@ -27,7 +27,7 @@
 		is_full_tank: true,
 		gas_station: '',
 		notes: ''
-	};
+	});
 
 	onMount(async () => {
 		await Promise.all([loadFueling(), loadVehicles()]);
@@ -298,7 +298,7 @@
 				<div class="flex gap-2">
 					{#if !isEditing}
 						<button
-							on:click={() => (isEditing = true)}
+							onclick={() => (isEditing = true)}
 							class="rounded-lg bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
 						>
 							Editar
@@ -318,7 +318,7 @@
 						</div>
 					{/if}
 
-					<form on:submit={handleUpdate} class="space-y-6">
+					<form onsubmit={handleUpdate} class="space-y-6">
 						<div class="grid gap-6 sm:grid-cols-2">
 							<!-- Veículo (readonly) -->
 							<div class="sm:col-span-2">
@@ -370,7 +370,8 @@
 								<div class="relative mt-1 flex gap-2">
 									<button
 										type="button"
-										on:click={decrementKm}
+										onclick={decrementKm}
+										aria-label="Diminuir quilometragem"
 										class="flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
 									>
 										<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -381,14 +382,15 @@
 										type="text"
 										id="km"
 										value={formData.km}
-										on:input={handleKmInput}
+										oninput={handleKmInput}
 										required
 										class="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 										placeholder="0 km"
 									/>
 									<button
 										type="button"
-										on:click={incrementKm}
+										onclick={incrementKm}
+										aria-label="Aumentar quilometragem"
 										class="flex items-center justify-center rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
 									>
 										<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -432,7 +434,7 @@
 									type="text"
 									id="liters"
 									value={formData.liters}
-									on:input={handleLitersInput}
+									oninput={handleLitersInput}
 									required
 									class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 									placeholder="0,00 L"
@@ -448,7 +450,7 @@
 									type="text"
 									id="price"
 									value={formData.price_per_liter}
-									on:input={handlePriceInput}
+									oninput={handlePriceInput}
 									required
 									class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 									placeholder="R$ 0,00"
@@ -457,9 +459,9 @@
 
 							<!-- Total (calculado) -->
 							<div>
-								<label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+								<div class="block text-sm font-medium text-gray-700 dark:text-gray-300">
 									Total
-								</label>
+								</div>
 								<div class="mt-1 block w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-600 dark:text-white">
 									{totalCost}
 								</div>
@@ -516,7 +518,7 @@
 						<div class="flex justify-end gap-3 border-t border-gray-200 pt-4 dark:border-gray-600">
 							<button
 								type="button"
-								on:click={() => {
+								onclick={() => {
 									isEditing = false;
 									resetForm();
 								}}
@@ -606,7 +608,7 @@
 				<h3 class="text-lg font-medium text-gray-900 dark:text-white">Ações</h3>
 				<div class="mt-4 flex flex-wrap gap-4">
 					<button
-						on:click={handleDelete}
+						onclick={handleDelete}
 						class="rounded-md border border-red-300 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-100 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none dark:border-red-700 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50"
 					>
 						Excluir Abastecimento
