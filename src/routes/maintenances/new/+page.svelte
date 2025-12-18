@@ -23,6 +23,7 @@
 	let showAdvanced = $state(false);
 	let showTypeSuggestions = $state(false);
 	let filteredSuggestions = $state<readonly string[]>([]);
+	let selectedSuggestionIndex = $state(-1);
 
 	// Form data
 	let formData = $state({
@@ -56,14 +57,16 @@
 
 	// Filter suggestions based on input
 	$effect(() => {
-		if (formData.type && formData.type.length >= 2) {
-			const searchTerm = formData.type.toLowerCase();
-			filteredSuggestions = COMMON_MAINTENANCE_TYPES.filter((type) =>
-				type.toLowerCase().includes(searchTerm)
-			);
-			showTypeSuggestions = filteredSuggestions.length > 0;
-		} else {
-			showTypeSuggestions = false;
+		if (showTypeSuggestions) {
+			if (formData.type && formData.type.length >= 1) {
+				const searchTerm = formData.type.toLowerCase();
+				filteredSuggestions = COMMON_MAINTENANCE_TYPES.filter((type) =>
+					type.toLowerCase().includes(searchTerm)
+				);
+			} else {
+				filteredSuggestions = COMMON_MAINTENANCE_TYPES;
+			}
+			selectedSuggestionIndex = -1;
 		}
 	});
 
@@ -76,6 +79,23 @@
 		}
 
 		await loadVehicles();
+
+		// Close suggestions dropdown when clicking outside
+		function handleClickOutside(event: MouseEvent) {
+			const target = event.target as HTMLElement;
+			const typeInput = document.getElementById('type');
+			const dropdown = typeInput?.nextElementSibling;
+
+			if (typeInput && !typeInput.contains(target) && dropdown && !dropdown.contains(target)) {
+				showTypeSuggestions = false;
+			}
+		}
+
+		document.addEventListener('click', handleClickOutside);
+
+		return () => {
+			document.removeEventListener('click', handleClickOutside);
+		};
 	});
 
 	async function loadVehicles() {
@@ -230,6 +250,50 @@
 	function selectSuggestion(type: string) {
 		formData.type = type;
 		showTypeSuggestions = false;
+		selectedSuggestionIndex = -1;
+		setTimeout(() => {
+			const input = document.getElementById('type') as HTMLInputElement;
+			input?.blur();
+		}, 0);
+	}
+
+	function handleTypeKeydown(e: KeyboardEvent) {
+		if (!showTypeSuggestions || filteredSuggestions.length === 0) {
+			if (e.key === 'ArrowDown') {
+				showTypeSuggestions = true;
+			}
+			return;
+		}
+
+		switch (e.key) {
+			case 'ArrowDown':
+				e.preventDefault();
+				selectedSuggestionIndex = Math.min(
+					selectedSuggestionIndex + 1,
+					filteredSuggestions.length - 1
+				);
+				break;
+
+			case 'ArrowUp':
+				e.preventDefault();
+				selectedSuggestionIndex = Math.max(selectedSuggestionIndex - 1, 0);
+				break;
+
+			case 'Enter':
+				e.preventDefault();
+				if (selectedSuggestionIndex >= 0) {
+					selectSuggestion(filteredSuggestions[selectedSuggestionIndex]);
+				} else if (filteredSuggestions.length > 0) {
+					selectSuggestion(filteredSuggestions[0]);
+				}
+				break;
+
+			case 'Escape':
+				e.preventDefault();
+				showTypeSuggestions = false;
+				selectedSuggestionIndex = -1;
+				break;
+		}
 	}
 
 	// Get category display info
@@ -346,18 +410,23 @@
 								class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
 								placeholder="Ex: Troca de óleo, Alinhamento..."
 								autocomplete="off"
-								on:focus={() => (showTypeSuggestions = true)}
-								on:blur={() => setTimeout(() => (showTypeSuggestions = false), 200)}
+								onfocus={() => (showTypeSuggestions = true)}
+								onkeydown={handleTypeKeydown}
 							/>
 							{#if showTypeSuggestions && filteredSuggestions.length > 0}
 								<div
 									class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-700"
 								>
-									{#each filteredSuggestions as suggestion}
+									{#each filteredSuggestions as suggestion, index}
 										<button
 											type="button"
-											class="block w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-600"
-											on:click={() => selectSuggestion(suggestion)}
+											class="block w-full px-4 py-2 text-left text-sm text-gray-900 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-600 {selectedSuggestionIndex ===
+											index
+												? 'bg-blue-100 dark:bg-blue-900/30'
+												: ''}"
+											data-suggestion-selected={selectedSuggestionIndex === index}
+											onclick={() => selectSuggestion(suggestion)}
+											onmouseenter={() => (selectedSuggestionIndex = index)}
 										>
 											{suggestion}
 										</button>
