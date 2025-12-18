@@ -1074,7 +1074,7 @@
 											<div>
 												<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Litros</p>
 												<p class="mt-1 text-lg text-gray-900 dark:text-white">
-													{Number.isFinite(fueling.liters) ? fueling.liters.toFixed(2) : '0,00'} L
+													{Number.isFinite(Number(fueling.liters)) ? Number(fueling.liters).toFixed(2) : '0,00'} L
 												</p>
 											</div>
 											<div>
