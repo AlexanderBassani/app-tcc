@@ -94,7 +94,9 @@
 		for (let i = index + 1; i < fuelings.length; i++) {
 			if (fuelings[i].vehicle_id === fueling.vehicle_id && fuelings[i].is_full_tank) {
 				const kmDiff = Number(fueling.km) - Number(fuelings[i].km);
-				const consumption = kmDiff / Number(fueling.liters);
+				const liters = Number(fueling.liters);
+				if (!Number.isFinite(liters) || liters <= 0 || kmDiff <= 0) return 'N/A';
+				const consumption = kmDiff / liters;
 				return `${consumption.toFixed(2)} km/L`;
 			}
 		}
@@ -331,7 +333,7 @@
 									<div class="flex gap-6 text-sm text-gray-700 dark:text-gray-300">
 										<div>
 											<span class="text-gray-600 dark:text-gray-400">Litros:</span>
-											<span class="ml-1">{Number(fueling.liters).toFixed(2)} L</span>
+											<span class="ml-1">{Number.isFinite(fueling.liters) ? fueling.liters.toFixed(2) : '0,00'} L</span>
 										</div>
 										<div>
 											<span class="text-gray-600 dark:text-gray-400">Preço/L:</span>

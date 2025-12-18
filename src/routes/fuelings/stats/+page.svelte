@@ -273,7 +273,7 @@
 							<div class="ml-4">
 								<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total de Litros</p>
 								<p class="text-2xl font-semibold text-gray-900 dark:text-white">
-									{Number(stats.overview.total_liters).toFixed(2)} L
+									{Number.isFinite(stats.overview.total_liters) ? stats.overview.total_liters.toFixed(2) : '0,00'} L
 								</p>
 							</div>
 						</div>
@@ -367,7 +367,7 @@
 												{periodStat.count}
 											</td>
 											<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-												{Number(periodStat.total_liters).toFixed(2)} L
+												{Number.isFinite(periodStat.total_liters) ? periodStat.total_liters.toFixed(2) : '0,00'} L
 											</td>
 											<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
 												{formatCurrency(Number(periodStat.total_cost))}

@@ -389,7 +389,7 @@
 												<div class="flex gap-6 text-sm text-gray-700 dark:text-gray-300">
 													<div>
 														<span class="text-gray-600 dark:text-gray-400">Litros:</span>
-														<span class="ml-1">{Number(fueling.liters).toFixed(2)} L</span>
+														<span class="ml-1">{Number.isFinite(Number(fueling.liters)) ? Number(fueling.liters).toFixed(2) : '0,00'} L</span>
 													</div>
 													<div>
 														<span class="text-gray-600 dark:text-gray-400">Preço/L:</span>

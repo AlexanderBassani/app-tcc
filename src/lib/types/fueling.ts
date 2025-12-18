@@ -139,3 +139,18 @@ export const PERIOD_OPTIONS = [
     { value: 'monthly', label: 'Mensal' },
     { value: 'yearly', label: 'Anual' }
 ] as const;
+
+export interface VehicleFuelingStats {
+    total_records: number;
+    total_liters: number;
+    total_cost: number;
+    avg_consumption: number | null;
+    avg_price_per_liter: number;
+    avg_liters_per_fueling: number;
+    km_range: { min: number; max: number };
+}
+
+export interface LastFuelingInfo extends Fueling {
+    days_ago: number;
+    km_diff: number;
+}
