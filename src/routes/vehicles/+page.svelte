@@ -46,7 +46,6 @@
 					last_maintenance: lastMaintenance
 						? {
 								id: lastMaintenance.id,
-								title: lastMaintenance.title,
 								service_date: lastMaintenance.service_date,
 								is_completed: lastMaintenance.is_completed,
 								type: lastMaintenance.type
@@ -70,7 +69,6 @@
 					last_maintenance: lastMaintenance
 						? {
 								id: lastMaintenance.id,
-								title: lastMaintenance.title,
 								service_date: lastMaintenance.service_date,
 								is_completed: lastMaintenance.is_completed,
 								type: lastMaintenance.type
@@ -210,6 +208,7 @@
 							<!-- Refresh Icon (top right) -->
 							<button
 								class="absolute right-6 top-6 rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-700 dark:hover:text-white"
+								aria-label="Atualizar dados do veículo"
 								onclick={(e) => {
 									e.preventDefault();
 									loadVehicles();
