@@ -185,6 +185,28 @@
 
 	$: totalPages = Math.ceil(totalItems / limit);
 
+	// Calculate total operation cost (maintenance + fuel)
+	$: totalOperationCost = historyItems.reduce((sum, item) => {
+		return sum + Number(item.cost || 0);
+	}, 0);
+
+	// Calculate total distance (difference between max and min km)
+	$: {
+		const kms = historyItems.map(item => Number(item.km || 0)).filter(km => km > 0);
+		if (kms.length > 0) {
+			const maxKm = Math.max(...kms);
+			const minKm = Math.min(...kms);
+			totalDistance = maxKm - minKm;
+		} else {
+			totalDistance = 0;
+		}
+	}
+
+	let totalDistance = 0;
+
+	// Calculate cost per km
+	$: costPerKm = totalDistance > 0 ? totalOperationCost / totalDistance : 0;
+
 	// Auto-apply filters when any filter changes (reactive statement)
 	$: {
 		// Watch for filter changes
@@ -221,6 +243,82 @@
 					{totalItems} {totalItems === 1 ? 'registro' : 'registros'}
 				</div>
 			</div>
+
+			<!-- Summary Cards -->
+			{#if historyItems.length > 0}
+				<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+					<!-- Total Operation Cost Card -->
+					<div class="rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 p-6 shadow-lg">
+						<div class="flex items-center justify-between">
+							<div>
+								<p class="text-sm font-medium text-blue-100">Custo Total de Operação</p>
+								<p class="mt-2 text-3xl font-bold text-white">
+									{formatCurrency(totalOperationCost)}
+								</p>
+								<p class="mt-2 text-sm text-blue-100">
+									{#if startDate || endDate}
+										Período selecionado
+									{:else}
+										Todos os registros
+									{/if}
+								</p>
+							</div>
+							<div class="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+								<svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+								</svg>
+							</div>
+						</div>
+						<div class="mt-4 flex items-center gap-4 text-sm text-blue-100">
+							<div>
+								<span class="opacity-80">Manutenções:</span>
+								<span class="ml-1 font-semibold">{formatCurrency(historyItems.filter(i => i.type === 'maintenance').reduce((sum, i) => sum + Number(i.cost || 0), 0))}</span>
+							</div>
+							<div>
+								<span class="opacity-80">Combustível:</span>
+								<span class="ml-1 font-semibold">{formatCurrency(historyItems.filter(i => i.type === 'fuel').reduce((sum, i) => sum + Number(i.cost || 0), 0))}</span>
+							</div>
+						</div>
+					</div>
+
+					<!-- Cost Per Km Card -->
+					<div class="rounded-xl bg-gradient-to-br from-orange-500 to-orange-700 p-6 shadow-lg">
+						<div class="flex items-center justify-between">
+							<div>
+								<p class="text-sm font-medium text-orange-100">Custo por Quilômetro</p>
+								<p class="mt-2 text-3xl font-bold text-white">
+									{#if totalDistance > 0}
+										{formatCurrency(costPerKm)}
+									{:else}
+										<span class="text-2xl">N/A</span>
+									{/if}
+								</p>
+								<p class="mt-2 text-sm text-orange-100">
+									{#if totalDistance > 0}
+										{totalDistance.toLocaleString('pt-BR')} km percorridos
+									{:else}
+										Dados insuficientes
+									{/if}
+								</p>
+							</div>
+							<div class="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+								<svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+								</svg>
+							</div>
+						</div>
+						{#if totalDistance > 0}
+							<div class="mt-4 text-sm text-orange-100">
+								<span class="opacity-80">Indicador de eficiência operacional</span>
+							</div>
+						{:else}
+							<div class="mt-4 text-sm text-orange-100">
+								<span class="opacity-80">Adicione mais registros para calcular</span>
+							</div>
+						{/if}
+					</div>
+				</div>
+			{/if}
 
 			<!-- Filters Section -->
 			<div class="space-y-4 rounded-lg bg-white p-6 shadow-sm dark:bg-gray-800">
