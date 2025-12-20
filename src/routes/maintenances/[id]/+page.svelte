@@ -219,54 +219,15 @@
 					</div>
 				</div>
 
-				<!-- Info Cards -->
-				<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-					<!-- Vehicle Card -->
-					<div
-						class="group relative overflow-hidden rounded-2xl border border-gray-700 bg-gradient-to-br from-gray-900 to-gray-800 p-6 shadow-sm transition-all hover:shadow-md"
-					>
-						<div class="flex items-start justify-between">
-							<div class="flex-1">
-								<p class="text-xs font-medium uppercase tracking-wide text-gray-400">
-									Veículo
-								</p>
-								<p class="mt-2 text-lg font-bold text-white">
-									{vehicles.find((v) => v.id === maintenance.vehicle_id)?.brand || ''}
-									{vehicles.find((v) => v.id === maintenance.vehicle_id)?.model || ''}
-								</p>
-								<p class="mt-1 text-sm text-gray-400">
-									{vehicles.find((v) => v.id === maintenance.vehicle_id)?.plate || ''}
-								</p>
-							</div>
-							<div
-								class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/20"
-							>
-								<svg
-									class="h-6 w-6 text-blue-400"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 001-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6 0a1 1 0 001 1h2a1 1 0 001-1m-6 0h6"
-									></path>
-								</svg>
-							</div>
-						</div>
-					</div>
-
+				<!-- Info Cards Row 1: Date, Cost, Status -->
+				<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 					<!-- Date Card -->
 					<div
 						class="group relative overflow-hidden rounded-2xl border border-gray-700 bg-gradient-to-br from-gray-900 to-gray-800 p-6 shadow-sm transition-all hover:shadow-md"
 					>
 						<div class="flex items-start justify-between">
 							<div class="flex-1">
-								<p class="text-xs font-medium uppercase tracking-wide text-gray-400">
-									Data
-								</p>
+								<p class="text-xs font-medium tracking-wide text-gray-400 uppercase">Data</p>
 								<p class="mt-2 text-lg font-bold text-white">
 									{formatDate(maintenance.service_date)}
 								</p>
@@ -276,9 +237,7 @@
 									</p>
 								{/if}
 							</div>
-							<div
-								class="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/20"
-							>
+							<div class="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/20">
 								<svg
 									class="h-6 w-6 text-purple-400"
 									fill="none"
@@ -302,9 +261,7 @@
 					>
 						<div class="flex items-start justify-between">
 							<div class="flex-1">
-								<p class="text-xs font-medium uppercase tracking-wide text-gray-400">
-									Custo
-								</p>
+								<p class="text-xs font-medium tracking-wide text-gray-400 uppercase">Custo</p>
 								<p class="mt-2 text-lg font-bold text-white">
 									{formatCurrency(Number(maintenance.cost || 0))}
 								</p>
@@ -314,9 +271,7 @@
 									</p>
 								{/if}
 							</div>
-							<div
-								class="flex h-12 w-12 items-center justify-center rounded-xl bg-green-500/20"
-							>
+							<div class="flex h-12 w-12 items-center justify-center rounded-xl bg-green-500/20">
 								<svg
 									class="h-6 w-6 text-green-400"
 									fill="none"
@@ -340,9 +295,7 @@
 					>
 						<div class="flex items-start justify-between">
 							<div class="flex-1">
-								<p class="text-xs font-medium uppercase tracking-wide text-gray-400">
-									Status
-								</p>
+								<p class="text-xs font-medium tracking-wide text-gray-400 uppercase">Status</p>
 								<div class="mt-2">
 									<span
 										class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-semibold {getStatusBadge(
@@ -366,9 +319,7 @@
 									: 'bg-orange-500/20'}"
 							>
 								<svg
-									class="h-6 w-6 {maintenance.is_completed
-										? 'text-green-400'
-										: 'text-orange-400'}"
+									class="h-6 w-6 {maintenance.is_completed ? 'text-green-400' : 'text-orange-400'}"
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
@@ -383,6 +334,119 @@
 							</div>
 						</div>
 					</div>
+				</div>
+
+				<!-- Info Cards Row 2: Vehicle, Next Maintenance, Warranty -->
+				<div class="flex flex-col gap-4 sm:flex-row">
+					<!-- Vehicle Card -->
+					<div
+						class="group relative flex-1 overflow-hidden rounded-2xl border border-gray-700 bg-gradient-to-br from-gray-900 to-gray-800 p-6 shadow-sm transition-all hover:shadow-md"
+					>
+						<div class="flex items-start justify-between">
+							<div class="flex-1">
+								<p class="text-xs font-medium tracking-wide text-gray-400 uppercase">Veículo</p>
+								<p class="mt-2 text-lg font-bold text-white">
+									{vehicles.find((v) => v.id === maintenance.vehicle_id)?.brand || ''}
+									{vehicles.find((v) => v.id === maintenance.vehicle_id)?.model || ''}
+								</p>
+								<p class="mt-1 text-sm text-gray-400">
+									{vehicles.find((v) => v.id === maintenance.vehicle_id)?.plate || ''}
+								</p>
+							</div>
+							<div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/20">
+								<svg
+									class="h-6 w-6 text-blue-400"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 001-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6 0a1 1 0 001 1h2a1 1 0 001-1m-6 0h6"
+									></path>
+								</svg>
+							</div>
+						</div>
+					</div>
+
+					<!-- Next Maintenance -->
+					{#if maintenance.next_service_date || maintenance.next_km}
+						<div
+							class="group relative flex-1 overflow-hidden rounded-2xl border border-gray-700 bg-gradient-to-br from-gray-900 to-gray-800 p-6 shadow-sm transition-all hover:shadow-md"
+						>
+							<div class="flex items-start justify-between">
+								<div class="flex-1">
+									<p class="text-xs font-medium tracking-wide text-gray-400 uppercase">
+										Próxima Manutenção
+									</p>
+									<div class="mt-2">
+										{#if maintenance.next_service_date}
+											<p class="text-lg font-bold text-white">
+												{formatDate(maintenance.next_service_date)}
+											</p>
+											{#if maintenance.next_km}
+												<p class="mt-1 text-sm text-gray-400">
+													{Number(maintenance.next_km).toLocaleString()} km
+												</p>
+											{/if}
+										{:else if maintenance.next_km}
+											<p class="text-lg font-bold text-white">
+												{Number(maintenance.next_km).toLocaleString()} km
+											</p>
+										{/if}
+									</div>
+								</div>
+								<div class="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-500/20">
+									<svg
+										class="h-6 w-6 text-orange-400"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+										></path>
+									</svg>
+								</div>
+							</div>
+						</div>
+					{/if}
+
+					<!-- Warranty -->
+					{#if maintenance.warranty_until}
+						<div
+							class="group relative flex-1 overflow-hidden rounded-2xl border border-gray-700 bg-gradient-to-br from-gray-900 to-gray-800 p-6 shadow-sm transition-all hover:shadow-md"
+						>
+							<div class="flex items-start justify-between">
+								<div class="flex-1">
+									<p class="text-xs font-medium tracking-wide text-gray-400 uppercase">Garantia</p>
+									<p class="mt-2 text-lg font-bold text-white">
+										{formatDate(maintenance.warranty_until)}
+									</p>
+								</div>
+								<div class="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/20">
+									<svg
+										class="h-6 w-6 text-purple-400"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+										></path>
+									</svg>
+								</div>
+							</div>
+						</div>
+					{/if}
 				</div>
 
 				<!-- Description Section -->
@@ -417,85 +481,6 @@
 								{maintenance.description}
 							</p>
 						</div>
-					</div>
-				{/if}
-
-				<!-- Additional Info Grid -->
-				{#if maintenance.next_service_date || maintenance.next_km || maintenance.warranty_until || maintenance.notes}
-					<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-						<!-- Next Maintenance -->
-						{#if maintenance.next_service_date || maintenance.next_km}
-							<div
-								class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
-							>
-								<div class="flex items-center gap-2">
-									<svg
-										class="h-5 w-5 text-orange-600 dark:text-orange-400"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-										></path>
-									</svg>
-									<h3 class="font-semibold text-gray-900 dark:text-white">Próxima Manutenção</h3>
-								</div>
-								<div class="mt-4 space-y-2">
-									{#if maintenance.next_service_date}
-										<div class="flex justify-between">
-											<span class="text-sm text-gray-600 dark:text-gray-400">Data prevista:</span>
-											<span class="text-sm font-medium text-gray-900 dark:text-white">
-												{formatDate(maintenance.next_service_date)}
-											</span>
-										</div>
-									{/if}
-									{#if maintenance.next_km}
-										<div class="flex justify-between">
-											<span class="text-sm text-gray-600 dark:text-gray-400">KM previsto:</span>
-											<span class="text-sm font-medium text-gray-900 dark:text-white">
-												{Number(maintenance.next_km).toLocaleString()} km
-											</span>
-										</div>
-									{/if}
-								</div>
-							</div>
-						{/if}
-
-						<!-- Warranty -->
-						{#if maintenance.warranty_until}
-							<div
-								class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
-							>
-								<div class="flex items-center gap-2">
-									<svg
-										class="h-5 w-5 text-purple-600 dark:text-purple-400"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-										></path>
-									</svg>
-									<h3 class="font-semibold text-gray-900 dark:text-white">Garantia</h3>
-								</div>
-								<div class="mt-4">
-									<div class="flex justify-between">
-										<span class="text-sm text-gray-600 dark:text-gray-400">Válida até:</span>
-										<span class="text-sm font-medium text-gray-900 dark:text-white">
-											{formatDate(maintenance.warranty_until)}
-										</span>
-									</div>
-								</div>
-							</div>
-						{/if}
 					</div>
 				{/if}
 

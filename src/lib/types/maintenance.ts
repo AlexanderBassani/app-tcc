@@ -8,6 +8,16 @@ export type MaintenanceCategory =
     | 'recall'
     | 'other';
 
+export interface MaintenanceFilters {
+    page?: number;
+    limit?: number;
+    vehicleId?: number;
+    from?: string;
+    to?: string;
+    sort?: string;
+    status?: 'all' | 'pending' | 'completed';
+}
+
 export interface Maintenance {
     id: number;
     user_id: number;
@@ -112,4 +122,11 @@ export const COMMON_MAINTENANCE_TYPES = [
     'Troca de correia dentada',
     'Troca de filtros (óleo, ar, combustível)',
     'Revisão completa'
+] as const;
+
+export const SORT_OPTIONS = [
+    { value: 'date:DESC', label: 'Mais recentes' },
+    { value: 'date:ASC', label: 'Mais antigos' },
+    { value: 'cost:DESC', label: 'Maior custo' },
+    { value: 'cost:ASC', label: 'Menor custo' }
 ] as const;

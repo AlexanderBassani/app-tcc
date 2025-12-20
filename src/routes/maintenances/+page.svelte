@@ -5,6 +5,7 @@
 	import { authStore } from '$lib/stores/auth';
 	import type { Maintenance } from '$lib/types/maintenance';
 	import type { Vehicle } from '$lib/types/vehicle';
+	import { SORT_OPTIONS } from '$lib/types/maintenance';
 	import DashboardLayout from '$lib/components/DashboardLayout.svelte';
 	import ProtectedRoute from '$lib/components/ProtectedRoute.svelte';
 
@@ -12,11 +13,29 @@
 	let vehicles: Vehicle[] = [];
 	let loading = true;
 	let error = '';
+
+	// Filters
+	let selectedVehicle: number | undefined = undefined;
+	let startDate = '';
+	let endDate = '';
+	let sortBy = 'date:DESC';
 	let selectedFilter = 'all'; // all, pending, completed
 
 	onMount(async () => {
+		await loadVehicles();
 		await loadData();
 	});
+
+	async function loadVehicles() {
+		try {
+			const token = $authStore.token;
+			if (!token) return;
+			const res = await vehiclesApi.list(token);
+			vehicles = res.data || [];
+		} catch (err) {
+			console.error('Erro ao carregar veículos', err);
+		}
+	}
 
 	async function loadData() {
 		try {
@@ -24,18 +43,33 @@
 			const token = $authStore.token;
 			if (!token) throw new Error('Usuário não autenticado');
 
-			const [maintenancesRes, vehiclesRes] = await Promise.all([
-				maintenancesApi.list(token),
-				vehiclesApi.list(token)
-			]);
+			const res = await maintenancesApi.list(token, {
+				vehicleId: selectedVehicle,
+				from: startDate || undefined,
+				to: endDate || undefined,
+				sort: sortBy
+				// Status handled client-side
+			});
 
-			maintenances = maintenancesRes.data || [];
-			vehicles = vehiclesRes.data || [];
+			maintenances = res.data || [];
 		} catch (err: any) {
 			error = err.message || 'Erro ao carregar dados';
 		} finally {
 			loading = false;
 		}
+	}
+
+	async function handleFilterChange() {
+		await loadData();
+	}
+
+	function clearFilters() {
+		selectedVehicle = undefined;
+		startDate = '';
+		endDate = '';
+		sortBy = 'date:DESC';
+		selectedFilter = 'all';
+		loadData();
 	}
 
 	function getVehicleInfo(vehicleId: number) {
@@ -126,7 +160,7 @@
 				<h1 class="text-2xl font-bold text-gray-900 dark:text-white">Manutenções</h1>
 				<a
 					href="/maintenances/new"
-					class="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+					class="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
 				>
 					<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path
@@ -140,7 +174,101 @@
 				</a>
 			</div>
 
-			<!-- Tabs / Filters -->
+			<!-- Filters -->
+			<div class="rounded-lg bg-white p-4 dark:bg-gray-800">
+				<div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+					<!-- Vehicle -->
+					<div>
+						<label
+							for="filter-vehicle"
+							class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
+						>
+							Veículo
+						</label>
+						<select
+							id="filter-vehicle"
+							bind:value={selectedVehicle}
+							onchange={handleFilterChange}
+							class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+						>
+							<option value={undefined}>Todos os veículos</option>
+							{#each vehicles as vehicle}
+								<option value={vehicle.id}>
+									{vehicle.brand}
+									{vehicle.model} ({vehicle.plate})
+								</option>
+							{/each}
+						</select>
+					</div>
+
+					<!-- Start Date -->
+					<div>
+						<label
+							for="filter-start-date"
+							class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
+						>
+							Data Inicial
+						</label>
+						<input
+							id="filter-start-date"
+							type="date"
+							bind:value={startDate}
+							onchange={handleFilterChange}
+							class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+						/>
+					</div>
+
+					<!-- End Date -->
+					<div>
+						<label
+							for="filter-end-date"
+							class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
+						>
+							Data Final
+						</label>
+						<input
+							id="filter-end-date"
+							type="date"
+							bind:value={endDate}
+							onchange={handleFilterChange}
+							class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+						/>
+					</div>
+
+					<!-- Sort -->
+					<div>
+						<label
+							for="filter-sort-by"
+							class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
+						>
+							Ordenar por
+						</label>
+						<select
+							id="filter-sort-by"
+							bind:value={sortBy}
+							onchange={handleFilterChange}
+							class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+						>
+							{#each SORT_OPTIONS as option}
+								<option value={option.value}>{option.label}</option>
+							{/each}
+						</select>
+					</div>
+				</div>
+
+				{#if selectedVehicle || startDate || endDate || sortBy !== 'date:DESC'}
+					<div class="mt-4">
+						<button
+							onclick={clearFilters}
+							class="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+						>
+							Limpar filtros
+						</button>
+					</div>
+				{/if}
+			</div>
+
+			<!-- Status Tabs -->
 			<div class="rounded-lg bg-white p-1 dark:bg-gray-800">
 				<div class="flex gap-2">
 					<button
@@ -185,10 +313,8 @@
 				>
 					{error}
 				</div>
-			{:else if filteredMaintenances.length === 0}
-				<div
-					class="rounded-xl bg-white p-12 text-center shadow-sm dark:bg-gray-800"
-				>
+			{:else if maintenances.length === 0}
+				<div class="rounded-xl bg-white p-12 text-center shadow-sm dark:bg-gray-800">
 					<svg
 						class="mx-auto h-16 w-16 text-gray-400"
 						fill="none"
@@ -206,28 +332,24 @@
 						Nenhuma manutenção encontrada
 					</h3>
 					<p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-						{selectedFilter === 'all'
-							? 'Comece criando sua primeira manutenção.'
-							: `Não há manutenções ${selectedFilter === 'pending' ? 'pendentes' : 'concluídas'}.`}
+						Tente ajustar os filtros ou registre sua primeira manutenção.
 					</p>
-					{#if selectedFilter === 'all'}
-						<div class="mt-6">
-							<a
-								href="/maintenances/new"
-								class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700"
-							>
-								<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-									></path>
-								</svg>
-								Nova Manutenção
-							</a>
-						</div>
-					{/if}
+					<div class="mt-6">
+						<a
+							href="/maintenances/new"
+							class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700"
+						>
+							<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+								></path>
+							</svg>
+							Nova Manutenção
+						</a>
+					</div>
 				</div>
 			{:else}
 				<!-- Maintenance List -->

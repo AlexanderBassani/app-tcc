@@ -1,513 +1,275 @@
-# Vehicle Manager - Guia do Projeto
+# ⚠️ REGRAS IMPORTANTES
 
-## Visão Geral
+## 🚫 NÃO FAZER COMMITS E PUSH AUTOMATICAMENTE
 
-Sistema de gerenciamento de veículos e manutenções desenvolvido como TCC. Aplicação web full-stack com frontend em SvelteKit e backend em Node.js/Express.
+**NUNCA faça commits ou push sem pedir permissão explícita do usuário!**
 
-**Repositórios:**
-- Frontend (este): `C:/Users/alexa/Desktop/PUC/tcc/app`
-- Backend API: `C:/Users/alexa/Desktop/PUC/tcc/api`
+- ❌ NÃO execute `git commit` por iniciativa própria
+- ❌ NÃO execute `git push` automaticamente
+- ✅ SEMPRE pergunte ao usuário antes de commitar
+- ✅ ESPERE confirmação explícita antes de fazer push
 
-**URL da API de Produção:**
-- `https://api-tcc-production-80e5.up.railway.app`
-
----
-
-## Stack Tecnológico
-
-### Frontend
-- **SvelteKit** 2.43.2 - Framework full-stack
-- **Svelte** 5.39.5 - Usando Svelte 5 Runes (`$state`, `$derived`, `$effect`)
-- **TypeScript** - Tipagem estática
-- **Tailwind CSS** 4.1.13 - Estilização
-- **Vite** - Build tool
-
-### Testes
-- **Vitest** - Testes unitários
-- **Playwright** - Testes E2E
-
-### Backend
-- Node.js + Express
-- PostgreSQL
-- Railway (hospedagem)
+**Exceção:** Apenas faça commit/push quando o usuário **explicitamente** pedir:
+- "faça o commit"
+- "commita isso"
+- "pode commitar"
+- "faz o push"
 
 ---
 
-## Estrutura de Pastas
+## 📋 PADRÕES DE CÓDIGO - Svelte 5 e Acessibilidade
 
-```
-app/
-├── src/
-│   ├── lib/
-│   │   ├── api/              # Clientes API
-│   │   │   ├── client.ts     # Cliente HTTP base
-│   │   │   ├── auth.ts       # Endpoints de autenticação
-│   │   │   ├── users.ts      # Endpoints de usuários
-│   │   │   ├── vehicles.ts   # Endpoints de veículos
-│   │   │   ├── maintenances.ts # Endpoints de manutenções
-│   │   │   └── preferences.ts  # Endpoints de preferências
-│   │   ├── components/       # Componentes reutilizáveis
-│   │   │   ├── DashboardLayout.svelte
-│   │   │   ├── ProtectedRoute.svelte
-│   │   │   ├── UserDropdown.svelte
-│   │   │   └── SearchableSelect.svelte
-│   │   ├── config/           # Configurações
-│   │   │   └── api.ts        # Configuração da API
-│   │   └── stores/           # Svelte stores
-│   │       └── auth.ts       # Store de autenticação
-│   ├── routes/               # Páginas (file-based routing)
-│   │   ├── +layout.svelte    # Layout raiz
-│   │   ├── +page.svelte      # Página inicial
-│   │   ├── login/            # Login
-│   │   ├── register/         # Registro
-│   │   ├── usuarios/         # Gerenciamento de usuários
-│   │   ├── vehicles/         # Gerenciamento de veículos
-│   │   ├── maintenances/     # Gerenciamento de manutenções
-│   │   └── preferencias/     # Preferências do usuário
-│   └── app.html              # Template HTML base
-├── static/                   # Arquivos estáticos
-│   ├── manifest.json         # PWA manifest
-│   ├── sw.js                 # Service Worker
-│   └── icons/                # Ícones PWA
-├── tests/                    # Testes E2E
-└── .env                      # Variáveis de ambiente
-```
+**SEMPRE siga estas diretrizes ao criar ou modificar arquivos Svelte:**
 
----
+### Svelte 5 - Melhores Práticas
 
-## Boas Práticas - SvelteKit/Svelte 5
+#### 1. Reatividade - Use Runes
+```svelte
+<!-- ❌ ERRADO - Svelte 4 (deprecated) -->
+let count = 0;
+let user = { name: 'John' };
 
-### 1. Navegação
-
-❌ **NUNCA USE:**
-```javascript
-window.location.href = '/path';
-window.location.replace('/path');
-```
-
-✅ **SEMPRE USE:**
-```javascript
-import { goto } from '$app/navigation';
-
-goto('/path');
-```
-
-**Motivo:** `goto()` faz navegação client-side mantendo o estado SPA, enquanto `window.location` força reload completo da página.
-
-### 2. Svelte 5 Runes
-
-✅ **Estado Reativo:**
-```javascript
+<!-- ✅ CORRETO - Svelte 5 -->
 let count = $state(0);
 let user = $state({ name: 'John' });
-```
-
-✅ **Valores Derivados:**
-```javascript
 let doubled = $derived(count * 2);
-let fullName = $derived(`${user.firstName} ${user.lastName}`);
 ```
 
-✅ **Efeitos Colaterais:**
-```javascript
-$effect(() => {
-    console.log('Count changed:', count);
-    // Cleanup automático quando a dependência muda
-});
-```
-
-✅ **Props em Componentes:**
-```javascript
-let { user, onUpdate = () => {} } = $props();
-```
-
-### 3. Estrutura de Componentes
-
+#### 2. Event Handlers - Use Atributos Nativos
 ```svelte
-<script lang="ts">
-    // 1. Imports
-    import Component from './Component.svelte';
-    import { goto } from '$app/navigation';
-    import { authStore } from '$lib/stores/auth';
+<!-- ❌ ERRADO - Svelte 4 (deprecated) -->
+<button on:click={handleClick}>Click</button>
+<form on:submit={handleSubmit}>
+<input on:input={handleInput} />
 
-    // 2. Props
-    let { data, title = 'Default' } = $props();
+<!-- ✅ CORRETO - Svelte 5 -->
+<button onclick={handleClick}>Click</button>
+<form onsubmit={handleSubmit}>
+<input oninput={handleInput} />
+```
 
-    // 3. State
-    let isLoading = $state(false);
-    let items = $state([]);
+### WCAG - Diretrizes de Acessibilidade
 
-    // 4. Derived
-    let itemCount = $derived(items.length);
+#### 1. Labels Devem Ter Controles Associados
+```svelte
+<!-- ❌ ERRADO -->
+<label class="...">Nome</label>
+<input type="text" />
 
-    // 5. Functions
-    async function handleSubmit() {
-        // ...
-    }
+<!-- ✅ CORRETO -->
+<label for="name" class="...">Nome</label>
+<input id="name" type="text" />
+```
 
-    // 6. Effects
-    $effect(() => {
-        // Side effects
-    });
-</script>
+#### 2. Botões Sem Texto Precisam de ARIA Labels
+```svelte
+<!-- ❌ ERRADO -->
+<button onclick={increment}>
+  <svg><!-- ícone + --></svg>
+</button>
 
-<!-- Template -->
-<div>
-    {#if isLoading}
-        <p>Loading...</p>
-    {:else}
-        {#each items as item}
-            <div>{item.name}</div>
-        {/each}
-    {/if}
+<!-- ✅ CORRETO -->
+<button onclick={increment} aria-label="Aumentar valor">
+  <svg><!-- ícone + --></svg>
+</button>
+```
+
+#### 3. Labels para Grupos de Botões - Use DIV
+```svelte
+<!-- ❌ ERRADO - label sem controle associado -->
+<label class="...">Escolha um tema</label>
+<div class="grid">
+  <button>Claro</button>
+  <button>Escuro</button>
 </div>
 
-<style>
-    /* Scoped styles */
-</style>
+<!-- ✅ CORRETO - div em vez de label -->
+<div class="...">Escolha um tema</div>
+<div class="grid">
+  <button>Claro</button>
+  <button>Escuro</button>
+</div>
 ```
 
-### 4. Chamadas de API
-
-✅ **Padrão do Projeto:**
-```typescript
-import { usersApi } from '$lib/api/users';
-import { authStore } from '$lib/stores/auth';
-
-async function loadUsers() {
-    try {
-        const response = await usersApi.list($authStore.token);
-        users = response.data;
-    } catch (error) {
-        console.error('Erro:', error);
-        errorMessage = error.message;
-    }
-}
-```
-
-**Estrutura de Response:**
-```typescript
-interface Response<T> {
-    message: string;
-    data: T;
-    count?: number;
-}
-```
-
-### 5. Autenticação e Proteção de Rotas
-
+#### 4. Campos Calculados/Read-only - Use DIV
 ```svelte
-<script>
-    import ProtectedRoute from '$lib/components/ProtectedRoute.svelte';
-    import { authStore } from '$lib/stores/auth';
-</script>
+<!-- ❌ ERRADO -->
+<label>Total</label>
+<div class="read-only">{total}</div>
 
-<!-- Rota protegida (qualquer usuário autenticado) -->
-<ProtectedRoute>
-    <div>Conteúdo protegido</div>
-</ProtectedRoute>
-
-<!-- Rota apenas para admins -->
-<ProtectedRoute adminOnly={true}>
-    <div>Conteúdo administrativo</div>
-</ProtectedRoute>
+<!-- ✅ CORRETO -->
+<div class="label-style">Total</div>
+<div class="read-only">{total}</div>
 ```
 
-### 6. Formulários
+### Checklist Obrigatório
 
-```svelte
-<script lang="ts">
-    let formData = $state({
-        name: '',
-        email: '',
-        password: ''
-    });
+Antes de criar/modificar um arquivo Svelte, verifique:
 
-    let errorMessage = $state('');
-    let isLoading = $state(false);
+- [ ] Variáveis reativas usam `$state()`
+- [ ] Valores derivados usam `$derived` ou `$derived.by()`
+- [ ] Event handlers usam `onclick`, `oninput`, `onsubmit`, etc.
+- [ ] Todos os `<label>` têm atributo `for` correspondente ao `id` do input
+- [ ] Botões com apenas ícones têm `aria-label`
+- [ ] Links sem texto têm `aria-label`
+- [ ] Grupos de botões/opções usam `<div>` em vez de `<label>`
+- [ ] Campos read-only usam `<div>` em vez de `<label>`
 
-    async function handleSubmit(e: Event) {
-        e.preventDefault();
-        errorMessage = '';
-        isLoading = true;
+### Ferramentas de Verificação
 
-        try {
-            await api.post('/endpoint', formData);
-            goto('/success');
-        } catch (error: any) {
-            errorMessage = error.message;
-        } finally {
-            isLoading = false;
-        }
-    }
-</script>
-
-<form onsubmit={handleSubmit}>
-    <input
-        type="text"
-        bind:value={formData.name}
-        required
-    />
-
-    {#if errorMessage}
-        <div class="error">{errorMessage}</div>
-    {/if}
-
-    <button type="submit" disabled={isLoading}>
-        {isLoading ? 'Salvando...' : 'Salvar'}
-    </button>
-</form>
-```
-
-### 7. Stores
-
-```typescript
-// src/lib/stores/auth.ts
-import { writable } from 'svelte/store';
-
-function createAuthStore() {
-    const { subscribe, set, update } = writable(initialState);
-
-    return {
-        subscribe,
-        login: (user, token) => set({ user, token, isAuthenticated: true }),
-        logout: () => set({ user: null, token: null, isAuthenticated: false }),
-        initialize: () => { /* ... */ }
-    };
-}
-
-export const authStore = createAuthStore();
-
-// Uso em componentes
-import { authStore } from '$lib/stores/auth';
-
-// Acessar valor reativo
-$authStore.user
-$authStore.token
-```
-
----
-
-## API Endpoints
-
-### Autenticação (`/api/users`)
-- `POST /login` - Login
-- `POST /register` - Registro
-- `POST /logout` - Logout (requer token)
-- `POST /refresh-token` - Renovar token (requer token)
-- `PUT /change-password` - Alterar senha (requer token)
-
-### Usuários (`/api/users`)
-- `GET /` - Listar usuários (admin)
-- `GET /profile` - Perfil do usuário logado
-- `GET /:id` - Buscar usuário por ID (admin)
-- `PUT /profile` - Atualizar próprio perfil
-- `PUT /:id` - Atualizar usuário (admin)
-- `PUT /:id/change-password` - Alterar senha de usuário (admin)
-
-### Veículos (`/api/vehicles`)
-- `GET /` - Listar veículos do usuário
-- `GET /:id` - Buscar veículo por ID
-- `POST /` - Criar veículo
-- `PUT /:id` - Atualizar veículo
-- `DELETE /:id` - Deletar veículo
-
-### Manutenções (`/api/maintenances`)
-- `GET /` - Listar manutenções
-- `GET /:id` - Buscar manutenção por ID
-- `POST /` - Criar manutenção
-- `PUT /:id` - Atualizar manutenção
-- `DELETE /:id` - Deletar manutenção
-
-### Preferências (`/api/preferences`)
-- `GET /` - Obter preferências do usuário
-- `PUT /` - Atualizar preferências
-
----
-
-## Configurações Importantes
-
-### Variáveis de Ambiente (`.env`)
+Execute regularmente:
 ```bash
-VITE_API_URL=https://api-tcc-production-80e5.up.railway.app
-```
-
-**IMPORTANTE:** Variáveis de ambiente no SvelteKit devem ter prefixo `VITE_` para serem acessíveis no cliente.
-
-### API Client (`src/lib/config/api.ts`)
-```typescript
-export const API_URL = getAbsoluteApiUrl();
-
-// Função garante URL absoluta
-// - Adiciona https:// se não tiver protocolo
-// - Remove trailing slash
-```
-
-### Service Worker (`static/sw.js`)
-- Cache de assets estáticos
-- Funcionamento offline
-- Página offline customizada
-
----
-
-## Padrões de Código
-
-### 1. Tipos TypeScript
-
-```typescript
-// Sempre defina interfaces para dados da API
-interface User {
-    id: number;
-    first_name: string;
-    last_name: string;
-    email: string;
-    role: 'admin' | 'user';
-}
-
-// Use tipos para request/response
-interface LoginRequest {
-    login: string;
-    password: string;
-}
-
-interface LoginResponse {
-    token: string;
-    user: User;
-}
-```
-
-### 2. Tratamento de Erros
-
-```typescript
-try {
-    const response = await api.post('/endpoint', data);
-    successMessage = 'Operação realizada com sucesso!';
-} catch (e: any) {
-    console.error('Erro:', e);
-
-    // Tratar erros da API
-    if (e.response?.data?.error) {
-        errorMessage = e.response.data.error;
-    } else if (e.message) {
-        errorMessage = e.message;
-    } else {
-        errorMessage = 'Erro desconhecido';
-    }
-}
-```
-
-### 3. Loading States
-
-```typescript
-let isLoading = $state(false);
-
-async function loadData() {
-    isLoading = true;
-    try {
-        data = await api.get('/endpoint');
-    } finally {
-        isLoading = false; // Sempre no finally
-    }
-}
-```
-
-### 4. Formatação
-
-- **Telefone:** `(XX) XXXXX-XXXX`
-- **Data:** `YYYY-MM-DD` (formato ISO no backend)
-- **Placa:** `ABC-1234` ou `ABC1D23` (Mercosul)
-
----
-
-## Comandos Úteis
-
-```bash
-# Desenvolvimento
-npm run dev              # Inicia dev server (localhost:5173)
-
-# Build
-npm run build            # Build de produção
-npm run preview          # Preview do build
-
-# Qualidade de Código
-npm run check            # Type checking
-npm run lint             # ESLint
-npm run format           # Prettier
-
-# Testes
-npm run test:unit        # Testes unitários (Vitest)
-npm run test:e2e         # Testes E2E (Playwright)
-npm test                 # Todos os testes
+npm run check  # Verifica warnings de Svelte e TypeScript
 ```
 
 ---
 
-## Checklist - Ao Adicionar Nova Funcionalidade
+# Mudanças Pendentes
 
-- [ ] Usar `$state` para estado reativo (não `let` normal)
-- [ ] Usar `goto()` para navegação (não `window.location`)
-- [ ] Adicionar tipos TypeScript apropriados
-- [ ] Implementar loading states
-- [ ] Adicionar tratamento de erros
-- [ ] Mostrar mensagens de sucesso/erro ao usuário
-- [ ] Verificar autenticação/autorização se necessário
-- [ ] Testar em modo produção (`npm run build && npm run preview`)
-- [ ] Validar formulários antes de enviar
-- [ ] Usar componentes reutilizáveis quando possível
+## ✅ TAREFA CONCLUÍDA: Formulário de manutenção reformulado
+
+### Status Final
+- ✅ Tipos atualizados em `maintenance.ts`
+- ✅ Formulário completo implementado (703 linhas)
+- ⏳ Aguardando teste e commit
+
+###  Plano de Implementação
+
+#### Fase 1: Atualizar tipos (CONCLUÍDO ✅)
+- ✅ Renomear campos conforme API
+- ✅ Adicionar novos campos (service_provider_id, invoice_number, warranty_until)
+- ✅ Criar constantes para categorias e sugestões
+
+#### Fase 2: Criar novo formulário (EM ANÁLISE)
+O formulário será **MUITO GRANDE** (~800+ linhas). Recursos planejados:
+
+**Campos básicos:**
+1. Veículo (select com km atual)
+2. Tipo de manutenção (input com autocomplete)
+3. Categoria (radio buttons com ícones)
+4. Descrição (textarea com contador)
+5. Custo (input com máscara R$)
+6. KM no serviço (input com validação)
+7. Data do serviço (date picker)
+
+**Campos avançados (colapsáveis):**
+8. Prestador de serviço (select opcional)
+9. Próxima manutenção (KM + Data)
+10. Nota fiscal
+11. Garantia até
+
+**Features extras:**
+- Validações em tempo real
+- Máscaras de input
+- Sugestões inteligentes
+- Preview em tempo real
+- Estados de loading
+- Mensagens de erro inline
+- Modo responsivo
+
+#### Opções de Implementação
+
+**Opção A - Formulário Completo (Recomendado)**
+- ~800 linhas de código
+- Todos os recursos da especificação
+- Tempo estimado: 2-3 horas de implementação
+- Melhor UX
+
+**Opção B - Formulário Simples**
+- ~200 linhas
+- Apenas campos obrigatórios + básicos
+- Adicionar recursos depois conforme necessidade
+- Mais rápido
+
+**Opção C - Incremental**
+- Começar com campos obrigatórios
+- Adicionar um grupo de campos por vez
+- Testar entre cada adição
+
+### Decisão Necessária
+Por favor, escolha uma opção (A, B ou C) para prosseguir
 
 ---
 
-## Problemas Comuns e Soluções
+# Mudanças Pendentes - Dashboard
 
-### 1. URL da API Errada
-**Sintoma:** Requisições vão para `localhost:5173/api-tcc-production...`
+## 🐛 PROBLEMA IDENTIFICADO: Dados não estão sendo exibidos no gráfico
 
-**Solução:**
-- Verificar `.env` tem `VITE_API_URL` com protocolo (`https://`)
-- Reiniciar servidor dev após mudar `.env`
-- Limpar cache do navegador
+### Diagnóstico
+O console mostra `"No monthly expenses data"`, indicando que `monthlyExpenses` está vazio quando `calculateCategoryDistribution()` é chamado.
 
-### 2. Estado Não Reatualiza
-**Sintoma:** Mudanças no estado não refletem na UI
+**Possíveis causas:**
+1. A função reativa é executada antes do `onMount` carregar os dados
+2. A API pode estar retornando dados em formato diferente do esperado
+3. Os campos `fuel` e `maintenance` podem estar com valor 0
 
-**Solução:**
-- Usar `$state()` ao invés de `let` comum
-- Verificar se está mutando objetos corretamente:
-  ```typescript
-  // ❌ Errado
-  user.name = 'New Name';
-
-  // ✅ Correto
-  user = { ...user, name: 'New Name' };
-  ```
-
-### 3. Redirect Após Ação
-**Sintoma:** Página não carrega corretamente após redirect
-
-**Solução:**
-- Usar `goto()` ao invés de `window.location.href`
-- Esperar timeout antes de redirect se necessário:
-  ```typescript
-  setTimeout(() => goto('/path'), 1500);
-  ```
-
-### 4. Token Não Persistindo
-**Sintoma:** Usuário desloga ao recarregar página
-
-**Solução:**
-- Chamar `authStore.initialize()` no `+layout.svelte`
-- Verificar localStorage/sessionStorage tem os dados
-- Verificar cookies estão sendo setados corretamente
+**Próximos passos:**
+1. ✅ Adicionar log para ver os dados retornados pela API
+2. ⏳ Verificar estrutura dos dados no console
+3. ⏳ Ajustar lógica se necessário
 
 ---
 
-## Recursos Úteis
+## fix: corrigir estrutura e exibição do gráfico de Distribuição por Categoria
 
-- [SvelteKit Docs](https://kit.svelte.dev/docs)
-- [Svelte 5 Runes](https://svelte-5-preview.vercel.app/docs/runes)
-- [Tailwind CSS](https://tailwindcss.com/docs)
-- [TypeScript](https://www.typescriptlang.org/docs/)
+### Descrição
+Corrige a estrutura HTML do gráfico donut (rosca) de Distribuição por Categoria que não estava sendo exibido corretamente. O problema era que o texto central estava fora do container relativo.
+
+### Mudanças realizadas
+
+**Arquivo:** `src/routes/+page.svelte`
+
+1. **Estrutura HTML corrigida**
+   - O container do gráfico agora tem `relative mx-auto h-48 w-48` para posicionar corretamente
+   - O texto central (`absolute inset-0`) agora está dentro do container relativo do SVG
+   - Removido container desnecessário que causava problemas de layout
+
+2. **Melhorias de formatação**
+   - Substituído `toLocaleString('pt-BR')` por `formatCurrency()` para consistência
+   - Aplicado em ambos: valor total central e valores da legenda
+
+3. **Layout otimizado**
+   - Container principal alterado de `flex flex-col items-center justify-center gap-6` para `space-y-6`
+   - Adicionado `mx-auto` no container do SVG para centralização
+   - Removido `w-full` desnecessário da legenda
+
+### Detalhes técnicos
+
+Antes:
+```html
+<div class="flex flex-col items-center justify-center gap-6">
+    <div class="relative h-48 w-48 shrink-0">
+        <svg>...</svg>
+    </div>
+    <!-- Texto central estava FORA do container relativo -->
+    <div class="absolute inset-0 flex items-center justify-center">
+        ...
+    </div>
+</div>
+```
+
+Depois:
+```html
+<div class="space-y-6">
+    <div class="relative mx-auto h-48 w-48">
+        <svg>...</svg>
+        <!-- Texto central agora está DENTRO do container relativo -->
+        <div class="absolute inset-0 flex items-center justify-center">
+            ...
+        </div>
+    </div>
+</div>
+```
+
+### Impacto
+- ✅ Gráfico de rosca agora é exibido corretamente
+- ✅ Texto central mostra o valor total formatado
+- ✅ Legenda abaixo do gráfico funciona normalmente
+- ✅ Layout responsivo mantido
+
+### Arquivos modificados
+- `src/routes/+page.svelte` (linhas 404-472)
 
 ---
 
-**Última Atualização:** 2025-12-13
+_Última atualização: 2025-12-18_

@@ -18,18 +18,10 @@
 	let loading = $state(true);
 	let error = $state('');
 
-	// Computed KPIs
-	let totalMaintenanceCost = $derived(
-		maintenances.reduce((sum, m) => sum + (m.cost || 0), 0)
-	);
-
-	let pendingMaintenances = $derived(
-		maintenances.filter(m => !m.is_completed).length
-	);
-
-	let totalFuelVolume = $derived(
-		fuelings.reduce((sum, f) => sum + (f.liters || 0), 0)
-	);
+	// Stats
+	let totalMaintenanceCost = $state(0);
+	let pendingMaintenances = $state(0);
+	let totalFuelCost = $state(0);
 
 	onMount(async () => {
 		await Promise.all([loadVehicle(), loadFuelings(), loadMaintenances()]);
@@ -64,8 +56,19 @@
 			if (!token) return;
 
 			const id = Number($page.params.id);
-			const res = await fuelingsApi.list(token, { vehicleId: id, limit: 2 });
-			fuelings = res.data || [];
+
+			// Load all fuelings for stats
+			const res = await fuelingsApi.listByVehicle(id, token);
+			const allFuelings = res.data || [];
+
+			// Calculate stats
+			totalFuelCost = allFuelings.reduce((sum, f) => sum + (Number(f.total_cost) || 0), 0);
+
+			// Slice for display (latest 2)
+			// Assuming the API returns them sorted by date desc, or we sort them
+			fuelings = allFuelings
+				.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+				.slice(0, 2);
 		} catch (err) {
 			console.error('Error loading fuelings:', err);
 		}
@@ -78,7 +81,14 @@
 
 			const id = Number($page.params.id);
 			const res = await maintenancesApi.list(token);
-			maintenances = (res.data || []).filter((m: Maintenance) => m.vehicle_id === id).slice(0, 3);
+			const allMaintenances = (res.data || []).filter((m: Maintenance) => m.vehicle_id === id);
+
+			// Calculate stats from full list
+			totalMaintenanceCost = allMaintenances.reduce((sum, m) => sum + (Number(m.cost) || 0), 0);
+			pendingMaintenances = allMaintenances.filter((m) => !m.is_completed).length;
+
+			// Slice for display
+			maintenances = allMaintenances.slice(0, 3);
 		} catch (err) {
 			console.error('Error loading maintenances:', err);
 		}
@@ -198,7 +208,8 @@
 						<div>
 							<div class="flex items-center gap-3">
 								<h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-									{vehicle.brand} {vehicle.model}
+									{vehicle.brand}
+									{vehicle.model}
 								</h1>
 								{#if vehicle.is_active}
 									<span
@@ -246,29 +257,27 @@
 					>
 						<div class="flex items-start justify-between">
 							<div class="flex-1">
-								<p class="text-xs font-medium uppercase tracking-wide text-gray-400">
+								<p class="text-xs font-medium tracking-wide text-gray-400 uppercase">
 									Quilometragem
 								</p>
 								<p class="mt-2 text-2xl font-bold text-white">
 									{Number(vehicle.current_km || 0).toLocaleString()} km
 								</p>
 							</div>
-							<div
-								class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/20"
-							>
+							<div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/20">
 								<svg
-									class="h-6 w-6 text-blue-400"
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
 									fill="none"
 									stroke="currentColor"
-									viewBox="0 0 24 24"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="lucide lucide-gauge h-5 w-5 text-blue-400"
+									><path d="m12 14 4-4"></path><path d="M3.34 19a10 10 0 1 1 17.32 0"></path></svg
 								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M13 10V3L4 14h7v7l9-11h-7z"
-									></path>
-								</svg>
 							</div>
 						</div>
 					</div>
@@ -279,36 +288,28 @@
 					>
 						<div class="flex items-start justify-between">
 							<div class="flex-1">
-								<p class="text-xs font-medium uppercase tracking-wide text-gray-400">
-									Manutenções
-								</p>
+								<p class="text-xs font-medium tracking-wide text-gray-400 uppercase">Manutenções</p>
 								<p class="mt-2 text-2xl font-bold text-white">
 									{pendingMaintenances}
 									<span class="text-base font-normal text-gray-400">pendentes</span>
 								</p>
 							</div>
-							<div
-								class="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-500/20"
-							>
+							<div class="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-500/20">
 								<svg
-									class="h-6 w-6 text-orange-400"
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
 									fill="none"
 									stroke="currentColor"
-									viewBox="0 0 24 24"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="lucide lucide-wrench h-5 w-5 text-orange-400"
+									><path
+										d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+									></path></svg
 								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-									></path>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-									></path>
-								</svg>
 							</div>
 						</div>
 					</div>
@@ -319,16 +320,14 @@
 					>
 						<div class="flex items-start justify-between">
 							<div class="flex-1">
-								<p class="text-xs font-medium uppercase tracking-wide text-gray-400">
+								<p class="text-xs font-medium tracking-wide text-gray-400 uppercase">
 									Gastos Manutenção
 								</p>
 								<p class="mt-2 text-2xl font-bold text-white">
 									{formatCurrency(totalMaintenanceCost)}
 								</p>
 							</div>
-							<div
-								class="flex h-12 w-12 items-center justify-center rounded-xl bg-green-500/20"
-							>
+							<div class="flex h-12 w-12 items-center justify-center rounded-xl bg-green-500/20">
 								<svg
 									class="h-6 w-6 text-green-400"
 									fill="none"
@@ -352,29 +351,31 @@
 					>
 						<div class="flex items-start justify-between">
 							<div class="flex-1">
-								<p class="text-xs font-medium uppercase tracking-wide text-gray-400">
-									Combustível
+								<p class="text-xs font-medium tracking-wide text-gray-400 uppercase">
+									Gastos com Combustível
 								</p>
 								<p class="mt-2 text-2xl font-bold text-white">
-									{Math.round(totalFuelVolume)}L
+									{formatCurrency(totalFuelCost)}
 								</p>
 							</div>
-							<div
-								class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/20"
-							>
+							<div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/20">
 								<svg
-									class="h-6 w-6 text-blue-400"
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
 									fill="none"
 									stroke="currentColor"
-									viewBox="0 0 24 24"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="lucide lucide-droplets h-5 w-5 text-blue-400"
+									><path
+										d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"
+									></path><path
+										d="M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97"
+									></path></svg
 								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
-									></path>
-								</svg>
 							</div>
 						</div>
 					</div>
@@ -384,7 +385,7 @@
 				<div
 					class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
 				>
-					<div class="flex items-center gap-3 mb-6">
+					<div class="mb-6 flex items-center gap-3">
 						<div
 							class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30"
 						>
@@ -488,30 +489,26 @@
 					<div
 						class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
 					>
-						<div class="flex items-center justify-between mb-6">
+						<div class="mb-6 flex items-center justify-between">
 							<div class="flex items-center gap-3">
 								<div
 									class="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-900/30"
 								>
 									<svg
-										class="h-5 w-5 text-orange-600 dark:text-orange-400"
+										xmlns="http://www.w3.org/2000/svg"
+										width="24"
+										height="24"
+										viewBox="0 0 24 24"
 										fill="none"
 										stroke="currentColor"
-										viewBox="0 0 24 24"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										class="lucide lucide-wrench h-5 w-5 text-orange-400"
+										><path
+											d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+										></path></svg
 									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-										></path>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-										></path>
-									</svg>
 								</div>
 								<h3 class="text-lg font-semibold text-gray-900 dark:text-white">
 									Manutenções
@@ -579,8 +576,15 @@
 												<p class="font-medium text-gray-900 dark:text-white">
 													{maintenance.type}
 												</p>
-												<div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-													<svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<div
+													class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400"
+												>
+													<svg
+														class="h-3 w-3"
+														fill="none"
+														stroke="currentColor"
+														viewBox="0 0 24 24"
+													>
 														<path
 															stroke-linecap="round"
 															stroke-linejoin="round"
@@ -616,24 +620,27 @@
 					<div
 						class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
 					>
-						<div class="flex items-center justify-between mb-6">
+						<div class="mb-6 flex items-center justify-between">
 							<div class="flex items-center gap-3">
 								<div
 									class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30"
 								>
 									<svg
-										class="h-5 w-5 text-blue-600 dark:text-blue-400"
+										xmlns="http://www.w3.org/2000/svg"
+										width="24"
+										height="24"
+										viewBox="0 0 24 24"
 										fill="none"
 										stroke="currentColor"
-										viewBox="0 0 24 24"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										class="lucide lucide-fuel h-5 w-5 flex-shrink-0 text-blue-400"
+										><line x1="3" x2="15" y1="22" y2="22"></line><line x1="4" x2="14" y1="9" y2="9"
+										></line><path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"></path><path
+											d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 5"
+										></path></svg
 									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
-										></path>
-									</svg>
 								</div>
 								<h3 class="text-lg font-semibold text-gray-900 dark:text-white">
 									Abastecimentos
@@ -673,8 +680,15 @@
 												<p class="font-medium text-gray-900 dark:text-white">
 													{getFuelTypeLabel(fueling.fuel_type)}
 												</p>
-												<div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-													<svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<div
+													class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400"
+												>
+													<svg
+														class="h-3 w-3"
+														fill="none"
+														stroke="currentColor"
+														viewBox="0 0 24 24"
+													>
 														<path
 															stroke-linecap="round"
 															stroke-linejoin="round"
