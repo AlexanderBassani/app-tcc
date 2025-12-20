@@ -8,6 +8,7 @@
 	import ColorSelect from '$lib/components/ColorSelect.svelte';
 	import ModelSelect from '$lib/components/ModelSelect.svelte';
 	import KilometersInput from '$lib/components/KilometersInput.svelte';
+	import { FUEL_TYPES } from '$lib/types/fueling';
 	import { carBrands } from '$lib/data/carBrands';
 	import { QUICK_YEARS, ALL_YEARS, NOTE_SUGGESTIONS } from '$lib/data/vehicleConstants';
 	import {
@@ -17,7 +18,8 @@
 		validatePurchaseDate,
 		validateNotes,
 		calculateOwnershipDuration,
-		getVehicleAge
+		getVehicleAge,
+		validateCurrentKm
 	} from '$lib/utils/vehicleValidation';
 
 	// State
@@ -37,6 +39,7 @@
 		plate: '',
 		color: '',
 		current_km: 0,
+		fuel_type: '',
 		purchase_date: '',
 		is_primary: false,
 		notes: ''
@@ -48,7 +51,9 @@
 		model: { valid: true, message: '' },
 		year: { valid: true, message: '' },
 		purchaseDate: { valid: true, message: '' },
-		notes: { valid: true, message: '' }
+		notes: { valid: true, message: '' },
+		currentKm: { valid: true, message: '' },
+		fuelType: { valid: true, message: '' }
 	});
 
 	// Character counter for notes
@@ -75,13 +80,16 @@
 			formData.model &&
 			formData.year &&
 			formData.plate &&
+			formData.fuel_type &&
 			plateValid &&
 			plateAvailable !== false &&
 			validations.brand.valid &&
 			validations.model.valid &&
 			validations.year.valid &&
 			validations.purchaseDate.valid &&
-			validations.notes.valid
+			validations.notes.valid &&
+			validations.currentKm.valid &&
+			validations.fuelType.valid
 		);
 	});
 
@@ -97,6 +105,23 @@
 		if (formData.model) {
 			const result = validateModel(formData.model);
 			validations.model = result;
+		}
+	});
+
+	$effect(() => {
+		// Validate mileage
+		const result = validateCurrentKm(formData.current_km, formData.year);
+		// Override message if empty/zero (since we made it mandatory and validateCurrentKm might be lenient for 0)
+		// Assuming validateCurrentKm handles it. If not, I can enforce here.
+		// Usually 0 is valid for 2024 car.
+		validations.currentKm = result;
+	});
+
+	$effect(() => {
+		if (formData.fuel_type) {
+			validations.fuelType = { valid: true, message: '' };
+		} else {
+			validations.fuelType = { valid: false, message: 'Selecione o tipo de combustível' };
 		}
 	});
 
@@ -146,6 +171,16 @@
 		showNoteSuggestions = false;
 	}
 
+	// Fuel Type Config (UI)
+	const fuelTypeConfig = {
+		gasoline: { icon: '⛽', color: 'red', label: 'Gasolina' },
+		ethanol: { icon: '🌿', color: 'green', label: 'Etanol' },
+		diesel: { icon: '🚛', color: 'gray', label: 'Diesel' },
+		gnv: { icon: '💨', color: 'blue', label: 'GNV' },
+		flex: { icon: '🔄', color: 'purple', label: 'Flex' },
+		electric: { icon: '⚡', color: 'yellow', label: 'Elétrico' }
+	};
+
 	async function handleSubmit(e: Event) {
 		e.preventDefault();
 
@@ -170,6 +205,7 @@
 				plate: formData.plate.toUpperCase(),
 				color: formData.color.trim() || 'Não informado',
 				current_km: formData.current_km,
+				fuel_type: formData.fuel_type,
 				purchase_date: formData.purchase_date || new Date().toISOString().split('T')[0],
 				is_primary: formData.is_primary,
 				notes: formData.notes.trim()
@@ -276,12 +312,7 @@
 						<label for="model" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
 							Modelo <span class="text-red-500">*</span>
 						</label>
-						<ModelSelect
-							id="model"
-							bind:value={formData.model}
-							brand={formData.brand}
-							required
-						/>
+						<ModelSelect id="model" bind:value={formData.model} brand={formData.brand} required />
 						{#if !validations.model.valid && validations.model.message}
 							<p class="mt-1 text-sm text-red-600 dark:text-red-400">
 								{validations.model.message}
@@ -298,7 +329,7 @@
 							<button
 								type="button"
 								onclick={() => (showYearDropdown = !showYearDropdown)}
-								class="mt-1 flex w-full items-center justify-between rounded-md border border-gray-300 bg-white px-4 py-2 text-left shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+								class="focus:border-primary-500 focus:ring-primary-500 mt-1 flex w-full items-center justify-between rounded-md border border-gray-300 bg-white px-4 py-2 text-left shadow-sm focus:ring-2 focus:outline-none dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 							>
 								<span>{formData.year}</span>
 								<svg
@@ -319,7 +350,7 @@
 
 							{#if showYearDropdown}
 								<div
-									class="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 dark:bg-gray-700"
+									class="ring-opacity-5 absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 shadow-lg ring-1 ring-black dark:bg-gray-700"
 								>
 									<div class="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400">
 										Anos recentes
@@ -330,7 +361,7 @@
 											onclick={() => handleYearChange(year)}
 											class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-600 {year ===
 											formData.year
-												? 'bg-primary-600 text-white hover:bg-primary-700'
+												? 'bg-primary-600 hover:bg-primary-700 text-white'
 												: ''}"
 										>
 											{year}
@@ -347,7 +378,7 @@
 												onclick={() => handleYearChange(year)}
 												class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-600 {year ===
 												formData.year
-													? 'bg-primary-600 text-white hover:bg-primary-700'
+													? 'bg-primary-600 hover:bg-primary-700 text-white'
 													: ''}"
 											>
 												{year}
@@ -382,9 +413,7 @@
 
 			<!-- Step 2: Characteristics -->
 			<div class="rounded-lg bg-white p-6 shadow dark:bg-gray-700">
-				<h2 class="mb-6 text-lg font-semibold text-gray-800 dark:text-white">
-					2. Características
-				</h2>
+				<h2 class="mb-6 text-lg font-semibold text-gray-800 dark:text-white">2. Características</h2>
 
 				<div class="grid gap-6 sm:grid-cols-2">
 					<!-- Color -->
@@ -395,19 +424,63 @@
 						<ColorSelect bind:value={formData.color} />
 					</div>
 
+					<!-- Fuel Type -->
+					<div class="sm:col-span-2">
+						<div class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+							Tipo de Combustível <span class="text-red-500">*</span>
+						</div>
+						<div class="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-6">
+							{#each FUEL_TYPES as fuelType}
+								{@const config = fuelTypeConfig[fuelType.value]}
+								<button
+									type="button"
+									onclick={() => (formData.fuel_type = fuelType.value)}
+									class="flex flex-col items-center justify-center gap-1 rounded-lg border-2 p-3 transition-all {formData.fuel_type ===
+									fuelType.value
+										? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30'
+										: 'border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500'}"
+									aria-label="Selecionar {config.label}"
+								>
+									<span class="text-2xl">{config.icon}</span>
+									<span
+										class="text-xs font-medium {formData.fuel_type === fuelType.value
+											? 'text-blue-700 dark:text-blue-400'
+											: 'text-gray-700 dark:text-gray-300'}"
+									>
+										{config.label}
+									</span>
+								</button>
+							{/each}
+						</div>
+						{#if !validations.fuelType.valid && validations.fuelType.message}
+							<p class="mt-1 text-sm text-red-600 dark:text-red-400">
+								{validations.fuelType.message}
+							</p>
+						{/if}
+					</div>
+
 					<!-- Current KM -->
 					<div>
 						<label
 							for="current_km"
 							class="block text-sm font-medium text-gray-700 dark:text-gray-300"
 						>
-							Quilometragem Atual <span class="text-sm text-gray-500">(opcional)</span>
+							Quilometragem Atual <span class="text-red-500">*</span>
 						</label>
-						<KilometersInput bind:value={formData.current_km} year={formData.year} />
+						<KilometersInput
+							bind:value={formData.current_km}
+							year={formData.year}
+							required={true}
+						/>
+						{#if !validations.currentKm.valid && validations.currentKm.message}
+							<p class="mt-1 text-sm text-red-600 dark:text-red-400">
+								{validations.currentKm.message}
+							</p>
+						{/if}
 					</div>
 
 					<!-- Purchase Date -->
-					<div class="sm:col-span-2">
+					<div>
 						<label
 							for="purchase_date"
 							class="block text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -420,7 +493,7 @@
 							bind:value={formData.purchase_date}
 							oninput={handlePurchaseDateChange}
 							max={new Date().toISOString().split('T')[0]}
-							class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+							class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 						/>
 						{#if ownershipDuration}
 							<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -444,11 +517,11 @@
 
 				<!-- Primary Vehicle -->
 				<div class="mb-6">
-					<label class="flex items-center gap-3 cursor-pointer">
+					<label class="flex cursor-pointer items-center gap-3">
 						<input
 							type="checkbox"
 							bind:checked={formData.is_primary}
-							class="h-5 w-5 rounded border-gray-300 text-primary-600 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-600"
+							class="text-primary-600 focus:ring-primary-500 h-5 w-5 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-600"
 						/>
 						<div>
 							<span class="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -470,7 +543,7 @@
 						<button
 							type="button"
 							onclick={() => (showNoteSuggestions = !showNoteSuggestions)}
-							class="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400"
+							class="text-primary-600 hover:text-primary-700 dark:text-primary-400 text-sm"
 						>
 							{showNoteSuggestions ? 'Ocultar' : 'Sugestões'}
 						</button>
@@ -482,7 +555,7 @@
 								<button
 									type="button"
 									onclick={() => addNoteSuggestion(suggestion)}
-									class="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-700 transition-colors hover:bg-primary-100 hover:text-primary-700 dark:bg-gray-600 dark:text-gray-300 dark:hover:bg-primary-900"
+									class="hover:bg-primary-100 hover:text-primary-700 dark:hover:bg-primary-900 rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-700 transition-colors dark:bg-gray-600 dark:text-gray-300"
 								>
 									{suggestion}
 								</button>
@@ -497,7 +570,7 @@
 						rows="4"
 						maxlength={notesCharLimit}
 						placeholder="Ex: Veículo seminovo, kit multimídia, sensor de estacionamento..."
-						class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-600 dark:text-white"
+						class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
 					></textarea>
 					<div class="mt-1 flex items-center justify-between text-sm">
 						<span class="text-gray-500 dark:text-gray-400">
@@ -518,14 +591,14 @@
 					type="button"
 					onclick={handleCancel}
 					disabled={loading}
-					class="rounded-md border border-gray-300 bg-white px-6 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500"
+					class="focus:ring-primary-500 rounded-md border border-gray-300 bg-white px-6 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:opacity-50 dark:border-gray-600 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500"
 				>
 					Cancelar
 				</button>
 				<button
 					type="submit"
 					disabled={loading || !isFormValid}
-					class="inline-flex items-center justify-center gap-2 rounded-md border border-transparent bg-primary-600 px-6 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+					class="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 inline-flex items-center justify-center gap-2 rounded-md border border-transparent px-6 py-2 text-sm font-medium text-white shadow-sm transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
 				>
 					{#if loading}
 						<svg
