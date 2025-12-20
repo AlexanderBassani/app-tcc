@@ -36,21 +36,82 @@
 </script>
 
 <div
-	class="flex min-h-screen items-center justify-center bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 px-4 py-12 transition-colors duration-300 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
+	class="flex min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
 >
-	<div class="w-full max-w-md">
-		<!-- Card -->
-		<div
-			class="overflow-hidden rounded-2xl bg-white shadow-xl transition-colors duration-300 dark:bg-gray-800"
-		>
-			<!-- Header -->
-			<div class="bg-primary-600 px-8 py-6 text-center">
-				<h1 class="mb-2 text-3xl font-bold text-white">Bem-vindo</h1>
-				<p class="text-white/80">Faça login para continuar</p>
+	<!-- Left Side - Branding -->
+	<div
+		class="hidden lg:flex lg:w-1/2 flex-col justify-center items-center bg-gradient-to-br from-blue-500 to-blue-700 p-12 relative overflow-hidden"
+	>
+		<!-- Decorative circles -->
+		<div class="absolute top-10 right-10 w-72 h-72 bg-white/10 rounded-full blur-3xl"></div>
+		<div class="absolute bottom-10 left-10 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
+
+		<div class="relative z-10 text-center">
+			<!-- Logo -->
+			<div class="flex items-center justify-center mb-8">
+				<div class="flex h-20 w-20 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm">
+					<span class="text-4xl font-bold text-white">AM</span>
+				</div>
 			</div>
 
-			<!-- Form -->
-			<form onsubmit={handleSubmit} class="space-y-6 px-8 py-8">
+			<h1 class="text-5xl font-bold text-white mb-4">AutoManager</h1>
+			<p class="text-xl text-blue-100 mb-8 max-w-md">
+				Gerencie seus veículos, manutenções e abastecimentos de forma simples e eficiente
+			</p>
+
+			<!-- Features -->
+			<div class="space-y-4 text-left max-w-md mx-auto">
+				<div class="flex items-center gap-3 text-white">
+					<div class="flex h-10 w-10 items-center justify-center rounded-lg bg-white/20">
+						<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+						</svg>
+					</div>
+					<span>Controle completo da sua frota</span>
+				</div>
+				<div class="flex items-center gap-3 text-white">
+					<div class="flex h-10 w-10 items-center justify-center rounded-lg bg-white/20">
+						<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+						</svg>
+					</div>
+					<span>Relatórios e análises detalhadas</span>
+				</div>
+				<div class="flex items-center gap-3 text-white">
+					<div class="flex h-10 w-10 items-center justify-center rounded-lg bg-white/20">
+						<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+						</svg>
+					</div>
+					<span>Histórico completo de manutenções</span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Right Side - Login Form -->
+	<div class="flex-1 flex items-center justify-center px-6 py-12 lg:px-8">
+		<div class="w-full max-w-md">
+			<!-- Mobile Logo -->
+			<div class="lg:hidden flex flex-col items-center mb-8">
+				<div class="flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 mb-4">
+					<span class="text-2xl font-bold text-white">AM</span>
+				</div>
+				<h1 class="text-2xl font-bold bg-gradient-to-r from-blue-500 to-blue-700 bg-clip-text text-transparent">
+					AutoManager
+				</h1>
+			</div>
+
+			<!-- Card -->
+			<div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
+				<!-- Header -->
+				<div class="mb-8">
+					<h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Bem-vindo de volta</h2>
+					<p class="text-gray-600 dark:text-gray-400">Entre com suas credenciais para continuar</p>
+				</div>
+
+				<!-- Form -->
+				<form onsubmit={handleSubmit} class="space-y-6">
 				<!-- Error Message -->
 				{#if errorMessage}
 					<div
@@ -70,66 +131,80 @@
 					</div>
 				{/if}
 
-				<!-- Login -->
-				<div>
-					<label
-						for="login"
-						class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-					>
-						Login
-					</label>
-					<input
-						type="login"
-						id="login"
-						bind:value={login}
-						required
-						placeholder="nome usuário ou email"
-						class="focus:ring-primary-500 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 transition duration-200 outline-none focus:border-transparent focus:ring-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500"
-					/>
-				</div>
+					<!-- Login -->
+					<div>
+						<label
+							for="login"
+							class="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300"
+						>
+							Login
+						</label>
+						<div class="relative">
+							<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+								<svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+								</svg>
+							</div>
+							<input
+								type="text"
+								id="login"
+								bind:value={login}
+								required
+								placeholder="nome de usuário ou email"
+								class="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-3.5 pl-10 text-gray-900 placeholder-gray-400 transition outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-700/50 dark:text-white dark:placeholder-gray-500 dark:focus:border-blue-500 dark:focus:bg-gray-700"
+							/>
+						</div>
+					</div>
 
-				<!-- Password -->
-				<div>
-					<label
-						for="password"
-						class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-					>
-						Senha
-					</label>
-					<input
-						type="password"
-						id="password"
-						bind:value={password}
-						required
-						placeholder="••••••••"
-						class="focus:ring-primary-500 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-400 transition duration-200 outline-none focus:border-transparent focus:ring-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500"
-					/>
-				</div>
+					<!-- Password -->
+					<div>
+						<label
+							for="password"
+							class="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300"
+						>
+							Senha
+						</label>
+						<div class="relative">
+							<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+								<svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+								</svg>
+							</div>
+							<input
+								type="password"
+								id="password"
+								bind:value={password}
+								required
+								placeholder="••••••••"
+								class="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-3.5 pl-10 text-gray-900 placeholder-gray-400 transition outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-700/50 dark:text-white dark:placeholder-gray-500 dark:focus:border-blue-500 dark:focus:bg-gray-700"
+							/>
+						</div>
+					</div>
 
-				<!-- Remember me & Forgot password -->
-				<div class="flex items-center justify-between">
-					<label class="flex items-center">
-						<input
-							type="checkbox"
-							bind:checked={rememberMe}
-							class="text-primary-600 focus:ring-primary-500 h-4 w-4 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700"
-						/>
-						<span class="ml-2 text-sm text-gray-600 dark:text-gray-400">Lembrar-me</span>
-					</label>
-					<a
-						href="/forgot-password"
-						class="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 cursor-pointer text-sm font-medium"
-					>
-						Esqueceu a senha?
-					</a>
-				</div>
+					<!-- Remember me & Forgot password -->
+					<div class="flex items-center justify-between">
+						<label class="flex items-center cursor-pointer group">
+							<input
+								type="checkbox"
+								bind:checked={rememberMe}
+								class="h-4 w-4 rounded border-gray-300 text-blue-600 transition focus:ring-2 focus:ring-blue-500/20 dark:border-gray-600 dark:bg-gray-700"
+							/>
+							<span class="ml-2 text-sm text-gray-600 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-gray-300">Lembrar-me</span>
+						</label>
+						<a
+							href="/forgot-password"
+							class="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+						>
+							Esqueceu a senha?
+						</a>
+					</div>
 
-				<!-- Submit Button -->
-				<button
-					type="submit"
-					disabled={isLoading}
-					class="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 w-full transform cursor-pointer rounded-lg px-4 py-3 font-semibold text-white transition duration-200 hover:scale-[1.02] focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
-				>
+					<!-- Submit Button -->
+					<button
+						type="submit"
+						disabled={isLoading}
+						class="w-full bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white font-semibold rounded-lg px-4 py-3.5 transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg shadow-blue-500/30"
+					>
 					{#if isLoading}
 						<span class="flex items-center justify-center">
 							<svg
@@ -209,21 +284,20 @@
 						<span class="ml-2 text-sm font-medium text-gray-700 dark:text-gray-300">Facebook</span>
 					</button>
 				</div> -->
-			</form>
+				</form>
 
-			<!-- Footer -->
-			<div
-				class="border-t border-gray-100 bg-gray-50 px-8 py-4 text-center dark:border-gray-700 dark:bg-gray-700/50"
-			>
-				<p class="text-sm text-gray-600 dark:text-gray-400">
-					Não tem uma conta?
-					<a
-						href="/register"
-						class="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium"
-					>
-						Criar conta
-					</a>
-				</p>
+				<!-- Footer -->
+				<div class="mt-6 text-center">
+					<p class="text-sm text-gray-600 dark:text-gray-400">
+						Não tem uma conta?
+						<a
+							href="/register"
+							class="font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+						>
+							Criar conta
+						</a>
+					</p>
+				</div>
 			</div>
 		</div>
 	</div>

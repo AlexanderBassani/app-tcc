@@ -136,10 +136,11 @@
 			<div class="rounded-lg bg-white p-4 shadow dark:bg-gray-700">
 				<div class="grid grid-cols-1 gap-4 md:grid-cols-4">
 					<div>
-						<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+						<label for="stats-vehicle" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
 							Veículo *
 						</label>
 						<select
+							id="stats-vehicle"
 							bind:value={selectedVehicle}
 							on:change={handleFilterChange}
 							class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
@@ -154,10 +155,11 @@
 					</div>
 
 					<div>
-						<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+						<label for="stats-start-date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
 							Data Inicial
 						</label>
 						<input
+							id="stats-start-date"
 							type="date"
 							bind:value={startDate}
 							on:change={handleFilterChange}
@@ -167,10 +169,11 @@
 					</div>
 
 					<div>
-						<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+						<label for="stats-end-date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
 							Data Final
 						</label>
 						<input
+							id="stats-end-date"
 							type="date"
 							bind:value={endDate}
 							on:change={handleFilterChange}
@@ -180,10 +183,11 @@
 					</div>
 
 					<div>
-						<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+						<label for="stats-period" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
 							Período
 						</label>
 						<select
+							id="stats-period"
 							bind:value={period}
 							on:change={handleFilterChange}
 							disabled={!selectedVehicle}
@@ -269,7 +273,7 @@
 							<div class="ml-4">
 								<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total de Litros</p>
 								<p class="text-2xl font-semibold text-gray-900 dark:text-white">
-									{Number(stats.overview.total_liters).toFixed(2)} L
+									{Number.isFinite(stats.overview.total_liters) ? stats.overview.total_liters.toFixed(2) : '0,00'} L
 								</p>
 							</div>
 						</div>
@@ -363,7 +367,7 @@
 												{periodStat.count}
 											</td>
 											<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-												{Number(periodStat.total_liters).toFixed(2)} L
+												{Number.isFinite(periodStat.total_liters) ? periodStat.total_liters.toFixed(2) : '0,00'} L
 											</td>
 											<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
 												{formatCurrency(Number(periodStat.total_cost))}

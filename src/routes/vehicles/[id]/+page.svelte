@@ -3,127 +3,94 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { vehiclesApi } from '$lib/api/vehicles';
+	import { fuelingsApi } from '$lib/api/fuelings';
+	import { maintenancesApi } from '$lib/api/maintenances';
 	import { authStore } from '$lib/stores/auth';
 	import type { Vehicle } from '$lib/types/vehicle';
+	import type { Fueling } from '$lib/types/fueling';
+	import type { Maintenance } from '$lib/types/maintenance';
 	import DashboardLayout from '$lib/components/DashboardLayout.svelte';
-import SearchableSelect from '$lib/components/SearchableSelect.svelte';
-import { carBrands } from '$lib/data/carBrands';
-import VehicleMaintenances from '$lib/components/VehicleMaintenances.svelte';
+	import ProtectedRoute from '$lib/components/ProtectedRoute.svelte';
 
-	let vehicle: Vehicle | null = null;
-	let loading = true;
-	let error = '';
-	let isEditing = false;
-	let isSaving = false;
+	let vehicle: Vehicle | null = $state(null);
+	let fuelings: Fueling[] = $state([]);
+	let maintenances: Maintenance[] = $state([]);
+	let loading = $state(true);
+	let error = $state('');
 
-	let formData = {
-		brand: '',
-		model: '',
-		year: 0,
-		plate: '',
-		color: '',
-		current_km: 0,
-		purchase_date: '',
-		notes: ''
-	};
+	// Stats
+	let totalMaintenanceCost = $state(0);
+	let pendingMaintenances = $state(0);
+	let totalFuelCost = $state(0);
 
 	onMount(async () => {
-		await loadVehicle();
+		await Promise.all([loadVehicle(), loadFuelings(), loadMaintenances()]);
 	});
 
 	async function loadVehicle() {
-		console.log('loadVehicle called');
 		try {
 			loading = true;
 			const token = $authStore.token;
-			console.log('Token:', token ? 'Found' : 'Missing');
-
 			if (!token) {
 				error = 'Usuário não autenticado';
 				return;
 			}
 
 			const id = Number($page.params.id);
-			console.log('Vehicle ID:', id);
-
 			const res = await vehiclesApi.getById(id, token);
-			console.log('API Response:', res);
 
-			// Handle both structures (mock uses .vehicle, real API uses .data)
-			vehicle = res.data || res.vehicle || null;
-
+			vehicle = res.data;
 			if (!vehicle) {
-				throw new Error('Dados do veículo não encontrados na resposta');
+				throw new Error('Veículo não encontrado');
 			}
-
-			resetForm();
 		} catch (err: any) {
-			console.error('Error loading vehicle:', err);
 			error = err.message || 'Erro ao carregar veículo';
 		} finally {
 			loading = false;
 		}
 	}
 
-	function resetForm() {
-		if (vehicle) {
-			formData = {
-				brand: vehicle.brand,
-				model: vehicle.model,
-				year: vehicle.year,
-				plate: vehicle.plate,
-				color: vehicle.color,
-				current_km: vehicle.current_km,
-				purchase_date: vehicle.purchase_date.split('T')[0],
-				notes: vehicle.notes || ''
-			};
-		}
-	}
-
-	async function handleUpdate(e: Event) {
-		e.preventDefault();
-		if (!vehicle) return;
-
-		isSaving = true;
-		try {
-			const token = $authStore.token;
-			if (!token) throw new Error('Usuário não autenticado');
-
-			const res = await vehiclesApi.update(vehicle.id, formData, token);
-			vehicle = res.data || res.vehicle || null;
-			isEditing = false;
-		} catch (err: any) {
-			error = err.message || 'Erro ao atualizar veículo';
-		} finally {
-			isSaving = false;
-		}
-	}
-
-	async function handleInactivate() {
-		if (!vehicle || !confirm('Tem certeza que deseja inativar este veículo?')) return;
-
+	async function loadFuelings() {
 		try {
 			const token = $authStore.token;
 			if (!token) return;
 
-			const res = await vehiclesApi.inactivate(vehicle.id, token);
-			vehicle = res.data || res.vehicle || null;
-		} catch (err: any) {
-			alert(err.message || 'Erro ao inativar veículo');
+			const id = Number($page.params.id);
+
+			// Load all fuelings for stats
+			const res = await fuelingsApi.listByVehicle(id, token);
+			const allFuelings = res.data || [];
+
+			// Calculate stats
+			totalFuelCost = allFuelings.reduce((sum, f) => sum + (Number(f.total_cost) || 0), 0);
+
+			// Slice for display (latest 2)
+			// Assuming the API returns them sorted by date desc, or we sort them
+			fuelings = allFuelings
+				.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+				.slice(0, 2);
+		} catch (err) {
+			console.error('Error loading fuelings:', err);
 		}
 	}
 
-	async function handleReactivate() {
-		if (!vehicle || !confirm('Tem certeza que deseja reativar este veículo?')) return;
-
+	async function loadMaintenances() {
 		try {
 			const token = $authStore.token;
 			if (!token) return;
 
-			const res = await vehiclesApi.reactivate(vehicle.id, token);
-			vehicle = res.data || res.vehicle || null;
-		} catch (err: any) {
-			alert(err.message || 'Erro ao reativar veículo');
+			const id = Number($page.params.id);
+			const res = await maintenancesApi.list(token);
+			const allMaintenances = (res.data || []).filter((m: Maintenance) => m.vehicle_id === id);
+
+			// Calculate stats from full list
+			totalMaintenanceCost = allMaintenances.reduce((sum, m) => sum + (Number(m.cost) || 0), 0);
+			pendingMaintenances = allMaintenances.filter((m) => !m.is_completed).length;
+
+			// Slice for display
+			maintenances = allMaintenances.slice(0, 3);
+		} catch (err) {
+			console.error('Error loading maintenances:', err);
 		}
 	}
 
@@ -131,360 +98,695 @@ import VehicleMaintenances from '$lib/components/VehicleMaintenances.svelte';
 		if (
 			!vehicle ||
 			!confirm(
-				'Tem certeza que deseja excluir PERMANENTEMENTE este veículo? Esta ação não pode ser desfeita.'
+				'Tem certeza que deseja excluir PERMANENTEMENTE este veículo? Esta ação não pode ser desfeita e todos os registros associados serão perdidos.'
 			)
-		)
+		) {
 			return;
+		}
 
 		try {
 			const token = $authStore.token;
 			if (!token) return;
 
-			await vehiclesApi.delete(vehicle.id, token);
+			await vehiclesApi.delete(vehicle.id, token, true);
 			goto('/vehicles');
 		} catch (err: any) {
 			alert(err.message || 'Erro ao excluir veículo');
 		}
 	}
 
+	async function toggleStatus() {
+		if (!vehicle) return;
+
+		try {
+			const token = $authStore.token;
+			if (!token) return;
+
+			const newStatus = !vehicle.is_active;
+			await vehiclesApi.update(
+				vehicle.id,
+				{
+					...vehicle,
+					is_active: newStatus
+				},
+				token
+			);
+
+			vehicle.is_active = newStatus;
+		} catch (err: any) {
+			alert(err.message || 'Erro ao alterar status do veículo');
+		}
+	}
+
 	function formatDate(dateString: string) {
-		return new Date(dateString).toLocaleDateString('pt-BR');
+		return new Date(dateString).toLocaleDateString('pt-BR', {
+			day: '2-digit',
+			month: '2-digit',
+			year: 'numeric'
+		});
+	}
+
+	function formatCurrency(value: number) {
+		return new Intl.NumberFormat('pt-BR', {
+			style: 'currency',
+			currency: 'BRL'
+		}).format(value);
+	}
+
+	function getFuelTypeLabel(type: string) {
+		const types: Record<string, string> = {
+			gasoline: 'Gasolina',
+			ethanol: 'Etanol',
+			diesel: 'Diesel',
+			gnv: 'GNV',
+			flex: 'Flex'
+		};
+		return types[type] || type;
 	}
 </script>
 
-<DashboardLayout>
-	{#if loading}
-		<div class="flex justify-center py-12">
-			<div
-				class="border-primary-500 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"
-			></div>
-		</div>
-	{:else if error}
-		<div class="mx-auto max-w-2xl">
-			<div class="rounded-lg bg-red-50 p-4 text-red-700 dark:bg-red-900/30 dark:text-red-400">
-				{error}
+<ProtectedRoute>
+	<DashboardLayout>
+		{#if loading}
+			<div class="flex justify-center py-12">
+				<div
+					class="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"
+				></div>
 			</div>
-			<div class="mt-4 text-center">
-				<a href="/vehicles" class="text-primary-600 hover:text-primary-500 dark:text-primary-400">
-					&larr; Voltar para lista
-				</a>
+		{:else if error}
+			<div class="mx-auto max-w-2xl">
+				<div
+					class="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-400"
+				>
+					{error}
+				</div>
+				<div class="mt-4 text-center">
+					<a href="/vehicles" class="text-blue-600 hover:text-blue-500 dark:text-blue-400">
+						&larr; Voltar para lista
+					</a>
+				</div>
 			</div>
-		</div>
-	{:else if vehicle}
-		<div class="mx-auto max-w-3xl space-y-6">
-			<!-- Header -->
-			<div class="flex items-center justify-between">
-				<div class="flex items-center gap-4">
-					<a
-						href="/vehicles"
-						aria-label="Voltar para lista de veículos"
-						class="flex h-10 w-10 items-center justify-center rounded-lg bg-white text-gray-500 shadow transition-colors hover:text-gray-700 dark:bg-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-					>
-						<svg
-							class="h-6 w-6"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							xmlns="http://www.w3.org/2000/svg"
+		{:else if vehicle}
+			<div class="mx-auto max-w-7xl space-y-6">
+				<!-- Header -->
+				<div class="flex items-start justify-between">
+					<div class="flex items-start gap-4">
+						<a
+							href="/vehicles"
+							aria-label="Voltar para lista de veículos"
+							class="flex h-10 w-10 items-center justify-center rounded-lg bg-white/50 text-gray-500 backdrop-blur-sm transition-all hover:bg-white hover:text-gray-700 hover:shadow-md dark:bg-gray-800/50 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
 						>
+							<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M10 19l-7-7m0 0l7-7m-7 7h18"
+								></path>
+							</svg>
+						</a>
+						<div>
+							<div class="flex items-center gap-3">
+								<h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+									{vehicle.brand}
+									{vehicle.model}
+								</h1>
+								{#if vehicle.is_active}
+									<span
+										class="inline-flex items-center gap-1.5 rounded-full border border-green-500/30 bg-green-500/10 px-3 py-1 text-sm font-semibold text-green-400"
+									>
+										<span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>
+										Ativo
+									</span>
+								{:else}
+									<span
+										class="inline-flex items-center gap-1.5 rounded-full border border-gray-500/30 bg-gray-500/10 px-3 py-1 text-sm font-semibold text-gray-400"
+									>
+										<span class="h-1.5 w-1.5 rounded-full bg-gray-500"></span>
+										Inativo
+									</span>
+								{/if}
+							</div>
+							<p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+								{vehicle.year} • {vehicle.plate}
+							</p>
+						</div>
+					</div>
+
+					<a
+						href="/vehicles/{vehicle.id}/edit"
+						class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700"
+					>
+						<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path
 								stroke-linecap="round"
 								stroke-linejoin="round"
 								stroke-width="2"
-								d="M10 19l-7-7m0 0l7-7m-7 7h18"
+								d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
 							></path>
 						</svg>
+						Editar
 					</a>
-					<div>
-						<h1 class="text-2xl font-bold text-gray-800 dark:text-white">
-							{vehicle.brand}
-							{vehicle.model}
-						</h1>
-						<div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-							<span>{vehicle.year}</span>
-							<span>•</span>
-							<span>{vehicle.plate}</span>
-							{#if !vehicle.is_active}
-								<span
-									class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900 dark:text-red-200"
+				</div>
+
+				<!-- KPI Cards -->
+				<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+					<!-- Quilometragem -->
+					<div
+						class="group relative overflow-hidden rounded-2xl border border-gray-200 bg-gradient-to-br from-gray-900 to-gray-800 p-6 shadow-sm transition-all hover:shadow-md dark:border-gray-700"
+					>
+						<div class="flex items-start justify-between">
+							<div class="flex-1">
+								<p class="text-xs font-medium tracking-wide text-gray-400 uppercase">
+									Quilometragem
+								</p>
+								<p class="mt-2 text-2xl font-bold text-white">
+									{Number(vehicle.current_km || 0).toLocaleString()} km
+								</p>
+							</div>
+							<div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/20">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="lucide lucide-gauge h-5 w-5 text-blue-400"
+									><path d="m12 14 4-4"></path><path d="M3.34 19a10 10 0 1 1 17.32 0"></path></svg
 								>
-									Inativo
-								</span>
+							</div>
+						</div>
+					</div>
+
+					<!-- Manutenções -->
+					<div
+						class="group relative overflow-hidden rounded-2xl border border-gray-200 bg-gradient-to-br from-gray-900 to-gray-800 p-6 shadow-sm transition-all hover:shadow-md dark:border-gray-700"
+					>
+						<div class="flex items-start justify-between">
+							<div class="flex-1">
+								<p class="text-xs font-medium tracking-wide text-gray-400 uppercase">Manutenções</p>
+								<p class="mt-2 text-2xl font-bold text-white">
+									{pendingMaintenances}
+									<span class="text-base font-normal text-gray-400">pendentes</span>
+								</p>
+							</div>
+							<div class="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-500/20">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="lucide lucide-wrench h-5 w-5 text-orange-400"
+									><path
+										d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+									></path></svg
+								>
+							</div>
+						</div>
+					</div>
+
+					<!-- Gastos Manutenção -->
+					<div
+						class="group relative overflow-hidden rounded-2xl border border-gray-200 bg-gradient-to-br from-gray-900 to-gray-800 p-6 shadow-sm transition-all hover:shadow-md dark:border-gray-700"
+					>
+						<div class="flex items-start justify-between">
+							<div class="flex-1">
+								<p class="text-xs font-medium tracking-wide text-gray-400 uppercase">
+									Gastos Manutenção
+								</p>
+								<p class="mt-2 text-2xl font-bold text-white">
+									{formatCurrency(totalMaintenanceCost)}
+								</p>
+							</div>
+							<div class="flex h-12 w-12 items-center justify-center rounded-xl bg-green-500/20">
+								<svg
+									class="h-6 w-6 text-green-400"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+									></path>
+								</svg>
+							</div>
+						</div>
+					</div>
+
+					<!-- Combustível -->
+					<div
+						class="group relative overflow-hidden rounded-2xl border border-gray-200 bg-gradient-to-br from-gray-900 to-gray-800 p-6 shadow-sm transition-all hover:shadow-md dark:border-gray-700"
+					>
+						<div class="flex items-start justify-between">
+							<div class="flex-1">
+								<p class="text-xs font-medium tracking-wide text-gray-400 uppercase">
+									Gastos com Combustível
+								</p>
+								<p class="mt-2 text-2xl font-bold text-white">
+									{formatCurrency(totalFuelCost)}
+								</p>
+							</div>
+							<div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/20">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="lucide lucide-droplets h-5 w-5 text-blue-400"
+									><path
+										d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"
+									></path><path
+										d="M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97"
+									></path></svg
+								>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Informações do Veículo -->
+				<div
+					class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
+				>
+					<div class="mb-6 flex items-center gap-3">
+						<div
+							class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30"
+						>
+							<svg
+								class="h-5 w-5 text-blue-600 dark:text-blue-400"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+								></path>
+							</svg>
+						</div>
+						<h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+							Informações do Veículo
+						</h2>
+					</div>
+
+					<div class="grid grid-cols-2 gap-x-8 gap-y-4 sm:grid-cols-4">
+						<!-- COR -->
+						<div>
+							<div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+								<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
+									></path>
+								</svg>
+								<span>COR</span>
+							</div>
+							<p class="mt-1 font-medium text-gray-900 dark:text-white">
+								{vehicle.color || '-'}
+							</p>
+						</div>
+
+						<!-- KM ATUAL -->
+						<div>
+							<div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+								<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M13 10V3L4 14h7v7l9-11h-7z"
+									></path>
+								</svg>
+								<span>KM ATUAL</span>
+							</div>
+							<p class="mt-1 font-medium text-gray-900 dark:text-white">
+								{Number(vehicle.current_km || 0).toLocaleString()} km
+							</p>
+						</div>
+
+						<!-- DATA DE COMPRA -->
+						<div>
+							<div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+								<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+									></path>
+								</svg>
+								<span>DATA DE COMPRA</span>
+							</div>
+							<p class="mt-1 font-medium text-gray-900 dark:text-white">
+								{vehicle.purchase_date ? formatDate(vehicle.purchase_date) : '-'}
+							</p>
+						</div>
+
+						<!-- NOTAS -->
+						<div>
+							<div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+								<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+									></path>
+								</svg>
+								<span>NOTAS</span>
+							</div>
+							<p class="mt-1 font-medium text-gray-900 dark:text-white">
+								{vehicle.notes || '-'}
+							</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- Grid com Manutenções e Abastecimentos -->
+				<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+					<!-- Manutenções -->
+					<div
+						class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
+					>
+						<div class="mb-6 flex items-center justify-between">
+							<div class="flex items-center gap-3">
+								<div
+									class="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-900/30"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="24"
+										height="24"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										class="lucide lucide-wrench h-5 w-5 text-orange-400"
+										><path
+											d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+										></path></svg
+									>
+								</div>
+								<h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+									Manutenções
+									<span class="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400"
+										>{maintenances.length}</span
+									>
+								</h3>
+							</div>
+							<a
+								href="/maintenances/new?vehicle_id={vehicle.id}"
+								class="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+							>
+								+ Nova Manutenção
+							</a>
+						</div>
+
+						<div class="space-y-3">
+							{#if maintenances.length === 0}
+								<p class="py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+									Nenhuma manutenção registrada
+								</p>
+							{:else}
+								{#each maintenances as maintenance}
+									<a
+										href="/maintenances/{maintenance.id}"
+										class="flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 p-4 transition-all hover:border-gray-300 hover:shadow-sm dark:border-gray-700 dark:bg-gray-900 dark:hover:border-gray-600"
+									>
+										<div class="flex items-center gap-3">
+											<div
+												class="flex h-10 w-10 items-center justify-center rounded-lg {maintenance.is_completed
+													? 'bg-green-100 dark:bg-green-900/30'
+													: 'bg-orange-100 dark:bg-orange-900/30'}"
+											>
+												{#if maintenance.is_completed}
+													<svg
+														class="h-5 w-5 text-green-600 dark:text-green-400"
+														fill="none"
+														stroke="currentColor"
+														viewBox="0 0 24 24"
+													>
+														<path
+															stroke-linecap="round"
+															stroke-linejoin="round"
+															stroke-width="2"
+															d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+														></path>
+													</svg>
+												{:else}
+													<svg
+														class="h-5 w-5 text-orange-600 dark:text-orange-400"
+														fill="none"
+														stroke="currentColor"
+														viewBox="0 0 24 24"
+													>
+														<path
+															stroke-linecap="round"
+															stroke-linejoin="round"
+															stroke-width="2"
+															d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+														></path>
+													</svg>
+												{/if}
+											</div>
+											<div>
+												<p class="font-medium text-gray-900 dark:text-white">
+													{maintenance.type}
+												</p>
+												<div
+													class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400"
+												>
+													<svg
+														class="h-3 w-3"
+														fill="none"
+														stroke="currentColor"
+														viewBox="0 0 24 24"
+													>
+														<path
+															stroke-linecap="round"
+															stroke-linejoin="round"
+															stroke-width="2"
+															d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+														></path>
+													</svg>
+													<span>{formatDate(maintenance.service_date)}</span>
+													<span class="ml-2">{formatCurrency(maintenance.cost || 0)}</span>
+												</div>
+											</div>
+										</div>
+										<svg
+											class="h-5 w-5 text-gray-400"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M9 5l7 7-7 7"
+											></path>
+										</svg>
+									</a>
+								{/each}
+							{/if}
+						</div>
+					</div>
+
+					<!-- Abastecimentos -->
+					<div
+						class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
+					>
+						<div class="mb-6 flex items-center justify-between">
+							<div class="flex items-center gap-3">
+								<div
+									class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="24"
+										height="24"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										class="lucide lucide-fuel h-5 w-5 flex-shrink-0 text-blue-400"
+										><line x1="3" x2="15" y1="22" y2="22"></line><line x1="4" x2="14" y1="9" y2="9"
+										></line><path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"></path><path
+											d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 5"
+										></path></svg
+									>
+								</div>
+								<h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+									Abastecimentos
+									<span class="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400"
+										>{fuelings.length}</span
+									>
+								</h3>
+							</div>
+							<a
+								href="/fuelings/new?vehicle_id={vehicle.id}"
+								class="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+							>
+								+ Novo Abastecimento
+							</a>
+						</div>
+
+						<div class="space-y-3">
+							{#if fuelings.length === 0}
+								<p class="py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+									Nenhum abastecimento registrado
+								</p>
+							{:else}
+								{#each fuelings as fueling}
+									<a
+										href="/fuelings/{fueling.id}"
+										class="flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 p-4 transition-all hover:border-gray-300 hover:shadow-sm dark:border-gray-700 dark:bg-gray-900 dark:hover:border-gray-600"
+									>
+										<div class="flex items-center gap-3">
+											<div
+												class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30"
+											>
+												<span class="text-sm font-bold text-blue-600 dark:text-blue-400">
+													{Math.round(fueling.liters || 0)}L
+												</span>
+											</div>
+											<div>
+												<p class="font-medium text-gray-900 dark:text-white">
+													{getFuelTypeLabel(fueling.fuel_type)}
+												</p>
+												<div
+													class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400"
+												>
+													<svg
+														class="h-3 w-3"
+														fill="none"
+														stroke="currentColor"
+														viewBox="0 0 24 24"
+													>
+														<path
+															stroke-linecap="round"
+															stroke-linejoin="round"
+															stroke-width="2"
+															d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+														></path>
+													</svg>
+													<span>{formatDate(fueling.date)}</span>
+													<span class="ml-2">{formatCurrency(fueling.total_cost || 0)}</span>
+												</div>
+											</div>
+										</div>
+										<svg
+											class="h-5 w-5 text-gray-400"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M9 5l7 7-7 7"
+											></path>
+										</svg>
+									</a>
+								{/each}
 							{/if}
 						</div>
 					</div>
 				</div>
 
-				<div class="flex gap-2">
-					{#if !isEditing}
+				<!-- Ações -->
+				<div
+					class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
+				>
+					<h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Ações</h3>
+					<div class="flex flex-wrap gap-3">
 						<button
-							onclick={() => (isEditing = true)}
-							class="rounded-lg bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+							onclick={toggleStatus}
+							class="inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors {vehicle.is_active
+								? 'border-orange-300 bg-orange-50 text-orange-700 hover:bg-orange-100 dark:border-orange-700 dark:bg-orange-900/30 dark:text-orange-400 dark:hover:bg-orange-900/50'
+								: 'border-green-300 bg-green-50 text-green-700 hover:bg-green-100 dark:border-green-700 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50'}"
 						>
-							Editar
+							<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M13 10V3L4 14h7v7l9-11h-7z"
+								></path>
+							</svg>
+							{vehicle.is_active ? 'Inativar Veículo' : 'Ativar Veículo'}
 						</button>
-					{/if}
-				</div>
-			</div>
 
-			<!-- Content -->
-			<div class="rounded-lg bg-white p-6 shadow dark:bg-gray-700">
-				{#if isEditing}
-					<form onsubmit={handleUpdate} class="space-y-6">
-						<div class="grid gap-6 sm:grid-cols-2">
-							<div>
-								<label
-									for="brand"
-									class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-								>
-									Marca
-								</label>
-								<SearchableSelect
-									id="brand"
-									options={carBrands}
-									bind:value={formData.brand}
-									placeholder="Digite para buscar uma marca..."
-									required
-								/>
-							</div>
-							<div>
-								<label
-									for="model"
-									class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-								>
-									Modelo
-								</label>
-								<input
-									type="text"
-									id="model"
-									bind:value={formData.model}
-									required
-									class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
-								/>
-							</div>
-							<div>
-								<label
-									for="year"
-									class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-								>
-									Ano
-								</label>
-								<input
-									type="number"
-									id="year"
-									bind:value={formData.year}
-									required
-									class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
-								/>
-							</div>
-							<div>
-								<label
-									for="plate"
-									class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-								>
-									Placa
-								</label>
-								<input
-									type="text"
-									id="plate"
-									bind:value={formData.plate}
-									required
-									maxlength="8"
-									minlength="7"
-									class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
-								/>
-							</div>
-							<div>
-								<label
-									for="color"
-									class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-								>
-									Cor
-								</label>
-								<input
-									type="text"
-									id="color"
-									bind:value={formData.color}
-									required
-									class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
-								/>
-							</div>
-							<div>
-								<label
-									for="current_km"
-									class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-								>
-									KM Atual
-								</label>
-								<input
-									type="number"
-									id="current_km"
-									bind:value={formData.current_km}
-															min={vehicle?.current_km || 0}
-									required
-									class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
-								/>
-													<p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-								Valor mínimo: {vehicle?.current_km.toLocaleString()} km
-							</p>
-							</div>
-							<div>
-								<label
-									for="purchase_date"
-									class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-								>
-									Data de Compra
-								</label>
-								<input
-									type="date"
-									id="purchase_date"
-									bind:value={formData.purchase_date}
-									required
-									class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
-								/>
-							</div>
-						</div>
-						<div>
-							<label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-								Notas
-							</label>
-							<textarea
-								id="notes"
-								bind:value={formData.notes}
-								rows="3"
-								class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-600 dark:bg-gray-600 dark:text-white"
-							></textarea>
-						</div>
-						<div class="flex justify-end gap-3 border-t border-gray-200 pt-4 dark:border-gray-600">
-							<button
-								type="button"
-								onclick={() => {
-									isEditing = false;
-									resetForm();
-								}}
-								class="focus:ring-primary-500 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:border-gray-600 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500"
-							>
-								Cancelar
-							</button>
-							<button
-								type="submit"
-								disabled={isSaving}
-								class="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 inline-flex justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium text-white shadow-sm focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:opacity-50"
-							>
-								{isSaving ? 'Salvando...' : 'Salvar Alterações'}
-							</button>
-						</div>
-					</form>
-				{:else}
-					<div class="grid gap-6 sm:grid-cols-2">
-						<div>
-							<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Marca</p>
-							<p class="mt-1 text-lg text-gray-900 dark:text-white">{vehicle.brand}</p>
-						</div>
-						<div>
-							<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Modelo</p>
-							<p class="mt-1 text-lg text-gray-900 dark:text-white">{vehicle.model}</p>
-						</div>
-						<div>
-							<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Ano</p>
-							<p class="mt-1 text-lg text-gray-900 dark:text-white">{vehicle.year}</p>
-						</div>
-						<div>
-							<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Placa</p>
-							<p class="mt-1 text-lg text-gray-900 dark:text-white">{vehicle.plate}</p>
-						</div>
-						<div>
-							<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Cor</p>
-							<p class="mt-1 text-lg text-gray-900 dark:text-white">{vehicle.color}</p>
-						</div>
-						<div>
-							<p class="text-sm font-medium text-gray-500 dark:text-gray-400">KM Atual</p>
-							<p class="mt-1 text-lg text-gray-900 dark:text-white">
-								{vehicle.current_km.toLocaleString()} km
-							</p>
-						</div>
-						<div>
-							<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Data de Compra</p>
-							<p class="mt-1 text-lg text-gray-900 dark:text-white">
-								{formatDate(vehicle.purchase_date)}
-							</p>
-						</div>
-						<div class="col-span-full">
-							<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Notas</p>
-							<p class="mt-1 whitespace-pre-wrap text-gray-900 dark:text-white">
-								{vehicle.notes || '-'}
-							</p>
-						</div>
+						<button
+							onclick={handleDelete}
+							class="inline-flex items-center gap-2 rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-100 dark:border-red-700 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50"
+						>
+							<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+								></path>
+							</svg>
+							Excluir Veículo
+						</button>
 					</div>
-				{/if}
-			</div>
-
-			<!-- Manutenções -->
-			<div class="rounded-lg bg-white p-6 shadow dark:bg-gray-700">
-				<VehicleMaintenances vehicleId={vehicle.id} />
-			</div>
-
-			<!-- Actions -->
-			<div class="rounded-lg bg-white p-6 shadow dark:bg-gray-700">
-				<h3 class="text-lg font-medium text-gray-900 dark:text-white">Ações</h3>
-				<div class="mt-4 flex flex-wrap gap-4">
-					{#if vehicle.is_active}
-						<button
-							onclick={handleInactivate}
-							class="rounded-md border border-yellow-300 bg-yellow-50 px-4 py-2 text-sm font-medium text-yellow-700 hover:bg-yellow-100 focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 focus:outline-none dark:border-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 dark:hover:bg-yellow-900/50"
-						>
-							Inativar Veículo
-						</button>
-					{:else}
-						<button
-							onclick={handleReactivate}
-							class="rounded-md border border-green-300 bg-green-50 px-4 py-2 text-sm font-medium text-green-700 hover:bg-green-100 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none dark:border-green-700 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50"
-						>
-							Reativar Veículo
-						</button>
-					{/if}
-
-					<button
-						onclick={handleDelete}
-						class="rounded-md border border-red-300 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-100 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none dark:border-red-700 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50"
-					>
-						Excluir Veículo
-					</button>
 				</div>
 			</div>
-		</div>
-	{:else}
-		<div class="p-12 text-center">
-			<div
-				class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700"
-			>
-				<svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-					/>
-				</svg>
+		{:else}
+			<div class="p-12 text-center">
+				<div
+					class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700"
+				>
+					<svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+						/>
+					</svg>
+				</div>
+				<h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+					Veículo não encontrado
+				</h3>
+				<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+					Não foi possível carregar os dados do veículo.
+				</p>
+				<div class="mt-6">
+					<a href="/vehicles" class="text-blue-600 hover:text-blue-500 dark:text-blue-400">
+						&larr; Voltar para lista
+					</a>
+				</div>
 			</div>
-			<h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">Veículo não encontrado</h3>
-			<p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-				Não foi possível carregar os dados do veículo.
-			</p>
-			<div class="mt-6">
-				<a href="/vehicles" class="text-primary-600 hover:text-primary-500 dark:text-primary-400">
-					&larr; Voltar para lista
-				</a>
-			</div>
-			<div
-				class="mt-8 rounded bg-gray-100 p-4 text-left text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-400"
-			>
-				<p class="font-bold">Debug Info:</p>
-				<p>ID: {$page.params.id}</p>
-				<p>Token: {$authStore.token ? 'Presente' : 'Ausente'}</p>
-				<p>Loading: {loading}</p>
-				<p>Error: {error || 'None'}</p>
-			</div>
-		</div>
-	{/if}
-</DashboardLayout>
+		{/if}
+	</DashboardLayout>
+</ProtectedRoute>

@@ -1,11 +1,11 @@
 {
-    "name": "Vehicle Manager - Gerenciador de Veículos",
-    "short_name": "VehicleManager",
-    "description": "Sistema completo de gerenciamento de veículos com CRUD e rastreamento",
+    "name": "AutoManager - Gerenciador de Veículos",
+    "short_name": "AutoManager",
+    "description": "Sistema completo de gerenciamento de veículos e manutenções",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#ffffff",
-    "theme_color": "#4f46e5",
+    "theme_color": "#3b82f6",
     "orientation": "portrait-primary",
     "icons": [
         {

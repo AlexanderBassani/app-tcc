@@ -38,5 +38,27 @@ export const vehiclesApi = {
 
     // List vehicles by user (admin only)
     listByUser: (userId: number, token: string) =>
-        api.get<VehicleListResponse>(`/api/vehicles/user/${userId}`, token)
+        api.get<VehicleListResponse>(`/api/vehicles/user/${userId}`, token),
+
+    // Check plate availability
+    checkPlate: async (plate: string, token: string): Promise<{ available: boolean | null; message: string }> => {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/vehicles/check-plate/${plate}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.status === 200) {
+                return { available: true, message: '✅ Placa disponível' };
+            } else if (response.status === 409) {
+                return { available: false, message: '❌ Placa já cadastrada' };
+            } else {
+                return { available: null, message: '⚠️ Erro ao verificar placa' };
+            }
+        } catch (error) {
+            return { available: null, message: '⚠️ Erro ao verificar placa' };
+        }
+    }
 };

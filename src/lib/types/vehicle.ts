@@ -8,7 +8,9 @@ export interface Vehicle {
     color: string;
     current_km: number;
     purchase_date: string; // ISO Date string
+    fuel_type?: string;
     is_active: boolean;
+    is_primary: boolean;
     notes?: string;
     created_at: string;
     updated_at: string;
@@ -22,6 +24,8 @@ export interface CreateVehicleRequest {
     color: string;
     current_km: number;
     purchase_date: string;
+    fuel_type: string;
+    is_primary?: boolean;
     notes?: string;
 }
 
@@ -33,6 +37,8 @@ export interface UpdateVehicleRequest {
     color?: string;
     current_km?: number;
     purchase_date?: string;
+    fuel_type?: string;
+    is_primary?: boolean;
     notes?: string;
 }
 
@@ -51,7 +57,6 @@ export interface VehicleListResponse {
 export interface VehicleWithMaintenance extends Vehicle {
     last_maintenance?: {
         id: number;
-        title: string;
         service_date: string;
         is_completed: boolean;
         type: string;
